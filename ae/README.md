@@ -1,4 +1,4 @@
-# ae
+# AttendEase A Face Recognition System
 
 A new Flutter project.
 
