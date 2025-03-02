@@ -102,7 +102,9 @@ class _FaceDetectioncaptureScreenState extends State<FaceDetectionScreen> {
     } finally {
       _isCapturing = false;
       // Stop the camera stream after capturing images
-      await _cameraController?.stopImageStream();
+      if (_cameraController != null && _cameraController!.value.isStreamingImages) {
+        await _cameraController!.stopImageStream();
+      }
     }
   }
 
@@ -176,7 +178,7 @@ class _FaceDetectioncaptureScreenState extends State<FaceDetectionScreen> {
       // Increment frame count
       _frameCount++;
 
-      // Process every 5th frame
+      // Process every 3rd frame
       if (_frameCount % 3 != 0) {
         _isDetecting = false;
         return;
@@ -286,7 +288,7 @@ class _FaceDetectioncaptureScreenState extends State<FaceDetectionScreen> {
       if (_cameraController != null && _cameraController!.value.isStreamingImages) {
         await _cameraController!.stopImageStream();
       }
-      await _cameraController!.dispose();
+      await _cameraController?.dispose();
       _cameraController = null;
       await _faceDetector.close();
     } catch (e) {
