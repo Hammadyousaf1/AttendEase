@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:ae/old/user_details_screen.dart';
+import 'package:ae/InputUserDetailScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
@@ -280,11 +280,6 @@ class _FaceDetectioncaptureScreenState extends State<FaceDetectionScreen> {
 
   Future<void> _stopCameraAndDispose() async {
     try {
-      // Stop face detection before stopping the camera stream
-      if (_isDetecting) {
-        _isDetecting = false; // Ensure face detection is stopped
-      }
-      
       if (_cameraController != null && _cameraController!.value.isStreamingImages) {
         await _cameraController!.stopImageStream();
       }
@@ -412,7 +407,8 @@ class _FaceDetectioncaptureScreenState extends State<FaceDetectionScreen> {
                 height: faceRect.height,
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green, width: 2),
+                    border: Border.all(color: Colors.green, width: 6),
+                    borderRadius: BorderRadius.circular(12), // Added radius
                   ),
                 ),
               );

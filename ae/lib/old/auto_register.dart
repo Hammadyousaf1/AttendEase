@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:ae/old/user_details_screen.dart';
+import 'package:ae/InputUserDetailScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';

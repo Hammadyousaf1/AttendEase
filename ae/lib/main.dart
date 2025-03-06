@@ -1,11 +1,14 @@
 //import 'package:ae/face_recognition_screen.dart';
-import 'package:ae/auto%20_register_2.dart';
-import 'package:ae/old/face_recognition_screen.dart';
+import 'package:ae/RegisrationScreen.dart';
+//import 'package:ae/auto%20_register_2.dart';
+import 'package:ae/RecognitionScreen.dart';
+//import 'package:ae/old/face_recognition_screen.dart';
+//import 'package:ae/trail/auto_recognize.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
-import 'package:ae/old/auto_register.dart';
-import 'package:ae/trail/Recognition.dart';
+//import 'package:ae/old/auto_register.dart';
+//import 'package:ae/trail/Recognition.dart';
 
 void main() {
   runApp(MyApp());
@@ -125,10 +128,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 165,
                     height: 260,
                     child: _buildButton(screenWidth, "Start Face Attendance",
-                        Icons.camera_alt, Colors.blue, () {
+                        Icons.camera_alt, const Color.fromRGBO(33, 150, 243, 1), () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => FaceDetectionScreen(),
+                          builder: (context) => FaceRectScreen(),
                         ),
                       );
                     }),
@@ -141,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Icons.person_add, Colors.blue, () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => FaceDetectioncaptureScreen(),
+                          builder: (context) => Registrationscreen(),
                         ),
                       );
                     }),

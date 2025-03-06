@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
-import 'package:ae/old/user_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
@@ -23,6 +23,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   bool _isFrontCamera = true;
   int _frameCount = 0; // Counter to track frames
   String recognizedPersonName = ""; // Variable to hold recognized person's name
+  bool attendanceMarked = false; // Variable to track attendance status
 
   @override
   void initState() {
@@ -34,7 +35,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   Future<void> _initializeCamera() async {
     _cameras = await availableCameras();
     _cameraController = CameraController(
-      _cameras[1], // Use front camera
+      _cameras[_isFrontCamera ? 1 : 0], // Use front or back camera based on _isFrontCamera
       ResolutionPreset.high,
       enableAudio: false,
       imageFormatGroup: Platform.isAndroid
@@ -65,27 +66,51 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   }
 
   void _startFaceDetection() {
-    if (_cameraController == null) return;
+    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
 
     _cameraController!.startImageStream((CameraImage image) async {
-      if (_isDetecting) return;
+      if (_isDetecting) return; // Check if the previous frame is still being processed
       _isDetecting = true;
 
       // Increment frame count
       _frameCount++;
 
       // Process every 5th frame
-      if (_frameCount % 5 != 0) {
+      if (_frameCount % 3 != 0) {
         _isDetecting = false;
         return;
       }
 
+      // Add a small delay before processing the image buffer
+      await Future.delayed(Duration(milliseconds: 50));
+
       try {
+        // Check if the image buffer is accessible
+        if (image.planes.isEmpty) {
+          print("Image buffer inaccessible, restarting camera...");
+          await _restartCamera(); // Restart camera if buffer is inaccessible
+          _isDetecting = false;
+          return;
+        }
+
         // Create a copy of the image data immediately to avoid buffer access issues
         final List<Uint8List> planeData = [];
         for (Plane plane in image.planes) {
-          final bytes = Uint8List.fromList(plane.bytes);
-          planeData.add(bytes);
+          try {
+            // Use a copy of the bytes to avoid buffer access issues
+            final bytes = Uint8List.fromList(plane.bytes);
+            planeData.add(bytes);
+          } catch (e) {
+            print("Error accessing plane data: $e");
+            _isDetecting = false;
+            return;
+          }
+        }
+
+        // Ensure the image is not closed before processing
+        if (_cameraController == null || !_cameraController!.value.isInitialized) {
+          _isDetecting = false;
+          return;
         }
 
         final inputImage = await _processImageData(
@@ -131,9 +156,14 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       } catch (e) {
         print("Error in face detection: $e");
       } finally {
-        _isDetecting = false;
+        _isDetecting = false; // Mark detection as complete
       }
     });
+  }
+
+  Future<void> _restartCamera() async {
+    await _stopCameraAndDispose();
+    await _initializeCamera(); // Reinitialize the camera
   }
 
   Future<void> _captureAndSendImage(CameraImage image) async {
@@ -145,7 +175,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       // Rotate the image to match camera orientation
       final rotatedImage = await _rotateImage(imageFile);
 
-      // Send the image to the server
+      // Send the image to the server along with the current time
       await _sendImageToServer(rotatedImage);
     } catch (e) {
       print("Error capturing and sending image: $e");
@@ -161,17 +191,26 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   Future<void> _sendImageToServer(File imageFile) async {
     try {
       final request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.100.5:5000/recognize'));
+          'POST', Uri.parse('http://192.168.100.4:5000/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));
+
+      // Get the current device time
+      final currentTime = DateTime.now().toIso8601String();
+      // Debug: Print the timestamp being sent
+      print("Sending timestamp: $currentTime");
+
+      request.fields['timestamp'] = currentTime; // Add timestamp to the request
+
       final response = await request.send();
 
       if (response.statusCode == 200) {
         final responseData = await response.stream.bytesToString();
+        final data = jsonDecode(responseData);
         setState(() {
-          recognizedPersonName =
-              responseData; // Assuming the response contains the name directly
+          recognizedPersonName = data['recognized_name']; // Extracting recognized name
+          attendanceMarked = data['attendance_marked']; // Extract attendance status
         });
         print("Image sent successfully");
       } else {
@@ -216,22 +255,34 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
 
   Future<void> _stopCameraAndDispose() async {
     try {
-      if (_cameraController != null &&
-          _cameraController!.value.isStreamingImages) {
-        await _cameraController!.stopImageStream();
+      if (_isDetecting) {
+        _isDetecting = false; // Ensure face detection is stopped
       }
-      await _cameraController!.dispose();
-      _cameraController = null;
+      if (_cameraController != null && _cameraController!.value.isInitialized) {
+        if (_cameraController!.value.isStreamingImages) {
+          await _cameraController!.stopImageStream();
+        }
+        await Future.delayed(Duration(milliseconds: 100)); // Delay before disposing
+        await _cameraController!.dispose();
+        _cameraController = null;
+      }
       await _faceDetector.close();
     } catch (e) {
       print("Error disposing resources: $e");
     }
   }
 
+  void _switchCamera() {
+    setState(() {
+      _isFrontCamera = !_isFrontCamera; // Toggle camera
+    });
+    _restartCamera(); // Restart camera with the new setting
+  }
+
   @override
   void dispose() {
+    super.dispose(); // Call super.dispose() first
     _stopCameraAndDispose();
-    super.dispose();
   }
 
   Rect _transformRect(Rect rect, Size imageSize, Size screenSize) {
@@ -245,10 +296,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       left = rect.left * scaleX - offsetX;
       right = left + rect.width * scaleX;
     } else {
-      left = screenSize.width -
-          (rect.left * scaleX) -
-          rect.width * scaleX -
-          offsetX;
+      // Adjusting for back camera
+      left = rect.left * scaleX; // Adjusting left position for back camera
       right = left + rect.width * scaleX;
     }
 
@@ -266,20 +315,22 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       return Center(child: CircularProgressIndicator());
     }
 
-    //final size = MediaQuery.of(context).size;
-    //final deviceRatio = size.width / size.height;
-    //final previewRatio = _cameraController!.value.aspectRatio;
-
     String statusText = "Face the camera";
     Color statusColor = Colors.red;
 
-    if (_faces.isNotEmpty) {
-      statusText = recognizedPersonName.isNotEmpty
-          ? "Recognized: $recognizedPersonName"
-          : "Face Detected";
+    if (attendanceMarked) {
+      statusText = "Attendance marked for $recognizedPersonName";
       statusColor = Colors.green;
+      Future.delayed(Duration(seconds: 3), () {
+        setState(() {
+          attendanceMarked = false; // Reset attendance status after 3 seconds
+        });
+      });
+    } else if (_faces.isNotEmpty) {
+      statusText = "Recognizing...";
+      statusColor = const Color.fromRGBO(33, 150, 243, 1);
     } else if (_isDetecting) {
-      statusText = "Detecting...";
+      statusText = "Recognizing...";
       statusColor = Colors.yellow;
     }
 
@@ -289,22 +340,41 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
         children: [
           Container(
             color: Colors.black,
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: 1 / _cameraController!.value.aspectRatio,
-                child: CameraPreview(_cameraController!),
-              ),
+            child: AspectRatio(
+              aspectRatio: _cameraController!.value.aspectRatio,
+              child: CameraPreview(_cameraController!), // Improved camera preview aspect ratio
             ),
           ),
           Positioned(
-            top: 100,
+            top: 40,
+            left: 16,
+            child: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () async {
+                await _stopCameraAndDispose(); // Ensure proper cleanup
+                if (mounted) {
+                  Navigator.of(context).pushReplacementNamed('/'); // Navigate to main screen
+                }
+              },
+            ),
+          ),
+          Positioned(
+            top: 40,
+            right: 16,
+            child: IconButton(
+              icon: Icon(Icons.switch_camera, color: Colors.white), // Switch camera icon
+              onPressed: _switchCamera, // Call switch camera function
+            ),
+          ),
+          Positioned(
+            top: 120,
             left: 0,
             right: 0,
             child: Center(
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.8),
+                  color: statusColor.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -325,15 +395,39 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
               MediaQuery.of(context).size,
             );
 
+            bool isRecognized = recognizedPersonName.isNotEmpty;
+
             return Positioned(
               left: faceRect.left,
               top: faceRect.top,
               width: faceRect.width,
               height: faceRect.height,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green, width: 8),
-                ),
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: isRecognized ? Colors.green : Colors.white, width: 6),
+                      borderRadius: BorderRadius.circular(12), // Added radius
+                    ),
+                  ),
+                  Positioned(
+                    top: 10, // Adjust as needed to position the text above the rectangle
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: Text(
+                        isRecognized ? recognizedPersonName : "",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: isRecognized ? const Color.fromARGB(255, 255, 255, 255) : Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
           }).toList(),
