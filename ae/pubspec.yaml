@@ -46,6 +46,9 @@ dependencies:
   supabase_flutter: ^2.0.0
   google_fonts: ^4.0.4
   url_launcher: ^6.0.20 
+  flutter_screenutil: ^5.9.3
+  carousel_slider: ^5.0.0
+  google_nav_bar: ^5.0.7
   #tflite_flutter_helper: ^0.1.3
 
   
