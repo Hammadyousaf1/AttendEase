@@ -191,7 +191,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   Future<void> _sendImageToServer(File imageFile) async {
     try {
       final request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.100.4:5000/recognize'));
+          'POST', Uri.parse('http://172.31.12.218:8000/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));
@@ -328,7 +328,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       });
     } else if (_faces.isNotEmpty) {
       statusText = "Recognizing...";
-      statusColor = const Color.fromRGBO(33, 150, 243, 1);
+      statusColor = const Color(0xFF1E4FFE);
     } else if (_isDetecting) {
       statusText = "Recognizing...";
       statusColor = Colors.yellow;
@@ -362,7 +362,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
             top: 40,
             right: 16,
             child: IconButton(
-              icon: Icon(Icons.switch_camera, color: Colors.white), // Switch camera icon
+              icon: Icon(Icons.switch_camera, color: Color(0xFF1E4FFE)), // Switch camera icon
               onPressed: _switchCamera, // Call switch camera function
             ),
           ),

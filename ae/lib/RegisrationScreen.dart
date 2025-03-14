@@ -374,7 +374,7 @@ Widget build(BuildContext context) {
                   height: 16, // Set the desired height
                   child: LinearProgressIndicator(
                     value: captureProgress,
-                    backgroundColor: Colors.grey,
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                   ),
                 ),
@@ -415,7 +415,8 @@ Widget build(BuildContext context) {
             right: 20,
             child: FloatingActionButton(
               onPressed: _toggleCamera,
-              child: Icon(Icons.switch_camera),
+              child: Icon(Icons.switch_camera, color: Colors.white), // Changed icon color to white
+              backgroundColor: Color(0xFF1E4FFE), // Added background color
             ),
           ),
         ],
