@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:ae/RecognitionScreen.dart';
 import 'package:ae/RegisrationScreen.dart';
@@ -18,7 +17,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String currentime = '';
   late Timer _timer;
-
   @override
   @override
   void initState() {
@@ -55,14 +53,14 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(
               color: Color.fromARGB(255, 7, 22, 47),
               fontWeight: FontWeight.bold,
-              fontSize: 35.h),
+              fontSize: 30),
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 30.w),
+            padding: EdgeInsets.only(right: 30),
             child: Image.asset(
               'assets/Group2.png',
-              height: 40.h,
+              height: 35,
               color: const Color.fromARGB(255, 7, 22, 47),
             ),
           ),
@@ -91,19 +89,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Today is',
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
-                      fontSize: 24.h),
+                      fontSize: 24),
                 ),
                 Text(
                   DateFormat.EEEE().format(DateTime.now()),
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontSize: 24.h),
+                      fontSize: 24),
                 ),
                 Text(
                   DateFormat('dd MMMM yyyy').format(DateTime.now()),
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontSize: 24.h),
+                      fontSize: 24),
                 ),
                 SizedBox(
                   height: 17,
@@ -112,13 +110,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Time',
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
-                      fontSize: 24.h),
+                      fontSize: 24),
                 ),
                 Text(
                   currentime,
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontSize: 24.h),
+                      fontSize: 24),
                 )
               ],
             ),
@@ -157,8 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.only(left: 10),
                           child: Text(
                             'Start face Attendence',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 20.h),
+                            style: TextStyle(color: Colors.white, fontSize: 20),
                           ),
                         )
                       ],
@@ -194,8 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.only(right: 60),
                           child: Text(
                             'Create \nProfile',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 20.h),
+                            style: TextStyle(color: Colors.white, fontSize: 20),
                           ),
                         )
                       ],
