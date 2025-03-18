@@ -19,8 +19,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   Future<List<Map<String, dynamic>>> fetchUsers() async {
     try {
-      final response =
-          await supabase.from('attendance').select().eq('status', 'enrolled');
+      final response = await supabase.from('users').select();
       return response;
     } catch (e) {
       print('Error fetching users: $e');
@@ -30,7 +29,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   Future<void> deleteUser(int userId) async {
     try {
-      await supabase.from('attendance').delete().eq('id', userId);
+      await supabase.from('users').delete().eq('id', userId);
       setState(() {
         _usersFuture = fetchUsers(); // Refetch users after deletion
       });
@@ -153,9 +152,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     }
                     final users = snapshot.data ?? [];
 
-                    // Sort users by roll_no
-                    users.sort((a, b) => (a['roll_no'] as String)
-                        .compareTo(b['roll_no'] as String));
+                    // Sort users by id (as string)
+                    users.sort((a, b) =>
+                        (a['id'] as String).compareTo(b['id'] as String));
 
                     return ListView.builder(
                       itemCount: users.length,
@@ -170,7 +169,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                               tileColor: Colors.white,
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 16.0), // Ensures padding
-                              leading: Text('${user['roll_no'] ?? ''}',
+                              leading: Text('${user['id'] ?? ''}',
                                   style: TextStyle(
                                       fontSize: constraints.maxWidth * 0.035)),
                               title: Text('${user['name'] ?? 'Unknown'}',
@@ -196,7 +195,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                           color: Colors.red,
                                           size: constraints.maxWidth * 0.05),
                                       onPressed: () => deleteUser(
-                                          int.parse(user['roll_no'])),
+                                          int.parse(user['id'])),
                                     ),
                                   ],
                                 ),

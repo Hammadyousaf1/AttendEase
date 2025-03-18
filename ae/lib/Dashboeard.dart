@@ -112,8 +112,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         var student = attendanceList[index];
                         return ListTile(
                           leading:
-                              CircleAvatar(child: Text(student['roll_no'])),
-                          title: Text(student['name']),
+                              CircleAvatar(child: Text(student['user_id'])),
+                          title: Text(student['user_name']),
                           subtitle: Text("Status: ${student['status']}"),
                           trailing: Text(
                             DateFormat.jm()

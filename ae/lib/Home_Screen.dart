@@ -90,19 +90,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Today is',
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
-                      fontSize: 24.sp),
+                      fontSize: 20.sp),
                 ),
                 Text(
                   DateFormat.EEEE().format(DateTime.now()),
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontSize: 24.sp),
+                      fontSize: 16.sp),
                 ),
                 Text(
                   DateFormat('dd MMMM yyyy').format(DateTime.now()),
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontSize: 24.sp),
+                      fontSize: 16.sp),
                 ),
                 SizedBox(
                   height: 17.h,
@@ -111,13 +111,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Time',
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
-                      fontSize: 24.sp),
+                      fontSize: 20.sp),
                 ),
                 Text(
                   currentime,
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontSize: 24.sp),
+                      fontSize: 16.sp),
                 )
               ],
             ),
@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     height: 0.3.sh,
-                    width: 0.4.sw,
+                    width: 0.43.sw,
                     child: Column(
                       children: [
                         SizedBox(
@@ -150,14 +150,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 120.h,
                         ),
                         SizedBox(
-                          height: 30.h,
+                          height: 24.h,
                         ),
                         Padding(
                           padding: EdgeInsets.only(left: 8.w),
                           child: Text(
                             'Start face Attendence',
                             style:
-                                TextStyle(color: Colors.white, fontSize: 20.sp),
+                                TextStyle(color: Colors.white, fontSize: 16.sp),
                           ),
                         )
                       ],
@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     height: 0.3.sh,
-                    width: 0.4.sw,
+                    width: 0.43.sw,
                     child: Column(
                       children: [
                         SizedBox(
@@ -187,14 +187,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 120.h,
                         ),
                         SizedBox(
-                          height: 30.h,
+                          height: 24.h,
                         ),
                         Padding(
-                          padding: EdgeInsets.only(right: 45.w),
+                          padding: EdgeInsets.only(right: 42.w),
                           child: Text(
                             'Create \nProfile',
                             style:
-                                TextStyle(color: Colors.white, fontSize: 20.sp),
+                                TextStyle(color: Colors.white, fontSize: 16.sp),
                           ),
                         )
                       ],

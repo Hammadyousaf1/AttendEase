@@ -8,9 +8,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-    url: 'https://tsdqafsqvewaaqrmedlg.supabase.co',
+    url: 'https://arlexrfzqvahegtolcjp.supabase.co/',
     anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzZHFhZnNxdmV3YWFxcm1lZGxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5NjI3NDUsImV4cCI6MjA1NTUzODc0NX0.06M-zKOUc7mIOBoaW8Iy9cQf3tC_BiDYGBFqdQoFXBI',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybGV4cmZ6cXZhaGVndG9sY2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2ODE4MjcsImV4cCI6MjA1NDI1NzgyN30.ksThqyqHmQt16ZmlYM7hrutQVmBOcYt-0xap6a7QlhQ',
   );
 
   runApp(MyApp());
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           ),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: ReportsScreen(),
+        home: SplashScreen(),
       ),
     );
   }
