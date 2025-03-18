@@ -11,6 +11,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final SupabaseClient supabase = Supabase.instance.client;
   TextEditingController _dateController = TextEditingController();
   DateTime selectedDate = DateTime.now();
+  bool isLoading = false;
   int markedCount = 0;
   int enrolledCount = 0;
   List<Map<String, dynamic>> attendanceList = [];
@@ -22,25 +23,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
     fetchAttendanceData();
   }
 
-  /// Fetch attendance based on selected date
+  /// Fetch attendance data for selected date (ISO 8601 format)
   Future<void> fetchAttendanceData() async {
-    final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    setState(() => isLoading = true);
 
-    final response = await supabase
-        .from('attendance')
-        .select()
-        .eq('date', formattedDate); // Fetch records for selected date
+    final String formattedDate = selectedDate.toIso8601String().split('T')[0];
 
-    setState(() {
-      attendanceList = response;
-      markedCount =
-          response.where((entry) => entry['status'] == 'marked').length;
-      enrolledCount =
-          response.where((entry) => entry['status'] == 'enrolled').length;
-    });
+    try {
+      final response = await supabase
+          .from('attendance')
+          .select()
+          .gte('timestamp', '${formattedDate}T00:00:00.000Z')
+          .lt('timestamp', '${formattedDate}T23:59:59.999Z');
+
+      setState(() {
+        attendanceList = List<Map<String, dynamic>>.from(response);
+        markedCount = attendanceList.length; // Counting all records
+        enrolledCount = attendanceList.length; // Assuming all are enrolled
+        isLoading = false;
+      });
+
+      print("Fetched Data: $attendanceList");
+    } catch (error) {
+      print("Error fetching attendance: $error");
+      setState(() => isLoading = false);
+    }
   }
 
-  /// Date Picker Function
+  /// Show date picker and update attendance data
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -54,7 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         selectedDate = pickedDate;
         _dateController.text =
             DateFormat('EEEE, dd MMM yyyy').format(selectedDate);
-        fetchAttendanceData(); // Fetch new data for the selected date
+        fetchAttendanceData();
       });
     }
   }
@@ -72,7 +82,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             SizedBox(height: 20),
 
-            // Date Picker Field
+            // Date Picker
             TextField(
               controller: _dateController,
               readOnly: true,
@@ -87,7 +97,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               onTap: () => _selectDate(context),
             ),
-
             SizedBox(height: 20),
 
             // Attendance Summary Cards
@@ -99,30 +108,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: _buildCard("Enrolled", enrolledCount.toString())),
               ],
             ),
-
             SizedBox(height: 20),
 
             // Attendance List
             Expanded(
-              child: attendanceList.isEmpty
-                  ? Center(child: Text("No records found for this date."))
-                  : ListView.builder(
-                      itemCount: attendanceList.length,
-                      itemBuilder: (context, index) {
-                        var student = attendanceList[index];
-                        return ListTile(
-                          leading:
-                              CircleAvatar(child: Text(student['user_id'])),
-                          title: Text(student['user_name']),
-                          subtitle: Text("Status: ${student['status']}"),
-                          trailing: Text(
-                            DateFormat.jm()
-                                .format(DateTime.parse(student['timestamp'])),
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        );
-                      },
-                    ),
+              child: isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : attendanceList.isEmpty
+                      ? Center(child: Text("No records found for this date."))
+                      : ListView.builder(
+                          itemCount: attendanceList.length,
+                          itemBuilder: (context, index) {
+                            var student = attendanceList[index];
+                            return ListTile(
+                              leading:
+                                  CircleAvatar(child: Text(student['user_id'])),
+                              title: Text(student['user_name']),
+                              trailing: Text(
+                                DateFormat.jm().format(
+                                    DateTime.parse(student['timestamp'])),
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),
