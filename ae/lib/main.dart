@@ -1,4 +1,5 @@
 import 'package:ae/Splash_Screen.dart';
+import 'package:ae/reports_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
           ),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: SplashScreen(),
+        home: ReportsScreen(),
       ),
     );
   }
