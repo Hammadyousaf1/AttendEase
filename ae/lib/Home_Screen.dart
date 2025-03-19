@@ -38,38 +38,42 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<String> images = [
-    'assets/slide1.png',
-    'assets/slide2.png',
-    'assets/slide3.png',
+    'assets/Frame (3).png',
+    'assets/Frame (2).png',
+    'assets/Frame (1).png',
   ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        toolbarHeight: 70.h,
-        backgroundColor: Colors.transparent,
-        title: Text(
-          'WELCOME',
-          style: TextStyle(
-              color: Color.fromARGB(255, 7, 22, 47),
-              fontWeight: FontWeight.bold,
-              fontSize: 30.sp),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 30.w),
-            child: Image.asset(
-              'assets/Group2.png',
-              height: 35.h,
-              color: const Color.fromARGB(255, 7, 22, 47),
-            ),
-          ),
-        ],
-      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(
+            height: 32,
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Image.asset(
+                  'assets/logo2.png',
+                  height: 40.h,
+                ),
+                Text(
+                  'WELCOME',
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 7, 22, 47),
+                      fontSize: 28.sp,
+                      letterSpacing: -4.0), // Reduced letter spacing
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 12.h,
+          ),
           CarouselSlider(
             items: images
                 .map((e) => Center(child: Image(image: AssetImage(e))))
@@ -81,8 +85,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 enlargeCenterPage: true,
                 enlargeFactor: 0.4),
           ),
+          SizedBox(
+            height: 8.h,
+          ),
           Padding(
-            padding: EdgeInsets.only(left: 32.w),
+            padding: EdgeInsets.only(left: 24.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -90,39 +97,39 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Today is',
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
-                      fontSize: 20.sp),
+                      fontSize: 18.sp),
                 ),
                 Text(
                   DateFormat.EEEE().format(DateTime.now()),
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontSize: 16.sp),
+                      fontSize: 14.sp),
                 ),
                 Text(
                   DateFormat('dd MMMM yyyy').format(DateTime.now()),
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontSize: 16.sp),
+                      fontSize: 14.sp),
                 ),
                 SizedBox(
-                  height: 17.h,
+                  height: 12.h,
                 ),
                 Text(
                   'Time',
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
-                      fontSize: 20.sp),
+                      fontSize: 18.sp),
                 ),
                 Text(
                   currentime,
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontSize: 16.sp),
+                      fontSize: 14.sp),
                 )
               ],
             ),
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 28.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -146,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 20.h,
                         ),
                         Image.asset(
-                          'assets/gif3.gif',
+                          'assets/gif4.gif',
                           height: 120.h,
                         ),
                         SizedBox(
@@ -155,9 +162,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Padding(
                           padding: EdgeInsets.only(left: 8.w),
                           child: Text(
-                            'Start face Attendence',
+                            'Start Face Attendence',
                             style:
-                                TextStyle(color: Colors.white, fontSize: 16.sp),
+                                TextStyle(color: Colors.white, fontSize: 14.sp),
                           ),
                         )
                       ],
@@ -190,11 +197,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 24.h,
                         ),
                         Padding(
-                          padding: EdgeInsets.only(right: 42.w),
+                          padding: EdgeInsets.only(right: 72.w),
                           child: Text(
-                            'Create \nProfile',
+                            'Create\nProfile',
                             style:
-                                TextStyle(color: Colors.white, fontSize: 16.sp),
+                                TextStyle(color: Colors.white, fontSize: 14.sp),
                           ),
                         )
                       ],

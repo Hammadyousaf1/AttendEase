@@ -22,6 +22,7 @@ class _NavState extends State<Nav> {
     UserManagementScreen(),
     DashboardScreen(),
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,34 +37,50 @@ class _NavState extends State<Nav> {
             selectedIndex: currentindex,
             activeColor: Colors.blue,
             tabMargin:
-                EdgeInsets.symmetric(vertical: 7), // Reduce vertical padding
+                EdgeInsets.symmetric(horizontal: 20,vertical: 8), // Reduce vertical padding
             padding: EdgeInsets.symmetric(
-                horizontal: 26, vertical: 10), // Reduce overall padding
+                horizontal: 12, vertical: 12), // Add margin on left and right
             tabs: [
               GButton(
                 icon: Icons.home,
-                text: 'Home',
-                iconSize: 20, // Smaller icon
+                text: ' Home',
+                iconSize: 20,
+                textStyle: TextStyle(fontSize: 10, color: Colors.blue),
+                iconColor: Colors.blue,
+                backgroundColor:
+                    const Color.fromARGB(255, 0, 0, 0).withOpacity(0.1),
               ),
               GButton(
                 icon: Icons.person_sharp,
                 text: 'Attendence',
                 iconSize: 20,
+                textStyle: TextStyle(fontSize: 10, color: Colors.blue),
+                iconColor: Colors.blue,
+                backgroundColor:
+                    const Color.fromARGB(255, 0, 0, 0).withOpacity(0.1),
               ),
               GButton(
                 icon: Icons.supervised_user_circle_sharp,
                 text: 'User',
                 iconSize: 20,
+                textStyle: TextStyle(fontSize: 10, color: Colors.blue),
+                iconColor: Colors.blue,
+                backgroundColor:
+                    const Color.fromARGB(255, 0, 0, 0).withOpacity(0.1),
               ),
               GButton(
                 icon: Icons.dashboard,
-                text: 'Dashboard',
+                text: '  Dashboard',
                 iconSize: 20,
+                textStyle: TextStyle(fontSize: 10, color: Colors.blue),
+                iconColor: Colors.blue,
+                backgroundColor:
+                    const Color.fromARGB(255, 0, 0, 0).withOpacity(0.1),
               ),
             ]),
       ),
       backgroundColor: Colors.white,
-      body: myScreens[currentindex],
+      body: Center(child: myScreens[currentindex]),
     );
   }
 }

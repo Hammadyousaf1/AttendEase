@@ -1,5 +1,6 @@
 import 'package:ae/RegisrationScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserManagementScreen extends StatefulWidget {
@@ -42,240 +43,237 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        leading: IconButton(
-          icon:
-              Icon(Icons.arrow_back, color: const Color.fromARGB(255, 0, 0, 0)),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: constraints.maxWidth * 0.04, vertical: 8.0),
-                    child: Text(
-                      'User\nManagement',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: constraints.maxWidth * 0.043),
+      body: Padding(
+        padding: EdgeInsets.all(20.w), // Responsive padding
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              children: [
+                SizedBox(height: 8.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back,
+                          color: Color.fromARGB(255, 0, 0, 0),
+                          size: 24.w), // Responsive icon size
+                      onPressed: () => Navigator.pop(context),
                     ),
-                  ),
-                  FutureBuilder<List<Map<String, dynamic>>>(
-                    future: _usersFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      }
-                      if (snapshot.hasError) {
-                        return Text('Error',
-                            style: TextStyle(color: Colors.red));
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 20),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(12),
-                              margin: EdgeInsets.only(
-                                  left: constraints.maxWidth * 0.01,
-                                  top: constraints.maxHeight * 0.01),
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius:
-                                    BorderRadius.circular(8), // Set radius to 8
-                              ),
-                              width: constraints.maxWidth *
-                                  0.16, // Responsive width
-                              height: constraints.maxHeight *
-                                  0.07, // Responsive height
-                            ),
-                            Container(
-                              width: constraints.maxWidth *
-                                  0.16, // Responsive width
-                              height: constraints.maxHeight *
-                                  0.07, // Responsive height
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: Color.fromARGB(255, 0, 0, 0),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'Total ',
-                                      style: TextStyle(
-                                          color: Color.fromARGB(255, 0, 0, 0),
-                                          fontSize:
-                                              constraints.maxWidth * 0.030),
-                                    ),
-                                    Text(
-                                      '${snapshot.data?.length ?? 0}',
-                                      style: TextStyle(
-                                          color: Color.fromARGB(255, 0, 0, 0),
-                                          fontSize:
-                                              constraints.maxWidth * 0.030),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 12),
-              Expanded(
-                child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: _usersFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error loading users'));
-                    }
-                    final users = snapshot.data ?? [];
-
-                    // Sort users by id (as string)
-                    users.sort((a, b) =>
-                        (a['id'] as String).compareTo(b['id'] as String));
-
-                    return ListView.builder(
-                      itemCount: users.length,
-                      itemBuilder: (context, index) {
-                        final user = users[index];
+                    Image.asset(
+                      'assets/logo2.png',
+                      height: 35.h,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 0.0),
+                      child: Text(
+                        'User\nManagement',
+                        style: TextStyle(
+                            color: Colors.black, fontSize: 20.sp, height: 0.0),
+                      ),
+                    ),
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: _usersFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+                        if (snapshot.hasError) {
+                          return Text('Error',
+                              style: TextStyle(color: Colors.red));
+                        }
                         return Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: constraints.maxWidth * 0.00,
-                          ),
-                          child: Card(
-                            child: ListTile(
-                              tileColor: Colors.white,
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16.0), // Ensures padding
-                              leading: Text('${user['id'] ?? ''}',
-                                  style: TextStyle(
-                                      fontSize: constraints.maxWidth * 0.035)),
-                              title: Text('${user['name'] ?? 'Unknown'}',
-                                  style: TextStyle(
-                                      fontSize: constraints.maxWidth * 0.035)),
-                              trailing: Container(
-                                width:
-                                    96, // Fixed width to align buttons properly
-                                alignment: Alignment.centerRight,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.edit,
-                                          color: Colors.blue,
-                                          size: constraints.maxWidth * 0.05),
-                                      onPressed: () {
-                                        // Handle edit user
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete,
-                                          color: Colors.red,
-                                          size: constraints.maxWidth * 0.05),
-                                      onPressed: () => deleteUser(
-                                          int.parse(user['id'])),
-                                    ),
-                                  ],
+                          padding: EdgeInsets.only(right: 0),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(12.w),
+                                margin: EdgeInsets.only(
+                                    left: constraints.maxWidth * 0.01,
+                                    top: constraints.maxHeight * 0.01),
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                width: constraints.maxWidth * 0.24,
+                                height: constraints.maxHeight * 0.07,
+                              ),
+                              Container(
+                                width: constraints.maxWidth * 0.24,
+                                height: constraints.maxHeight * 0.07,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  border: Border.all(
+                                    color: Color.fromARGB(255, 0, 0, 0),
+                                    width: 1.w,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'Total ',
+                                        style: TextStyle(
+                                            color: Color.fromARGB(255, 0, 0, 0),
+                                            fontSize: 12.sp),
+                                      ),
+                                      Text(
+                                        '${snapshot.data?.length ?? 0}',
+                                        style: TextStyle(
+                                            color: Color.fromARGB(255, 0, 0, 0),
+                                            fontSize: 12.sp),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
                         );
                       },
-                    );
-                  },
+                    ),
+                  ],
                 ),
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => Registrationscreen(),
-                      ),
-                    );
-                  },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        width: constraints.maxWidth * 0.16, // Responsive width
-                        height:
-                            constraints.maxHeight * 0.1, // Responsive height
-                        // Black background container
-                        padding: EdgeInsets.all(12),
-                        margin: EdgeInsets.only(
-                            right: constraints.maxWidth * 0.035,
-                            bottom: constraints.maxHeight * 0.045),
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius:
-                              BorderRadius.circular(8), // Set radius to 8
-                        ),
-                      ),
-                      Container(
-                        width: constraints.maxWidth * 0.16, // Responsive width
-                        height:
-                            constraints.maxHeight * 0.1, // Responsive height
-                        padding: EdgeInsets.all(12),
-                        margin: EdgeInsets.only(
-                            right: constraints.maxWidth * 0.05,
-                            bottom: constraints.maxHeight *
-                                0.05), // Responsive margin
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Color.fromARGB(255, 0, 0, 0)
-                                  .withOpacity(1), // Updated border color
-                              width: 1,
+                Expanded(
+                  child: FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _usersFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error loading users'));
+                      }
+                      final users = snapshot.data ?? [];
+
+                      // Sort users by id (as string)
+                      users.sort((a, b) =>
+                          (a['id'] as String).compareTo(b['id'] as String));
+
+                      return ListView.builder(
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          final user = users[index];
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: constraints.maxWidth * 0.00,
                             ),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.blue
-                                  .withOpacity(0.2), // Updated box shadow color
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
+                            child: Card(
+                              child: ListTile(
+                                tileColor: Colors.white,
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 12.w),
+                                leading: Text('${user['id'] ?? ''}',
+                                    style: TextStyle(
+                                        fontSize:
+                                            constraints.maxWidth * 0.035)),
+                                title: Text('${user['name'] ?? 'Unknown'}',
+                                    style: TextStyle(
+                                        fontSize:
+                                            constraints.maxWidth * 0.035)),
+                                trailing: Container(
+                                  width: 96.w,
+                                  alignment: Alignment.centerRight,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.edit,
+                                            color: Colors.blue,
+                                            size: constraints.maxWidth * 0.05),
+                                        onPressed: () {
+                                          // Handle edit user
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.delete,
+                                            color: Colors.red,
+                                            size: constraints.maxWidth * 0.05),
+                                        onPressed: () =>
+                                            deleteUser(int.parse(user['id'])),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
-                          ],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(Icons.add,
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                            size: constraints.maxWidth *
-                                0.07), // Responsive icon size
-                      ),
-                    ],
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => Registrationscreen(),
+                        ),
+                      );
+                    },
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: constraints.maxWidth * 0.20,
+                          height: constraints.maxHeight * 0.1,
+                          padding: EdgeInsets.all(12.w),
+                          margin: EdgeInsets.only(
+                              right: constraints.maxWidth * 0.035,
+                              bottom: constraints.maxHeight * 0.045),
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                        Container(
+                          width: constraints.maxWidth * 0.20,
+                          height: constraints.maxHeight * 0.1,
+                          padding: EdgeInsets.all(12.w),
+                          margin: EdgeInsets.only(
+                              right: constraints.maxWidth * 0.05,
+                              bottom: constraints.maxHeight * 0.05),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            border: Border(
+                              bottom: BorderSide(
+                                color:
+                                    Color.fromARGB(255, 0, 0, 0).withOpacity(1),
+                                width: 1.w,
+                              ),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.blue.withOpacity(0.2),
+                                blurRadius: 4.r,
+                                offset: Offset(0, 2.h),
+                              ),
+                            ],
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Icon(Icons.add,
+                              color: const Color.fromARGB(255, 0, 0, 0),
+                              size: 24.w),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

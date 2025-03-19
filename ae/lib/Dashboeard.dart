@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -38,8 +39,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       setState(() {
         attendanceList = List<Map<String, dynamic>>.from(response);
-        markedCount = attendanceList.length; // Counting all records
-        enrolledCount = attendanceList.length; // Assuming all are enrolled
+        markedCount = attendanceList.length;
+        enrolledCount = attendanceList.length;
         isLoading = false;
       });
 
@@ -72,62 +73,114 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("AttendEase Dashboard")),
-      body: Padding(
-        padding: EdgeInsets.all(20),
+      body: Container(
+        color: Colors.white,
+        padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Dashboard",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 20),
+            SizedBox(height: 8.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back,
+                      color: Color.fromARGB(255, 0, 0, 0), size: 24.w),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                Image.asset(
+                  'assets/logo2.png',
+                  height: 35.h,
+                ),
+              ],
+            ),
+            SizedBox(height: 20.h),
+            Text(
+              "Dashboard",
+              style: TextStyle(fontSize: 20.sp),
+            ),
+            SizedBox(height: 20.h),
 
             // Date Picker
             TextField(
               controller: _dateController,
               readOnly: true,
+              style: TextStyle(fontSize: 12.sp),
               decoration: InputDecoration(
                 labelText: "Select Date",
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.calendar_today, color: Colors.blue),
-                  onPressed: () => _selectDate(context),
+                contentPadding: EdgeInsets.symmetric(
+                    vertical: 20.h,
+                    horizontal: 12.w), // Increased vertical padding
+                suffixIcon: Padding(
+                  padding: EdgeInsets.only(right: 12.w, top: 6.h, bottom: 6.h),
+                  child: Container(
+                    width: 30.w,
+                    height: 30.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4.r),
+                      color: Colors.blue,
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.calendar_today,
+                          color: Colors.white, size: 20.w),
+                      onPressed: () => _selectDate(context),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
                 ),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
               ),
               onTap: () => _selectDate(context),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             // Attendance Summary Cards
             Row(
               children: [
                 Expanded(child: _buildCard("Marked", markedCount.toString())),
-                SizedBox(width: 10),
+                SizedBox(width: 10.w),
                 Expanded(
                     child: _buildCard("Enrolled", enrolledCount.toString())),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             // Attendance List
             Expanded(
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
                   : attendanceList.isEmpty
-                      ? Center(child: Text("No records found for this date."))
+                      ? Center(
+                          child: Text(
+                            "No records found for this date.",
+                            style:
+                                TextStyle(fontSize: 12.sp, color: Colors.grey),
+                          ),
+                        )
                       : ListView.builder(
                           itemCount: attendanceList.length,
                           itemBuilder: (context, index) {
                             var student = attendanceList[index];
                             return ListTile(
-                              leading:
-                                  CircleAvatar(child: Text(student['user_id'])),
-                              title: Text(student['user_name']),
+                              leading: CircleAvatar(
+                                radius: 20.r,
+                                child: Text(
+                                  student['user_id'],
+                                  style: TextStyle(fontSize: 12.sp),
+                                ),
+                              ),
+                              title: Text(
+                                student['user_name'],
+                                style: TextStyle(fontSize: 16.sp),
+                              ),
                               trailing: Text(
                                 DateFormat.jm().format(
                                     DateTime.parse(student['timestamp'])),
-                                style: TextStyle(color: Colors.grey),
+                                style: TextStyle(
+                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                    fontSize: 14.sp),
                               ),
                             );
                           },
@@ -142,21 +195,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// Widget for attendance summary cards
   Widget _buildCard(String title, String value) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
         color: Colors.grey[200],
       ),
       child: Column(
         children: [
           Text(title,
               style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue)),
-          SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Text(value,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
         ],
       ),
     );

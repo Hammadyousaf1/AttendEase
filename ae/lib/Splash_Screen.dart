@@ -106,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         return Transform.scale(
                           scale: value,
                           child: Image.asset(
-                            'assets/image2.png',
+                            'assets/logo2.png',
                             fit: BoxFit.cover,
                             width: 150,
                             color: Theme.of(context).colorScheme.secondary,
