@@ -1,3 +1,4 @@
+import 'package:ae/InputUserDetailScreen.dart';
 import 'package:ae/RegisrationScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -36,6 +37,29 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       });
     } catch (e) {
       print('Error deleting user: $e');
+    }
+  }
+
+  Future<void> editUser(Map<String, dynamic> userData) async {
+    try {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfileScreen(
+            userData: userData,
+            capturedImages: [],
+          ),
+        ),
+      );
+
+      if (result == true) {
+        // Refresh the users list if edit was successful
+        setState(() {
+          _usersFuture = fetchUsers();
+        });
+      }
+    } catch (e) {
+      print('Error navigating to edit screen: $e');
     }
   }
 
@@ -190,9 +214,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                         icon: Icon(Icons.edit,
                                             color: Colors.blue,
                                             size: constraints.maxWidth * 0.05),
-                                        onPressed: () {
-                                          // Handle edit user
-                                        },
+                                        onPressed: () => editUser(user),
                                       ),
                                       IconButton(
                                         icon: Icon(Icons.delete,

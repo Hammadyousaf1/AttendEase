@@ -43,15 +43,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70.h,
-        backgroundColor: Colors.blue,
-        title: Text("Attendance Reports"),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 20.w),
-            child: Icon(Icons.pie_chart, color: Colors.white, size: 28),
-          ),
-        ],
+        backgroundColor: Colors.transparent,
+        actions: [],
       ),
       body: Padding(
         padding: const EdgeInsets.all(22.0),
@@ -104,6 +97,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
               style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10.h),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('ID'),
+                Text('Name'),
+                Text('Date'),
+                Text('Time'),
+              ],
+            ),
 
             /// Results List
             Expanded(

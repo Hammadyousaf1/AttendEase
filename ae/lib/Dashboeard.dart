@@ -1,3 +1,4 @@
+import 'package:ae/reports_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -73,6 +74,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ReportsScreen()));
+        },
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Icon(
+          Icons.search,
+          color: Colors.white,
+        ),
+      ),
       body: Container(
         color: Colors.white,
         padding: EdgeInsets.all(20.w),
@@ -145,7 +157,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: _buildCard("Enrolled", enrolledCount.toString())),
               ],
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 30.h),
+
+            Text(
+              'Daily Report',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 20.h,
+            ),
+            Row(
+              children: [
+                Text('ID',
+                    style: TextStyle(
+                        fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                SizedBox(
+                  width: 50.w,
+                ),
+                Text('Name',
+                    style: TextStyle(
+                        fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                SizedBox(width: 150.w),
+                Text('Time',
+                    style:
+                        TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold))
+              ],
+            ),
 
             // Attendance List
             Expanded(
@@ -163,25 +200,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           itemCount: attendanceList.length,
                           itemBuilder: (context, index) {
                             var student = attendanceList[index];
-                            return ListTile(
-                              leading: CircleAvatar(
-                                radius: 20.r,
-                                child: Text(
-                                  student['user_id'],
-                                  style: TextStyle(fontSize: 12.sp),
+                            return Row(
+                              children: [
+                                SizedBox(
+                                  width: 50.w,
+                                  child: Text(
+                                    student['user_id'],
+                                    style: TextStyle(fontSize: 14.sp),
+                                  ),
                                 ),
-                              ),
-                              title: Text(
-                                student['user_name'],
-                                style: TextStyle(fontSize: 16.sp),
-                              ),
-                              trailing: Text(
-                                DateFormat.jm().format(
-                                    DateTime.parse(student['timestamp'])),
-                                style: TextStyle(
-                                    color: const Color.fromARGB(255, 0, 0, 0),
-                                    fontSize: 14.sp),
-                              ),
+                                SizedBox(width: 20.w),
+                                SizedBox(
+                                  width: 150.w,
+                                  child: Text(
+                                    student['user_name'],
+                                    style: TextStyle(fontSize: 14.sp),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    DateFormat.jm().format(
+                                        DateTime.parse(student['timestamp'])),
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: const Color.fromARGB(255, 0, 0, 0),
+                                    ),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                              ],
                             );
                           },
                         ),
