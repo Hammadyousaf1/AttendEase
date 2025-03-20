@@ -14,10 +14,11 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController Controller;
   late Animation<Offset> animation;
+  late AnimationController Controller2;
+  late Animation<double> animation2;
 
   String currentime = '';
   late Timer _timer;
@@ -26,9 +27,14 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     Controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    animation = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero)
-        .animate(CurvedAnimation(parent: Controller, curve: Curves.easeInOut));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 800));
+    animation = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
+        CurvedAnimation(parent: Controller, curve: Curves.easeOutBack));
+    Controller2 = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 1000));
+    animation2 = Tween<double>(begin: 0, end: 1).animate(Controller2);
+    Controller2.forward();
+
     Controller.forward();
     updateTime();
     _timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
@@ -63,36 +69,42 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Image.asset(
-                  'assets/logo2.png',
-                  height: 40.h,
-                ),
-                Text(
-                  'WELCOME',
-                  style: TextStyle(
-                      color: Color.fromARGB(255, 7, 22, 47),
-                      fontSize: 28.sp,
-                      letterSpacing: -4.0), // Reduced letter spacing
-                ),
-              ],
+            child: FadeTransition(
+              opacity: animation2,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Image.asset(
+                    'assets/logo2.png',
+                    height: 40.h,
+                  ),
+                  Text(
+                    'WELCOME',
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 7, 22, 47),
+                        fontSize: 28.sp,
+                        letterSpacing: -4.0), // Reduced letter spacing
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(
             height: 12.h,
           ),
-          CarouselSlider(
-            items: images
-                .map((e) => Center(child: Image(image: AssetImage(e))))
-                .toList(),
-            options: CarouselOptions(
-                viewportFraction: 2,
-                aspectRatio: 16 / 9.5,
-                autoPlay: true,
-                enlargeCenterPage: true,
-                enlargeFactor: 0.4),
+          FadeTransition(
+            opacity: animation2,
+            child: CarouselSlider(
+              items: images
+                  .map((e) => Center(child: Image(image: AssetImage(e))))
+                  .toList(),
+              options: CarouselOptions(
+                  viewportFraction: 2,
+                  aspectRatio: 16 / 9.5,
+                  autoPlay: true,
+                  enlargeCenterPage: true,
+                  enlargeFactor: 0.4),
+            ),
           ),
           SizedBox(
             height: 8.h,

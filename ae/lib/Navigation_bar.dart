@@ -37,7 +37,7 @@ class _NavState extends State<Nav> {
             selectedIndex: currentindex,
             activeColor: Colors.blue,
             tabMargin: EdgeInsets.symmetric(
-                horizontal: 17, vertical: 8), // Reduce vertical padding
+                horizontal: 15, vertical: 8), // Reduce vertical padding
             padding: EdgeInsets.symmetric(
                 horizontal: 12, vertical: 12), // Add margin on left and right
             tabs: [

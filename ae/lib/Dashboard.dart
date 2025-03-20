@@ -26,29 +26,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
     fetchAttendanceData();
   }
 
-  /// Fetch attendance data for selected date (ISO 8601 format)
+  /// Fetch attendance and enrolled users
   Future<void> fetchAttendanceData() async {
     setState(() => isLoading = true);
 
-    final String formattedDate = selectedDate.toIso8601String().split('T')[0];
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
 
     try {
-      final response = await supabase
+      // Fetch attendance for the selected date
+      final attendanceResponse = await supabase
           .from('attendance')
           .select()
-          .gte('timestamp', '${formattedDate}T00:00:00.000Z')
-          .lt('timestamp', '${formattedDate}T23:59:59.999Z');
+          .gte('timestamp', '$formattedDate 00:00:00')
+          .lt('timestamp', '$formattedDate 23:59:59');
+
+      // Fetch total enrolled users
+      final usersResponse = await supabase.from('users').select();
 
       setState(() {
-        attendanceList = List<Map<String, dynamic>>.from(response);
+        attendanceList = List<Map<String, dynamic>>.from(attendanceResponse);
         markedCount = attendanceList.length;
-        enrolledCount = attendanceList.length;
+        enrolledCount = usersResponse.length; // Get total users
         isLoading = false;
       });
 
-      print("Fetched Data: $attendanceList");
+      print("Fetched Attendance: $attendanceList");
+      print("Total Enrolled Users: ${usersResponse.length}");
     } catch (error) {
-      print("Error fetching attendance: $error");
+      print("Error fetching data: $error");
       setState(() => isLoading = false);
     }
   }
@@ -63,27 +68,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            textTheme: GoogleFonts.kronaOneTextTheme(
-              TextTheme(
-                bodySmall: TextStyle(
-                    fontSize: 12.sp,
-                    color: Colors.grey), // Consistent with search hint text
-              ),
-            ),
+            textTheme: GoogleFonts.kronaOneTextTheme(),
             datePickerTheme: DatePickerThemeData(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.r),
               ),
-              dayStyle: GoogleFonts.kronaOne(
-                  fontSize: 12.sp, // Matches other text sizes in app
-                  color: Colors.blue),
-              yearStyle: GoogleFonts.kronaOne(
-                  fontSize: 12.sp, color: Colors.grey), // Matches results text
-              headerHeadlineStyle: GoogleFonts.kronaOne(
-                  fontSize: 24.sp,
-                  color: Colors.black), // Matches dashboard title
-              weekdayStyle: GoogleFonts.kronaOne(
-                  fontSize: 12.sp, color: Colors.grey), // Matches results text
             ),
           ),
           child: child!,
@@ -115,8 +104,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back,
-                      color: Color.fromARGB(255, 0, 0, 0), size: 24.w),
+                  icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.w),
                   onPressed: () => Navigator.pop(context),
                 ),
                 Image.asset(
@@ -139,44 +127,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: TextStyle(fontSize: 12.sp),
               decoration: InputDecoration(
                 labelText: "Select Date",
-                contentPadding: EdgeInsets.symmetric(
-                    vertical: 20.h,
-                    horizontal: 12.w), // Increased vertical padding
-                suffixIcon: Padding(
-                  padding: EdgeInsets.only(right: 12.w, top: 6.h, bottom: 6.h),
-                  child: Container(
-                    width: 30.w,
-                    height: 30.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4.r),
-                      color: Colors.blue,
-                      border: Border.all(
-                        color: Colors.black.withOpacity(0.3),
-                        width: 1.w,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromARGB(255, 0, 0, 0)
-                              .withOpacity(0.4),
-                          blurRadius: 4.r,
-                          offset: Offset(0, 3.h),
-                        ),
-                        BoxShadow(
-                          color: Colors.black,
-                          spreadRadius: 0,
-                          blurRadius: 0,
-                          offset: Offset(2, 3),
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: Icon(Icons.calendar_today,
-                          color: const Color.fromARGB(255, 255, 255, 255),
-                          size: 20.w),
-                      onPressed: () => _selectDate(context),
-                      padding: EdgeInsets.zero,
-                    ),
-                  ),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 20.h, horizontal: 12.w),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.calendar_today, color: Colors.blue),
+                  onPressed: () => _selectDate(context),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
@@ -199,19 +154,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             Text(
               'Daily Report',
-              style: TextStyle(
-                fontSize: 18.sp,
-              ),
+              style: TextStyle(fontSize: 18.sp),
             ),
-            SizedBox(
-              height: 16.h,
-            ),
+            SizedBox(height: 16.h),
+
             Row(
               children: [
                 Text('ID', style: TextStyle(fontSize: 14.sp)),
-                SizedBox(
-                  width: 28.w,
-                ),
+                SizedBox(width: 28.w),
                 Text('Name', style: TextStyle(fontSize: 14.sp)),
                 SizedBox(width: 140.w),
                 Text('Time', style: TextStyle(fontSize: 14.sp))
@@ -250,9 +200,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     child: Text(
                                       student['user_id'],
                                       style: TextStyle(
-                                          fontSize: 14.sp,
-                                          color: const Color.fromARGB(
-                                              255, 102, 102, 102)),
+                                          fontSize: 14.sp, color: Colors.grey),
                                     ),
                                   ),
                                   SizedBox(width: 0.w),
@@ -261,9 +209,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     child: Text(
                                       student['user_name'],
                                       style: TextStyle(
-                                          fontSize: 14.sp,
-                                          color: const Color.fromARGB(
-                                              255, 102, 102, 102)),
+                                          fontSize: 14.sp, color: Colors.grey),
                                     ),
                                   ),
                                   Expanded(
@@ -271,9 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       DateFormat.jm().format(
                                           DateTime.parse(student['timestamp'])),
                                       style: TextStyle(
-                                          fontSize: 14.sp,
-                                          color: const Color.fromARGB(
-                                              255, 102, 102, 102)),
+                                          fontSize: 14.sp, color: Colors.grey),
                                       textAlign: TextAlign.end,
                                     ),
                                   ),
@@ -283,6 +227,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           },
                         ),
             ),
+
             Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
@@ -296,28 +241,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.15,
                   height: MediaQuery.of(context).size.height * 0.06,
-                  padding: EdgeInsets.all(0.w),
-                  margin: EdgeInsets.only(
-                      right: MediaQuery.of(context).size.width * 0.03,
-                      bottom: MediaQuery.of(context).size.height * 0.008),
                   decoration: BoxDecoration(
                     color: Colors.blue,
-                    border: Border.all(
-                      color: Colors.black.withOpacity(0.3),
-                      width: 1.w,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
-                        blurRadius: 4.r,
-                        offset: Offset(0, 3.h),
-                      ),
-                      BoxShadow(
-                        color: Colors.black,
-                        offset: Offset(2.5.w, 3.5.h),
-                      ),
-                    ],
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(Icons.search, color: Colors.white, size: 24.w),
@@ -336,11 +261,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.r),
-        color: const Color.fromARGB(255, 255, 255, 255),
-        border: Border.all(
-          color: Colors.black26,
-          width: 1.w,
-        ),
+        color: Colors.white,
+        border: Border.all(color: Colors.black26, width: 1.w),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
