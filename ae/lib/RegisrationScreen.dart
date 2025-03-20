@@ -46,7 +46,9 @@ class _RegistrationScreenState extends State<Registrationscreen> {
       camera,
       ResolutionPreset.high,
       enableAudio: false,
-      imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888,
+      imageFormatGroup: Platform.isAndroid
+          ? ImageFormatGroup.nv21
+          : ImageFormatGroup.bgra8888,
     );
 
     await _cameraController!.initialize();
@@ -54,7 +56,8 @@ class _RegistrationScreenState extends State<Registrationscreen> {
 
     setState(() {
       _imageSize = _cameraController!.value.previewSize;
-      _isFrontCamera = _cameraController!.description.lensDirection == CameraLensDirection.front;
+      _isFrontCamera = _cameraController!.description.lensDirection ==
+          CameraLensDirection.front;
     });
 
     _startFaceDetection();
@@ -72,48 +75,51 @@ class _RegistrationScreenState extends State<Registrationscreen> {
   }
 
   Future<void> _captureImages() async {
-  if (_isCapturing) return;
-  _isCapturing = true;
+    if (_isCapturing) return;
+    _isCapturing = true;
 
-  try {
-    for (int i = capturedImages.length; i < requiredImages; i++) {
-      if (_cameraController?.value.isInitialized ?? false) {
-        try {
-          // Wait for a face to be detected before capturing an image
-          
-          // Capture the image
-          final XFile image = await _cameraController!.takePicture();
-          setState(() {
-            capturedImages.add(image.path);
-          });
+    try {
+      for (int i = capturedImages.length; i < requiredImages; i++) {
+        if (_cameraController?.value.isInitialized ?? false) {
+          try {
+            // Wait for a face to be detected before capturing an image
 
-          if (i < requiredImages - 1) {
-            await Future.delayed(Duration(milliseconds: 100)); // Add a small delay between captures
+            // Capture the image
+            final XFile image = await _cameraController!.takePicture();
+            setState(() {
+              capturedImages.add(image.path);
+            });
+
+            if (i < requiredImages - 1) {
+              await Future.delayed(Duration(
+                  milliseconds: 100)); // Add a small delay between captures
+            }
+          } catch (e) {
+            print("Error capturing image: $e");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text("Failed to capture image. Please try again.")),
+            );
+            break;
           }
-        } catch (e) {
-          print("Error capturing image: $e");
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to capture image. Please try again.")),
-          );
-          break;
         }
       }
-    }
 
-    if (!mounted) return;
-    await _showCapturedImagesDialog();
-  } catch (e) {
-    print("Error capturing images: $e");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("An error occurred. Please try again.")),
-    );
-  } finally {
-    _isCapturing = false;
-    if (_cameraController != null && _cameraController!.value.isStreamingImages) {
-      await _cameraController!.stopImageStream();
+      if (!mounted) return;
+      await _showCapturedImagesDialog();
+    } catch (e) {
+      print("Error capturing images: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("An error occurred. Please try again.")),
+      );
+    } finally {
+      _isCapturing = false;
+      if (_cameraController != null &&
+          _cameraController!.value.isStreamingImages) {
+        await _cameraController!.stopImageStream();
+      }
     }
   }
-}
 
   Future<void> _showCapturedImagesDialog() async {
     int currentImageIndex = 0;
@@ -124,7 +130,9 @@ class _RegistrationScreenState extends State<Registrationscreen> {
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text('Review Images (${currentImageIndex + 1}/${capturedImages.length})'),
+          title: Text(
+              'Review Images (${currentImageIndex + 1}/${capturedImages.length})',
+              style: TextStyle(fontSize: 16)),
           content: Container(
             width: double.maxFinite,
             height: 300,
@@ -170,7 +178,8 @@ class _RegistrationScreenState extends State<Registrationscreen> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProfileScreen(capturedImages: capturedImages),
+                    builder: (context) =>
+                        ProfileScreen(capturedImages: capturedImages),
                   ),
                 );
               },
@@ -183,78 +192,81 @@ class _RegistrationScreenState extends State<Registrationscreen> {
   }
 
   void _startFaceDetection() {
-  if (_cameraController == null) return;
+    if (_cameraController == null) return;
 
-  _cameraController!.startImageStream((CameraImage image) async {
-    if (_isDetecting) return; // Skip if already detecting
-    _isDetecting = true;
+    _cameraController!.startImageStream((CameraImage image) async {
+      if (_isDetecting) return; // Skip if already detecting
+      _isDetecting = true;
 
-    _frameCount++;
-    if (_frameCount % 3 != 0) { // Process every 3rd frame
-      _isDetecting = false;
-      return;
-    }
-
-    try {
-      final List<Uint8List> planeData = [];
-      for (Plane plane in image.planes) {
-        final bytes = Uint8List.fromList(plane.bytes);
-        planeData.add(bytes);
-      }
-
-      final inputImage = await _processImageData(
-        planeData,
-        image.width,
-        image.height,
-        image.planes[0].bytesPerRow,
-      );
-
-      if (inputImage == null) {
+      _frameCount++;
+      if (_frameCount % 3 != 0) {
+        // Process every 3rd frame
         _isDetecting = false;
         return;
       }
 
-      final faces = await _faceDetector.processImage(inputImage);
-      if (!mounted) return;
+      try {
+        final List<Uint8List> planeData = [];
+        for (Plane plane in image.planes) {
+          final bytes = Uint8List.fromList(plane.bytes);
+          planeData.add(bytes);
+        }
 
-      setState(() {
-        final imageWidth = image.width;
-        _faces = faces.map((face) {
-          Rect boundingBox = _isFrontCamera
-              ? Rect.fromLTRB(
-                  imageWidth - face.boundingBox.right,
-                  face.boundingBox.top,
-                  imageWidth - face.boundingBox.left,
-                  face.boundingBox.bottom,
-                )
-              : face.boundingBox;
+        final inputImage = await _processImageData(
+          planeData,
+          image.width,
+          image.height,
+          image.planes[0].bytesPerRow,
+        );
 
-          return Face(
-            boundingBox: boundingBox,
-            landmarks: face.landmarks,
-            contours: face.contours,
-            trackingId: face.trackingId,
-            leftEyeOpenProbability: face.leftEyeOpenProbability,
-            rightEyeOpenProbability: face.rightEyeOpenProbability,
-            smilingProbability: face.smilingProbability,
-            headEulerAngleX: face.headEulerAngleX,
-            headEulerAngleY: face.headEulerAngleY,
-            headEulerAngleZ: face.headEulerAngleZ,
-          );
-        }).toList();
-      });
+        if (inputImage == null) {
+          _isDetecting = false;
+          return;
+        }
 
-      // Start capturing images if a face is detected and not already capturing
-      if (_faces.isNotEmpty && !_isCapturing && capturedImages.length < requiredImages) {
-        _captureImages(); // Call the _captureImages method
+        final faces = await _faceDetector.processImage(inputImage);
+        if (!mounted) return;
+
+        setState(() {
+          final imageWidth = image.width;
+          _faces = faces.map((face) {
+            Rect boundingBox = _isFrontCamera
+                ? Rect.fromLTRB(
+                    imageWidth - face.boundingBox.right,
+                    face.boundingBox.top,
+                    imageWidth - face.boundingBox.left,
+                    face.boundingBox.bottom,
+                  )
+                : face.boundingBox;
+
+            return Face(
+              boundingBox: boundingBox,
+              landmarks: face.landmarks,
+              contours: face.contours,
+              trackingId: face.trackingId,
+              leftEyeOpenProbability: face.leftEyeOpenProbability,
+              rightEyeOpenProbability: face.rightEyeOpenProbability,
+              smilingProbability: face.smilingProbability,
+              headEulerAngleX: face.headEulerAngleX,
+              headEulerAngleY: face.headEulerAngleY,
+              headEulerAngleZ: face.headEulerAngleZ,
+            );
+          }).toList();
+        });
+
+        // Start capturing images if a face is detected and not already capturing
+        if (_faces.isNotEmpty &&
+            !_isCapturing &&
+            capturedImages.length < requiredImages) {
+          _captureImages(); // Call the _captureImages method
+        }
+      } catch (e) {
+        print("Error in face detection: $e");
+      } finally {
+        _isDetecting = false;
       }
-    } catch (e) {
-      print("Error in face detection: $e");
-    } finally {
-      _isDetecting = false;
-    }
-  });
-}
+    });
+  }
 
   Future<InputImage?> _processImageData(
     List<Uint8List> planeData,
@@ -269,11 +281,15 @@ class _RegistrationScreenState extends State<Registrationscreen> {
       }
       final bytes = allBytes.done().buffer.asUint8List();
 
-      final inputImageFormat = Platform.isAndroid ? InputImageFormat.nv21 : InputImageFormat.bgra8888;
+      final inputImageFormat = Platform.isAndroid
+          ? InputImageFormat.nv21
+          : InputImageFormat.bgra8888;
 
       final inputImageData = InputImageMetadata(
         size: Size(width.toDouble(), height.toDouble()),
-        rotation: _isFrontCamera ? InputImageRotation.rotation270deg : InputImageRotation.rotation90deg,
+        rotation: _isFrontCamera
+            ? InputImageRotation.rotation270deg
+            : InputImageRotation.rotation90deg,
         format: inputImageFormat,
         bytesPerRow: bytesPerRow,
       );
@@ -290,7 +306,8 @@ class _RegistrationScreenState extends State<Registrationscreen> {
 
   Future<void> _stopCameraAndDispose() async {
     try {
-      if (_cameraController != null && _cameraController!.value.isStreamingImages) {
+      if (_cameraController != null &&
+          _cameraController!.value.isStreamingImages) {
         await _cameraController!.stopImageStream();
       }
       await _cameraController?.dispose();
@@ -339,89 +356,91 @@ class _RegistrationScreenState extends State<Registrationscreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  if (_cameraController == null || !_cameraController!.value.isInitialized) {
-    return Center(child: CircularProgressIndicator());
-  }
+  Widget build(BuildContext context) {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      return Center(child: CircularProgressIndicator());
+    }
 
-  double captureProgress = capturedImages.length / requiredImages;
+    double captureProgress = capturedImages.length / requiredImages;
 
-  return WillPopScope(
-    onWillPop: () async {
-      if (_isCapturing) {
-        await _stopCameraAndDispose();
-        capturedImages.clear();
-        Navigator.pop(context);
-        return false;
-      }
-      return true;
-    },
-    child: Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          AspectRatio(
-            aspectRatio: _cameraController!.value.aspectRatio,
-            child: CameraPreview(_cameraController!), // Improved camera preview aspect ratio
-          ),
-          Positioned(
-            top: 50,
-            left: 0,
-            right: 0,
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 16, // Set the desired height
-                  child: LinearProgressIndicator(
-                    value: captureProgress,
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  "Capturing...",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+    return WillPopScope(
+      onWillPop: () async {
+        if (_isCapturing) {
+          await _stopCameraAndDispose();
+          capturedImages.clear();
+          Navigator.pop(context);
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            AspectRatio(
+              aspectRatio: _cameraController!.value.aspectRatio,
+              child: CameraPreview(
+                  _cameraController!), // Improved camera preview aspect ratio
             ),
-          ),
-          ..._faces.map((face) {
-            final Rect faceRect = _transformRect(
-              face.boundingBox,
-              Size(_imageSize!.height, _imageSize!.width),
-              MediaQuery.of(context).size,
-            );
-
-            return Positioned(
-              left: faceRect.left,
-              top: faceRect.top,
-              width: faceRect.width,
-              height: faceRect.height,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green, width: 6),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+            Positioned(
+              top: 50,
+              left: 0,
+              right: 0,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 16, // Set the desired height
+                    child: LinearProgressIndicator(
+                      value: captureProgress,
+                      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Capturing...",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-            );
-          }).toList(),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: _toggleCamera,
-              child: Icon(Icons.switch_camera, color: Colors.white), // Changed icon color to white
-              backgroundColor: Color(0xFF1E4FFE), // Added background color
             ),
-          ),
-        ],
+            ..._faces.map((face) {
+              final Rect faceRect = _transformRect(
+                face.boundingBox,
+                Size(_imageSize!.height, _imageSize!.width),
+                MediaQuery.of(context).size,
+              );
+
+              return Positioned(
+                left: faceRect.left,
+                top: faceRect.top,
+                width: faceRect.width,
+                height: faceRect.height,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.green, width: 6),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              );
+            }).toList(),
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: FloatingActionButton(
+                onPressed: _toggleCamera,
+                child: Icon(Icons.switch_camera,
+                    color: Colors.white), // Changed icon color to white
+                backgroundColor: Color(0xFF1E4FFE), // Added background color
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

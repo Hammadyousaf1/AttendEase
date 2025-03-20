@@ -21,6 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final SupabaseClient supabase = Supabase.instance.client;
   bool _isSubmitting = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -123,7 +124,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
+      body: SingleChildScrollView(
+        controller: _scrollController,
         padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,6 +167,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 labelStyle: TextStyle(fontSize: 14.sp, color: Colors.black),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
                 ),
               ),
             ),
@@ -178,6 +189,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 labelStyle: TextStyle(fontSize: 14.sp, color: Colors.black),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
                 ),
               ),
             ),
@@ -190,45 +210,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 labelStyle: TextStyle(fontSize: 14.sp, color: Colors.black),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
                 ),
               ),
             ),
             SizedBox(height: 20.h),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 52.h,
-                  margin: EdgeInsets.only(left: 3.w, top: 8.h),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.r),
-                    color: Colors.black,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: _isSubmitting ? null : _submitData,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    minimumSize: Size(double.infinity, 52.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.r),
+            GestureDetector(
+              onTap: _isSubmitting ? null : _submitData,
+              child: Container(
+                width: double.infinity,
+                height: 52.h,
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(8.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      spreadRadius: 1.5,
+                      blurRadius: 8,
+                      offset: Offset(1, 2),
                     ),
-                  ),
+                    BoxShadow(
+                      color: Colors.black,
+                      offset: Offset(3, 4),
+                    ),
+                  ],
+                ),
+                child: Center(
                   child: _isSubmitting
-                      ? CircularProgressIndicator.adaptive()
+                      ? CircularProgressIndicator.adaptive(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        )
                       : Text(
                           widget.userData != null
                               ? "Update Profile"
                               : "Create Profile",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 14.sp,
                           ),
                         ),
                 ),
-              ],
-            )
+              ),
+            ),
+            SizedBox(height: 20.h), // Added extra space for better scrolling
           ],
         ),
       ),

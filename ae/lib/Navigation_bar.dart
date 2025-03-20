@@ -1,4 +1,4 @@
-import 'package:ae/Dashboeard.dart';
+import 'package:ae/Dashboard.dart';
 import 'package:ae/Home_Screen.dart';
 import 'package:ae/RecognitionScreen.dart';
 import 'package:ae/UserManagement.dart';

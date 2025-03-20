@@ -97,8 +97,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       padding: EdgeInsets.symmetric(vertical: 0.0),
                       child: Text(
                         'User\nManagement',
-                        style: TextStyle(
-                            color: Colors.black, fontSize: 20.sp, height: 0.0),
+                        style: TextStyle(color: Colors.black, fontSize: 20.sp),
                       ),
                     ),
                     FutureBuilder<List<Map<String, dynamic>>>(
@@ -112,55 +111,45 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                           return Text('Error',
                               style: TextStyle(color: Colors.red));
                         }
-                        return Padding(
-                          padding: EdgeInsets.only(right: 0),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(12.w),
-                                margin: EdgeInsets.only(
-                                    left: constraints.maxWidth * 0.01,
-                                    top: constraints.maxHeight * 0.01),
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  borderRadius: BorderRadius.circular(8.r),
-                                ),
-                                width: constraints.maxWidth * 0.24,
-                                height: constraints.maxHeight * 0.07,
-                              ),
-                              Container(
-                                width: constraints.maxWidth * 0.24,
-                                height: constraints.maxHeight * 0.07,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8.r),
-                                  border: Border.all(
-                                    color: Color.fromARGB(255, 0, 0, 0),
-                                    width: 1.w,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        'Total ',
-                                        style: TextStyle(
-                                            color: Color.fromARGB(255, 0, 0, 0),
-                                            fontSize: 12.sp),
-                                      ),
-                                      Text(
-                                        '${snapshot.data?.length ?? 0}',
-                                        style: TextStyle(
-                                            color: Color.fromARGB(255, 0, 0, 0),
-                                            fontSize: 12.sp),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                        return Container(
+                          width: constraints.maxWidth * 0.20,
+                          height: constraints.maxHeight * 0.07,
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black,
+                                offset: Offset(2.5.w, 0.h),
                               ),
                             ],
+                            border: Border(
+                              left:
+                                  BorderSide(color: Colors.blue, width: 0.5.w),
+                              top: BorderSide(color: Colors.blue, width: 0.5.w),
+                              bottom:
+                                  BorderSide(color: Colors.blue, width: 0.5.w),
+                            ),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(6.r),
+                              bottomLeft: Radius.circular(6.r),
+                            ),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Total ',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12.sp),
+                                ),
+                                Text(
+                                  '${snapshot.data?.length ?? 0}',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12.sp),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -244,51 +233,34 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                         ),
                       );
                     },
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: constraints.maxWidth * 0.20,
-                          height: constraints.maxHeight * 0.1,
-                          padding: EdgeInsets.all(12.w),
-                          margin: EdgeInsets.only(
-                              right: constraints.maxWidth * 0.035,
-                              bottom: constraints.maxHeight * 0.045),
-                          decoration: BoxDecoration(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.15,
+                      height: MediaQuery.of(context).size.height * 0.08,
+                      padding: EdgeInsets.all(0.w),
+                      margin: EdgeInsets.only(
+                          right: MediaQuery.of(context).size.width * 0.03,
+                          bottom: MediaQuery.of(context).size.height * 0.008),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        border: Border.all(
+                          color: Colors.black.withOpacity(0.3),
+                          width: 1.w,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color.fromARGB(255, 0, 0, 0)
+                                .withOpacity(0.4),
+                            blurRadius: 4.r,
+                            offset: Offset(0, 3.h),
+                          ),
+                          BoxShadow(
                             color: Colors.black,
-                            borderRadius: BorderRadius.circular(8.r),
+                            offset: Offset(2.5.w, 3.5.h),
                           ),
-                        ),
-                        Container(
-                          width: constraints.maxWidth * 0.20,
-                          height: constraints.maxHeight * 0.1,
-                          padding: EdgeInsets.all(12.w),
-                          margin: EdgeInsets.only(
-                              right: constraints.maxWidth * 0.05,
-                              bottom: constraints.maxHeight * 0.05),
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            border: Border(
-                              bottom: BorderSide(
-                                color:
-                                    Color.fromARGB(255, 0, 0, 0).withOpacity(1),
-                                width: 1.w,
-                              ),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.blue.withOpacity(0.2),
-                                blurRadius: 4.r,
-                                offset: Offset(0, 2.h),
-                              ),
-                            ],
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                          child: Icon(Icons.add,
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                              size: 24.w),
-                        ),
-                      ],
+                        ],
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Icon(Icons.add, color: Colors.white, size: 24.w),
                     ),
                   ),
                 ),

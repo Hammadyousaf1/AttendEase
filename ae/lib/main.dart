@@ -1,4 +1,4 @@
-import 'package:ae/Dashboeard.dart';
+import 'package:ae/Dashboard.dart';
 import 'package:ae/Splash_Screen.dart';
 import 'package:ae/mys/Dashboard.dart';
 import 'package:ae/reports_Screen.dart';
