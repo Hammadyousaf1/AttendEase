@@ -1,4 +1,6 @@
 import 'package:ae/Dashboard.dart';
+import 'package:ae/Home_Screen.dart';
+import 'package:ae/Navigation_bar.dart';
 import 'package:ae/Splash_Screen.dart';
 import 'package:ae/mys/Dashboard.dart';
 import 'package:ae/reports_Screen.dart';
@@ -35,7 +37,7 @@ class MyApp extends StatelessWidget {
           ),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: SplashScreen(),
+        home: Nav(),
       ),
     );
   }
