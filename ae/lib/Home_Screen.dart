@@ -1,7 +1,5 @@
-import 'dart:async';
-
-import 'package:ae/RecognitionScreen.dart';
-import 'package:ae/RegisrationScreen.dart';
+import 'package:ae/Recognition_Screen.dart';
+import 'package:ae/Regisration_Screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,7 +19,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> animation2;
 
   String currentime = '';
-  late Timer _timer;
   @override
   @override
   void initState() {
@@ -37,11 +34,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     Controller.forward();
     updateTime();
-    _timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      if (mounted) {
-        updateTime();
-      }
-    });
   }
 
   void updateTime() {

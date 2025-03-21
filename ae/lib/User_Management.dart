@@ -1,5 +1,5 @@
-import 'package:ae/InputUserDetailScreen.dart';
-import 'package:ae/RegisrationScreen.dart';
+import 'package:ae/User_Input_Screen.dart';
+import 'package:ae/Regisration_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

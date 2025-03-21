@@ -1,7 +1,7 @@
 import 'package:ae/Dashboard.dart';
 import 'package:ae/Home_Screen.dart';
-import 'package:ae/RecognitionScreen.dart';
-import 'package:ae/UserManagement.dart';
+import 'package:ae/Recognition_Screen.dart';
+import 'package:ae/User_Management.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
