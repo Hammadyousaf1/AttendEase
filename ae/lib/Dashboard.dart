@@ -68,11 +68,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            textTheme: GoogleFonts.kronaOneTextTheme(),
+            textTheme: GoogleFonts.kronaOneTextTheme(
+              TextTheme(
+                bodySmall: TextStyle(
+                    fontSize: 12.sp,
+                    color: Colors.grey), // Consistent with search hint text
+              ),
+            ),
             datePickerTheme: DatePickerThemeData(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.r),
               ),
+              dayStyle: GoogleFonts.kronaOne(
+                  fontSize: 12.sp, // Matches other text sizes in app
+                  color: Colors.blue),
+              yearStyle: GoogleFonts.kronaOne(
+                  fontSize: 12.sp, color: Colors.grey), // Matches results text
+              headerHeadlineStyle: GoogleFonts.kronaOne(
+                  fontSize: 24.sp,
+                  color: Colors.black), // Matches dashboard title
+              weekdayStyle: GoogleFonts.kronaOne(
+                  fontSize: 12.sp, color: Colors.grey), // Matches results text
             ),
           ),
           child: child!,
@@ -108,12 +124,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onPressed: () => Navigator.pop(context),
                 ),
                 Image.asset(
-                  'assets/logo2.png',
-                  height: 35.h,
+                  'assets/logo5.png',
+                  height: 55.h,
                 ),
               ],
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 4.h),
             Text(
               "Dashboard",
               style: TextStyle(fontSize: 20.sp),
@@ -127,11 +143,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: TextStyle(fontSize: 12.sp),
               decoration: InputDecoration(
                 labelText: "Select Date",
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 20.h, horizontal: 12.w),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.calendar_today, color: Colors.blue),
-                  onPressed: () => _selectDate(context),
+                contentPadding: EdgeInsets.symmetric(
+                    vertical: 20.h,
+                    horizontal: 12.w), // Increased vertical padding
+                suffixIcon: Padding(
+                  padding: EdgeInsets.only(right: 12.w, top: 4.h, bottom: 6.h),
+                  child: Container(
+                    width: 30.w,
+                    height: 30.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.r),
+                      color: Colors.blue,
+                      border: Border.all(
+                        color: Colors.black.withOpacity(0.3),
+                        width: 1.w,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color.fromARGB(255, 0, 0, 0)
+                              .withOpacity(0.4),
+                          blurRadius: 4.r,
+                          offset: Offset(0, 3.h),
+                        ),
+                        BoxShadow(
+                          color: Color.fromARGB(255, 8, 84, 146),
+                          offset: Offset(2.w, 3.h),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.calendar_today,
+                          color: const Color.fromARGB(255, 255, 255, 255),
+                          size: 20.w),
+                      onPressed: () => _selectDate(context),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
@@ -150,13 +197,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: _buildCard("Enrolled", enrolledCount.toString())),
               ],
             ),
-            SizedBox(height: 30.h),
+            SizedBox(height: 20.h),
 
             Text(
               'Daily Report',
               style: TextStyle(fontSize: 18.sp),
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 8.h),
 
             Row(
               children: [
@@ -164,7 +211,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 SizedBox(width: 28.w),
                 Text('Name', style: TextStyle(fontSize: 14.sp)),
                 SizedBox(width: 140.w),
-                Text('Time', style: TextStyle(fontSize: 14.sp))
+                Expanded(
+                    child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('Time', style: TextStyle(fontSize: 14.sp))))
               ],
             ),
 
@@ -200,7 +250,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     child: Text(
                                       student['user_id'],
                                       style: TextStyle(
-                                          fontSize: 14.sp, color: Colors.grey),
+                                          fontSize: 14.sp,
+                                          color: Colors.black.withOpacity(0.7)),
                                     ),
                                   ),
                                   SizedBox(width: 0.w),
@@ -209,7 +260,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     child: Text(
                                       student['user_name'],
                                       style: TextStyle(
-                                          fontSize: 14.sp, color: Colors.grey),
+                                          fontSize: 14.sp,
+                                          color: Colors.black.withOpacity(0.7)),
                                     ),
                                   ),
                                   Expanded(
@@ -217,7 +269,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       DateFormat.jm().format(
                                           DateTime.parse(student['timestamp'])),
                                       style: TextStyle(
-                                          fontSize: 14.sp, color: Colors.grey),
+                                          fontSize: 14.sp,
+                                          color: Colors.black.withOpacity(0.7)),
                                       textAlign: TextAlign.end,
                                     ),
                                   ),
@@ -241,9 +294,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.15,
                   height: MediaQuery.of(context).size.height * 0.06,
+                  padding: EdgeInsets.all(0.w),
+                  margin: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).size.height * 0.008),
                   decoration: BoxDecoration(
                     color: Colors.blue,
-                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: Colors.black.withOpacity(0.3),
+                      width: 1.w,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
+                        blurRadius: 4.r,
+                        offset: Offset(0, 3.h),
+                      ),
+                      BoxShadow(
+                        color: Color.fromARGB(255, 8, 84, 146),
+                        offset: Offset(2.7.w, 3.7.h),
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Icon(Icons.search, color: Colors.white, size: 24.w),
                 ),

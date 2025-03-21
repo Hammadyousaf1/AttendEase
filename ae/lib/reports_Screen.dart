@@ -100,8 +100,9 @@ class _ReportsScreenState extends State<searchuser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.all(22.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -115,12 +116,12 @@ class _ReportsScreenState extends State<searchuser> {
                   onPressed: () => Navigator.pop(context),
                 ),
                 Image.asset(
-                  'assets/logo2.png',
-                  height: 35.h,
+                  'assets/logo5.png',
+                  height: 55.h,
                 ),
               ],
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 4.h),
 
             /// Title
             Text(
@@ -165,9 +166,7 @@ class _ReportsScreenState extends State<searchuser> {
                             offset: Offset(0, 3.h),
                           ),
                           BoxShadow(
-                            color: Colors.black,
-                            spreadRadius: 0,
-                            blurRadius: 0,
+                            color: Color.fromARGB(255, 8, 84, 146),
                             offset: Offset(2, 3),
                           ),
                         ]),
@@ -175,7 +174,7 @@ class _ReportsScreenState extends State<searchuser> {
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 2.0),
+                  borderSide: BorderSide(color: Colors.black, width: 1.0),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -187,16 +186,16 @@ class _ReportsScreenState extends State<searchuser> {
                 ),
               ),
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 12.h),
 
             // Filter Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildFilterButton('All', 'all'),
-                _buildFilterButton('Last\nWeek', 'last_week'),
-                _buildFilterButton('Last\nMonth', 'last_month'),
-                _buildFilterButton('Last\nYear', 'last_year'),
+                _buildFilterButton('Week', 'last_week'),
+                _buildFilterButton('Month', 'last_month'),
+                _buildFilterButton('Year', 'last_year'),
               ],
             ),
             SizedBox(height: 16.h),
@@ -266,14 +265,20 @@ class _ReportsScreenState extends State<searchuser> {
                             child: Row(
                               children: [
                                 Text(result['user_id'] ?? 'N/A',
-                                    style: TextStyle(fontSize: 12.sp)),
+                                    style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w200)),
                                 SizedBox(width: 25.w),
                                 Text(result['user_name'] ?? 'Unknown',
-                                    style: TextStyle(fontSize: 12.sp)),
+                                    style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w100)),
                                 Expanded(child: Container()),
                                 Text(
                                     DateFormat('dd-MM-yyyy').format(parsedDate),
-                                    style: TextStyle(fontSize: 12.sp)),
+                                    style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w100)),
                               ],
                             ),
                           ),
@@ -305,11 +310,16 @@ class _ReportsScreenState extends State<searchuser> {
                       ? Colors.blue
                       : const Color.fromARGB(255, 0, 0, 0)),
             ),
+            elevation: _selectedFilter == filter ? 4 : 0,
+            shadowColor: _selectedFilter == filter
+                ? Color.fromARGB(255, 8, 84, 146)
+                : Colors.black,
           ),
           onPressed: () => _applyFilter(filter),
           child: Text(
             text,
-            style: TextStyle(fontSize: 8.sp),
+            style: TextStyle(
+                fontSize: 12.sp), // Increased font size from 8.sp to 12.sp
             textAlign: TextAlign.center,
           ),
         ),

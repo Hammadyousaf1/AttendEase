@@ -37,45 +37,73 @@ class _NavState extends State<Nav> {
             selectedIndex: currentindex,
             activeColor: Colors.blue,
             tabMargin: EdgeInsets.symmetric(
-                horizontal: 15, vertical: 8), // Reduce vertical padding
+                horizontal: 14.5, vertical: 8), // Reduce vertical padding
             padding: EdgeInsets.symmetric(
                 horizontal: 12, vertical: 12), // Add margin on left and right
             tabs: [
               GButton(
                 icon: Icons.home,
-                text: ' Home',
+                text: '   Home',
                 iconSize: 20,
-                textStyle: TextStyle(fontSize: 10, color: Colors.blue),
-                iconColor: Colors.blue,
-                backgroundColor:
-                    const Color.fromARGB(255, 0, 0, 0).withOpacity(0.1),
+                textStyle: TextStyle(
+                    fontSize: 10,
+                    color: currentindex == 0 ? Colors.blue : Colors.black),
+                iconColor: currentindex == 0 ? Colors.blue : Colors.black,
+                border: currentindex == 0
+                    ? Border.all(
+                        color: Colors.blue,
+                        width: 1,
+                      )
+                    : null,
+                borderRadius: BorderRadius.circular(8),
               ),
               GButton(
-                icon: Icons.person_sharp,
-                text: 'Attendence',
+                icon: Icons.face_retouching_natural_sharp,
+                text: '   Attendence',
                 iconSize: 20,
-                textStyle: TextStyle(fontSize: 10, color: Colors.blue),
-                iconColor: Colors.blue,
-                backgroundColor:
-                    const Color.fromARGB(255, 0, 0, 0).withOpacity(0.1),
+                textStyle: TextStyle(
+                    fontSize: 10,
+                    color: currentindex == 1 ? Colors.blue : Colors.black),
+                iconColor: currentindex == 1 ? Colors.blue : Colors.black,
+                border: currentindex == 1
+                    ? Border.all(
+                        color: Colors.blue,
+                        width: 1,
+                      )
+                    : null,
+                borderRadius: BorderRadius.circular(8),
               ),
               GButton(
-                icon: Icons.supervised_user_circle_sharp,
-                text: 'User',
+                icon: Icons.group,
+                text: '  Users List',
                 iconSize: 20,
-                textStyle: TextStyle(fontSize: 10, color: Colors.blue),
-                iconColor: Colors.blue,
-                backgroundColor:
-                    const Color.fromARGB(255, 0, 0, 0).withOpacity(0.1),
+                textStyle: TextStyle(
+                    fontSize: 10,
+                    color: currentindex == 2 ? Colors.blue : Colors.black),
+                iconColor: currentindex == 2 ? Colors.blue : Colors.black,
+                border: currentindex == 2
+                    ? Border.all(
+                        color: Colors.blue,
+                        width: 1,
+                      )
+                    : null,
+                borderRadius: BorderRadius.circular(8),
               ),
               GButton(
-                icon: Icons.dashboard,
-                text: '  Dashboard',
+                icon: Icons.space_dashboard_sharp,
+                text: ' Dashboard',
                 iconSize: 20,
-                textStyle: TextStyle(fontSize: 10, color: Colors.blue),
-                iconColor: Colors.blue,
-                backgroundColor:
-                    const Color.fromARGB(255, 0, 0, 0).withOpacity(0.1),
+                textStyle: TextStyle(
+                    fontSize: 10,
+                    color: currentindex == 3 ? Colors.blue : Colors.black),
+                iconColor: currentindex == 3 ? Colors.blue : Colors.black,
+                border: currentindex == 3
+                    ? Border.all(
+                        color: Colors.blue,
+                        width: 1,
+                      )
+                    : null,
+                borderRadius: BorderRadius.circular(8),
               ),
             ]),
       ),

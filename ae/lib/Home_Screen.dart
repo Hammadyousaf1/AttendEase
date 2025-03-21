@@ -26,8 +26,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    Controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 800));
+    Controller = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 1200));
     animation = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
         CurvedAnimation(parent: Controller, curve: Curves.easeOutBack));
     Controller2 = AnimationController(
@@ -73,11 +73,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               opacity: animation2,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/logo2.png',
-                    height: 40.h,
-                  ),
                   Text(
                     'WELCOME',
                     style: TextStyle(
@@ -85,12 +82,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         fontSize: 28.sp,
                         letterSpacing: -4.0), // Reduced letter spacing
                   ),
+                  Image.asset(
+                    'assets/logo5.png',
+                    height: 55.h,
+                  ),
                 ],
               ),
             ),
-          ),
-          SizedBox(
-            height: 12.h,
           ),
           FadeTransition(
             opacity: animation2,
@@ -182,8 +180,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             offset: Offset(2.w, 3.h),
                           ),
                           BoxShadow(
-                            color: Colors.black,
-                            offset: Offset(3.5.w, 4.5.h),
+                            color: const Color.fromARGB(255, 8, 84, 146),
+                            offset: Offset(7.w, 4.h),
                           ),
                         ],
                       ),
@@ -222,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   child: Container(
                       decoration: BoxDecoration(
                         color: Colors.blue,
-                        borderRadius: BorderRadius.circular(10.r),
+                        borderRadius: BorderRadius.circular(16.r),
                         border: Border.all(
                           color: Colors.black.withOpacity(0.3),
                           width: 1.w,
@@ -235,8 +233,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             offset: Offset(2.w, 3.h),
                           ),
                           BoxShadow(
-                            color: Colors.black,
-                            offset: Offset(4.w, 5.h),
+                            color: const Color.fromARGB(255, 8, 84, 146),
+                            offset: Offset(7.w, 4.h),
                           ),
                         ],
                       ),

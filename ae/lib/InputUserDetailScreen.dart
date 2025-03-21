@@ -140,8 +140,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: () => Navigator.pop(context),
                 ),
                 Image.asset(
-                  'assets/logo2.png',
-                  height: 35.h,
+                  'assets/logo5.png',
+                  height: 55.h,
                 ),
               ],
             ),
@@ -231,6 +231,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: BoxDecoration(
                   color: Colors.blue,
                   borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(
+                    color: Colors.black.withOpacity(0.3),
+                    width: 1.w,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.3),
@@ -239,8 +243,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       offset: Offset(1, 2),
                     ),
                     BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(3, 4),
+                      color: Color.fromARGB(255, 8, 84, 146),
+                      offset: Offset(3, 5),
                     ),
                   ],
                 ),

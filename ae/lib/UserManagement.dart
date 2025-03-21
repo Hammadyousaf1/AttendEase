@@ -84,12 +84,12 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       onPressed: () => Navigator.pop(context),
                     ),
                     Image.asset(
-                      'assets/logo2.png',
-                      height: 35.h,
+                      'assets/logo5.png',
+                      height: 55.h,
                     ),
                   ],
                 ),
-                SizedBox(height: 20.h),
+                SizedBox(height: 4.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -111,44 +111,46 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                           return Text('Error',
                               style: TextStyle(color: Colors.red));
                         }
-                        return Container(
-                          width: constraints.maxWidth * 0.20,
-                          height: constraints.maxHeight * 0.07,
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black,
-                                offset: Offset(2.5.w, 0.h),
-                              ),
-                            ],
-                            border: Border(
-                              left:
-                                  BorderSide(color: Colors.blue, width: 0.5.w),
-                              top: BorderSide(color: Colors.blue, width: 0.5.w),
-                              bottom:
-                                  BorderSide(color: Colors.blue, width: 0.5.w),
-                            ),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(6.r),
-                              bottomLeft: Radius.circular(6.r),
-                            ),
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Total ',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12.sp),
-                                ),
-                                Text(
-                                  '${snapshot.data?.length ?? 0}',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12.sp),
+                        return Padding(
+                          padding: EdgeInsets.only(
+                              right: 3.5.w), // Added right padding
+                          child: Container(
+                            width: constraints.maxWidth * 0.20,
+                            height: constraints.maxHeight * 0.07,
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color.fromARGB(255, 8, 84, 146),
+                                  offset: Offset(3.w, 3.5.h),
                                 ),
                               ],
+                              border: Border.all(
+                                color: Colors.black.withOpacity(0.3),
+                                width: 1.w,
+                              ),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(8.r),
+                              ),
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Total ',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                        fontSize: 10.sp),
+                                  ),
+                                  Text(
+                                    '${snapshot.data?.length ?? 0}',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 10.sp),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );
@@ -176,11 +178,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                         itemCount: users.length,
                         itemBuilder: (context, index) {
                           final user = users[index];
-                          return Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: constraints.maxWidth * 0.00,
-                            ),
-                            child: Card(
+                          return Card(
+                            child: Container(
+                              width: constraints
+                                  .maxWidth, // Set width to screen width
                               child: ListTile(
                                 tileColor: Colors.white,
                                 contentPadding:
@@ -238,7 +239,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       height: MediaQuery.of(context).size.height * 0.08,
                       padding: EdgeInsets.all(0.w),
                       margin: EdgeInsets.only(
-                          right: MediaQuery.of(context).size.width * 0.03,
                           bottom: MediaQuery.of(context).size.height * 0.008),
                       decoration: BoxDecoration(
                         color: Colors.blue,
@@ -254,13 +254,14 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                             offset: Offset(0, 3.h),
                           ),
                           BoxShadow(
-                            color: Colors.black,
-                            offset: Offset(2.5.w, 3.5.h),
+                            color: Color.fromARGB(255, 8, 84, 146),
+                            offset: Offset(3.w, 4.h),
                           ),
                         ],
                         borderRadius: BorderRadius.circular(8.r),
                       ),
-                      child: Icon(Icons.add, color: Colors.white, size: 24.w),
+                      child: Icon(Icons.add,
+                          color: Colors.white, size: 28.w, weight: 3.0),
                     ),
                   ),
                 ),
