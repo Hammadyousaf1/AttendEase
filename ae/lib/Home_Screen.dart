@@ -17,6 +17,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<Offset> animation;
   late AnimationController Controller2;
   late Animation<double> animation2;
+  late AnimationController Controller3;
+  late Animation<Offset> animation3;
 
   String currentime = '';
   @override
@@ -27,12 +29,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         vsync: this, duration: Duration(milliseconds: 1200));
     animation = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
         CurvedAnimation(parent: Controller, curve: Curves.easeOutBack));
+    Controller.forward();
     Controller2 = AnimationController(
         vsync: this, duration: Duration(milliseconds: 1000));
     animation2 = Tween<double>(begin: 0, end: 1).animate(Controller2);
     Controller2.forward();
-
-    Controller.forward();
+    Controller3 = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 1000),
+    );
+    animation3 = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
+        CurvedAnimation(parent: Controller3, curve: Curves.easeOutBack));
+    Controller3.forward();
     updateTime();
   }
 
@@ -106,38 +114,53 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Today is',
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.secondary,
-                        fontSize: 18.sp),
+                  FadeTransition(
+                    opacity: animation2,
+                    child: Text(
+                      'Today is',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary,
+                          fontSize: 18.sp),
+                    ),
                   ),
-                  Text(
-                    DateFormat.EEEE().format(DateTime.now()),
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 14.sp),
+                  FadeTransition(
+                    opacity: animation2,
+                    child: Text(
+                      DateFormat.EEEE().format(DateTime.now()),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 14.sp),
+                    ),
                   ),
-                  Text(
-                    DateFormat('dd MMMM yyyy').format(DateTime.now()),
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 14.sp),
+                  FadeTransition(
+                    opacity: animation2,
+                    child: Text(
+                      DateFormat('dd MMMM yyyy').format(DateTime.now()),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 14.sp),
+                    ),
                   ),
                   SizedBox(
                     height: 12.h,
                   ),
-                  Text(
-                    'Time',
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.secondary,
-                        fontSize: 18.sp),
+                  FadeTransition(
+                    opacity: animation2,
+                    child: Text(
+                      'Time',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary,
+                          fontSize: 18.sp),
+                    ),
                   ),
-                  Text(
-                    currentime,
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 14.sp),
+                  FadeTransition(
+                    opacity: animation2,
+                    child: Text(
+                      currentime,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 14.sp),
+                    ),
                   )
                 ],
               ),
@@ -209,51 +232,54 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         MaterialPageRoute(
                             builder: (context) => Registrationscreen()));
                   },
-                  child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(16.r),
-                        border: Border.all(
-                          color: Colors.black.withOpacity(0.3),
-                          width: 1.w,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.35),
-                            spreadRadius: 2.w,
-                            blurRadius: 8.w,
-                            offset: Offset(2.w, 3.h),
+                  child: SlideTransition(
+                    position: animation3,
+                    child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(
+                            color: Colors.black.withOpacity(0.3),
+                            width: 1.w,
                           ),
-                          BoxShadow(
-                            color: const Color.fromARGB(255, 8, 84, 146),
-                            offset: Offset(7.w, 4.h),
-                          ),
-                        ],
-                      ),
-                      height: 0.3.sh,
-                      width: 0.43.sw,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 20.h,
-                          ),
-                          Image.asset(
-                            'assets/gif2.gif',
-                            height: 120.h,
-                          ),
-                          SizedBox(
-                            height: 24.h,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(right: 72.w),
-                            child: Text(
-                              'Create\nProfile',
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 14.sp),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.35),
+                              spreadRadius: 2.w,
+                              blurRadius: 8.w,
+                              offset: Offset(2.w, 3.h),
                             ),
-                          )
-                        ],
-                      )),
+                            BoxShadow(
+                              color: const Color.fromARGB(255, 8, 84, 146),
+                              offset: Offset(7.w, 4.h),
+                            ),
+                          ],
+                        ),
+                        height: 0.3.sh,
+                        width: 0.43.sw,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 20.h,
+                            ),
+                            Image.asset(
+                              'assets/gif2.gif',
+                              height: 120.h,
+                            ),
+                            SizedBox(
+                              height: 24.h,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(right: 72.w),
+                              child: Text(
+                                'Create\nProfile',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14.sp),
+                              ),
+                            )
+                          ],
+                        )),
+                  ),
                 )
               ],
             ),
