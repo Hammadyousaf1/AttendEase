@@ -21,9 +21,12 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   List<Face> _faces = [];
   Size? _imageSize;
   bool _isFrontCamera = true;
-  int _frameCount = 0; // Counter to track frames
-  String recognizedPersonName = ""; // Variable to hold recognized person's name
-  bool attendanceMarked = false; // Variable to track attendance status
+  int _frameCount = 0;
+  String recognizedPersonName = "";
+  bool attendanceMarked = false;
+  bool _isLive = false; // Added for liveness check
+  int _blinkCount = 0; // Added for blink detection
+  DateTime? _lastBlinkTime; // Added for blink timing
 
   @override
   void initState() {
@@ -63,6 +66,33 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
             FaceDetectorMode.fast, // Use fast mode for real-time performance
       ),
     );
+  }
+
+  bool _checkLiveness(Face face) {
+    // Check for blinking
+    if (face.leftEyeOpenProbability != null && face.rightEyeOpenProbability != null) {
+      if (face.leftEyeOpenProbability! < 0.3 && face.rightEyeOpenProbability! < 0.3) {
+        if (_lastBlinkTime == null || DateTime.now().difference(_lastBlinkTime!) > Duration(seconds: 1)) {
+          _blinkCount++;
+          _lastBlinkTime = DateTime.now();
+        }
+      }
+    }
+
+    // Check head movement
+    if (face.headEulerAngleX != null && face.headEulerAngleY != null) {
+      if (face.headEulerAngleX!.abs() > 15 || face.headEulerAngleY!.abs() > 15) {
+        return true;
+      }
+    }
+
+    // Check for smile
+    if (face.smilingProbability != null && face.smilingProbability! > 0.8) {
+      return true;
+    }
+
+    // Require at least 2 blinks for liveness
+    return _blinkCount >= 2;
   }
 
   void _startFaceDetection() {
@@ -150,7 +180,10 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
           }
 
           if (_faces.isNotEmpty) {
-            _captureAndSendImage(image);
+            _isLive = _checkLiveness(_faces.first);
+            if (_isLive) {
+              _captureAndSendImage(image);
+            }
           }
         });
       } catch (e) {
@@ -191,7 +224,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   Future<void> _sendImageToServer(File imageFile) async {
     try {
       final request = http.MultipartRequest(
-          'POST', Uri.parse('http://172.31.12.218:8000/recognize'));
+          'POST', Uri.parse('http://192.168.163.219:8000/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));
@@ -327,8 +360,13 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
         });
       });
     } else if (_faces.isNotEmpty) {
-      statusText = "Recognizing...";
-      statusColor = const Color(0xFF1E4FFE);
+      if (!_isLive) {
+        statusText = "Checking Liveness";
+        statusColor = Colors.orange;
+      } else {
+        statusText = "Recognizing...";
+        statusColor = const Color(0xFF1E4FFE);
+      }
     } else if (_isDetecting) {
       statusText = "Recognizing...";
       statusColor = Colors.yellow;
@@ -362,8 +400,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
             top: 40,
             right: 16,
             child: IconButton(
-              icon: Icon(Icons.switch_camera, color: Color(0xFF1E4FFE)), // Switch camera icon
-              onPressed: _switchCamera, // Call switch camera function
+              icon: Icon(Icons.switch_camera, color: Color(0xFF1E4FFE)),
+              onPressed: _switchCamera,
             ),
           ),
           Positioned(

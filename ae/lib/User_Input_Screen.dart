@@ -59,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       } else {
         // Create new user
         var request = http.MultipartRequest(
-            'POST', Uri.parse('http://172.31.12.218:8000/train'));
+            'POST', Uri.parse('http://192.168.163.219:8000/train'));
         request.fields['name'] = _nameController.text;
         request.fields['id'] = _idController.text;
         request.fields['phone'] = _phoneController.text;
