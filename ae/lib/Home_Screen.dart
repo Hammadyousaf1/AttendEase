@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     Controller = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 1200));
+        vsync: this, duration: Duration(milliseconds: 2000));
     animation = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
         CurvedAnimation(parent: Controller, curve: Curves.easeOutBack));
     Controller.forward();
@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     Controller2.forward();
     Controller3 = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 1000),
+      duration: Duration(milliseconds: 1500),
     );
     animation3 = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
         CurvedAnimation(parent: Controller3, curve: Curves.easeOutBack));

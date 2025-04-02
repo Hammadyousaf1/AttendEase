@@ -217,7 +217,7 @@ class _ReportsScreenState extends State<searchuser> {
                 ),
               ],
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 20.h),
 
             Row(
               children: [
@@ -253,7 +253,7 @@ class _ReportsScreenState extends State<searchuser> {
                           padding: const EdgeInsets.symmetric(vertical: 0.0),
                           child: Container(
                             padding: EdgeInsets.only(
-                                top: 0, bottom: 12, left: 4, right: 4),
+                                top: 8, bottom: 4, left: 0, right: 4), // Reduced top padding from 16 to 8
                             decoration: BoxDecoration(
                               border: Border(
                                 bottom: BorderSide(

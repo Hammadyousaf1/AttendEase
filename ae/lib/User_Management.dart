@@ -118,10 +118,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                             width: constraints.maxWidth * 0.20,
                             height: constraints.maxHeight * 0.07,
                             decoration: BoxDecoration(
-                              color: Colors.blue,
+                              color: const Color.fromARGB(255, 255, 255, 255),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color.fromARGB(255, 8, 84, 146),
+                                  color: Color.fromARGB(255, 40, 40, 40),
                                   offset: Offset(3.w, 3.5.h),
                                 ),
                               ],
@@ -141,13 +141,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                     'Total ',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w600,
-                                        color: Colors.white,
+                                        color: Colors.black,
                                         fontSize: 10.sp),
                                   ),
                                   Text(
                                     '${snapshot.data?.length ?? 0}',
                                     style: TextStyle(
-                                        color: Colors.white, fontSize: 10.sp),
+                                        color: Colors.black, fontSize: 10.sp),
                                   ),
                                 ],
                               ),

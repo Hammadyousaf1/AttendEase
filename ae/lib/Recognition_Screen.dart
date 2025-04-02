@@ -24,21 +24,18 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   int _frameCount = 0;
   String recognizedPersonName = "";
   bool attendanceMarked = false;
-  bool _isLive = false; // Added for liveness check
-  int _blinkCount = 0; // Added for blink detection
-  DateTime? _lastBlinkTime; // Added for blink timing
 
   @override
   void initState() {
     super.initState();
-    _initializeFaceDetector(); // Initialize face detector only once
+    _initializeFaceDetector();
     _initializeCamera();
   }
 
   Future<void> _initializeCamera() async {
     _cameras = await availableCameras();
     _cameraController = CameraController(
-      _cameras[_isFrontCamera ? 1 : 0], // Use front or back camera based on _isFrontCamera
+      _cameras[_isFrontCamera ? 1 : 0],
       ResolutionPreset.high,
       enableAudio: false,
       imageFormatGroup: Platform.isAndroid
@@ -62,72 +59,38 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
         enableContours: false,
         enableClassification: false,
         enableTracking: true,
-        performanceMode:
-            FaceDetectorMode.fast, // Use fast mode for real-time performance
+        performanceMode: FaceDetectorMode.fast,
       ),
     );
-  }
-
-  bool _checkLiveness(Face face) {
-    // Check for blinking
-    if (face.leftEyeOpenProbability != null && face.rightEyeOpenProbability != null) {
-      if (face.leftEyeOpenProbability! < 0.3 && face.rightEyeOpenProbability! < 0.3) {
-        if (_lastBlinkTime == null || DateTime.now().difference(_lastBlinkTime!) > Duration(seconds: 1)) {
-          _blinkCount++;
-          _lastBlinkTime = DateTime.now();
-        }
-      }
-    }
-
-    // Check head movement
-    if (face.headEulerAngleX != null && face.headEulerAngleY != null) {
-      if (face.headEulerAngleX!.abs() > 15 || face.headEulerAngleY!.abs() > 15) {
-        return true;
-      }
-    }
-
-    // Check for smile
-    if (face.smilingProbability != null && face.smilingProbability! > 0.8) {
-      return true;
-    }
-
-    // Require at least 2 blinks for liveness
-    return _blinkCount >= 2;
   }
 
   void _startFaceDetection() {
     if (_cameraController == null || !_cameraController!.value.isInitialized) return;
 
     _cameraController!.startImageStream((CameraImage image) async {
-      if (_isDetecting) return; // Check if the previous frame is still being processed
+      if (_isDetecting) return;
       _isDetecting = true;
 
-      // Increment frame count
       _frameCount++;
 
-      // Process every 5th frame
       if (_frameCount % 3 != 0) {
         _isDetecting = false;
         return;
       }
 
-      // Add a small delay before processing the image buffer
       await Future.delayed(Duration(milliseconds: 50));
 
       try {
-        // Check if the image buffer is accessible
         if (image.planes.isEmpty) {
           print("Image buffer inaccessible, restarting camera...");
-          await _restartCamera(); // Restart camera if buffer is inaccessible
+          await _restartCamera();
           _isDetecting = false;
           return;
         }
 
-        // Create a copy of the image data immediately to avoid buffer access issues
         final List<Uint8List> planeData = [];
         for (Plane plane in image.planes) {
           try {
-            // Use a copy of the bytes to avoid buffer access issues
             final bytes = Uint8List.fromList(plane.bytes);
             planeData.add(bytes);
           } catch (e) {
@@ -137,7 +100,6 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
           }
         }
 
-        // Ensure the image is not closed before processing
         if (_cameraController == null || !_cameraController!.value.isInitialized) {
           _isDetecting = false;
           return;
@@ -180,35 +142,27 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
           }
 
           if (_faces.isNotEmpty) {
-            _isLive = _checkLiveness(_faces.first);
-            if (_isLive) {
-              _captureAndSendImage(image);
-            }
+            _captureAndSendImage(image);
           }
         });
       } catch (e) {
         print("Error in face detection: $e");
       } finally {
-        _isDetecting = false; // Mark detection as complete
+        _isDetecting = false;
       }
     });
   }
 
   Future<void> _restartCamera() async {
     await _stopCameraAndDispose();
-    await _initializeCamera(); // Reinitialize the camera
+    await _initializeCamera();
   }
 
   Future<void> _captureAndSendImage(CameraImage image) async {
     try {
-      // Capture the image
       final XFile capturedImage = await _cameraController!.takePicture();
       final File imageFile = File(capturedImage.path);
-
-      // Rotate the image to match camera orientation
       final rotatedImage = await _rotateImage(imageFile);
-
-      // Send the image to the server along with the current time
       await _sendImageToServer(rotatedImage);
     } catch (e) {
       print("Error capturing and sending image: $e");
@@ -216,25 +170,21 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   }
 
   Future<File> _rotateImage(File imageFile) async {
-    // Implement rotation logic based on camera orientation
-    // This is a placeholder for the actual rotation logic
-    return imageFile; // Return the original file for now
+    return imageFile;
   }
 
   Future<void> _sendImageToServer(File imageFile) async {
     try {
       final request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.163.219:8000/recognize'));
+          'POST', Uri.parse('http://192.168.100.6:5000/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));
 
-      // Get the current device time
       final currentTime = DateTime.now().toIso8601String();
-      // Debug: Print the timestamp being sent
       print("Sending timestamp: $currentTime");
 
-      request.fields['timestamp'] = currentTime; // Add timestamp to the request
+      request.fields['timestamp'] = currentTime;
 
       final response = await request.send();
 
@@ -242,8 +192,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
         final responseData = await response.stream.bytesToString();
         final data = jsonDecode(responseData);
         setState(() {
-          recognizedPersonName = data['recognized_name']; // Extracting recognized name
-          attendanceMarked = data['attendance_marked']; // Extract attendance status
+          recognizedPersonName = data['recognized_name'];
+          attendanceMarked = data['attendance_marked'];
         });
         print("Image sent successfully");
       } else {
@@ -289,13 +239,13 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   Future<void> _stopCameraAndDispose() async {
     try {
       if (_isDetecting) {
-        _isDetecting = false; // Ensure face detection is stopped
+        _isDetecting = false;
       }
       if (_cameraController != null && _cameraController!.value.isInitialized) {
         if (_cameraController!.value.isStreamingImages) {
           await _cameraController!.stopImageStream();
         }
-        await Future.delayed(Duration(milliseconds: 100)); // Delay before disposing
+        await Future.delayed(Duration(milliseconds: 100));
         await _cameraController!.dispose();
         _cameraController = null;
       }
@@ -360,14 +310,10 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
         });
       });
     } else if (_faces.isNotEmpty) {
-      if (!_isLive) {
-        statusText = "Checking Liveness";
-        statusColor = Colors.orange;
-      } else {
         statusText = "Recognizing...";
         statusColor = const Color(0xFF1E4FFE);
       }
-    } else if (_isDetecting) {
+     else if (_isDetecting) {
       statusText = "Recognizing...";
       statusColor = Colors.yellow;
     }
