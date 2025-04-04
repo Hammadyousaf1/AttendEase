@@ -182,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   child: Container(
                       decoration: BoxDecoration(
                         color: Colors.blue,
-                        borderRadius: BorderRadius.circular(10.r),
+                        borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(
                           color: Colors.black.withOpacity(0.3),
                           width: 1.w,
@@ -190,13 +190,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.35),
-                            spreadRadius: 2.w,
                             blurRadius: 8.w,
-                            offset: Offset(2.w, 3.h),
+                            offset: Offset(3.w, 4.h),
                           ),
                           BoxShadow(
                             color: const Color.fromARGB(255, 8, 84, 146),
-                            offset: Offset(7.w, 4.h),
+                            offset: Offset(5.w, 6.h),
                           ),
                         ],
                       ),
@@ -237,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     child: Container(
                         decoration: BoxDecoration(
                           color: Colors.blue,
-                          borderRadius: BorderRadius.circular(16.r),
+                          borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
                             color: Colors.black.withOpacity(0.3),
                             width: 1.w,
@@ -245,13 +244,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.35),
-                              spreadRadius: 2.w,
                               blurRadius: 8.w,
-                              offset: Offset(2.w, 3.h),
+                              offset: Offset(3.w, 4.h),
                             ),
                             BoxShadow(
                               color: const Color.fromARGB(255, 8, 84, 146),
-                              offset: Offset(7.w, 4.h),
+                              offset: Offset(5.w, 6.h),
                             ),
                           ],
                         ),

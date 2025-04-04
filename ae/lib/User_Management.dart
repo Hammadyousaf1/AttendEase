@@ -1,3 +1,5 @@
+import 'package:ae/Home_Screen.dart';
+import 'package:ae/User_Detail.dart';
 import 'package:ae/User_Input_Screen.dart';
 import 'package:ae/Regisration_Screen.dart';
 import 'package:flutter/material.dart';
@@ -105,7 +107,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return CircularProgressIndicator();
+                          return CircularProgressIndicator(strokeWidth: 2);
                         }
                         if (snapshot.hasError) {
                           return Text('Error',
@@ -119,7 +121,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                             height: constraints.maxHeight * 0.07,
                             decoration: BoxDecoration(
                               color: const Color.fromARGB(255, 255, 255, 255),
-                              boxShadow: [
+                              /*boxShadow: [
                                 BoxShadow(
                                   color: Color.fromARGB(255, 40, 40, 40),
                                   offset: Offset(3.w, 3.5.h),
@@ -131,7 +133,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                               ),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(8.r),
-                              ),
+                              ),*/
                             ),
                             child: Center(
                               child: Column(
@@ -141,13 +143,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                     'Total ',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w600,
-                                        color: Colors.black,
-                                        fontSize: 10.sp),
+                                        color: const Color.fromARGB(
+                                            255, 99, 99, 99),
+                                        fontSize: 12.sp),
                                   ),
                                   Text(
                                     '${snapshot.data?.length ?? 0}',
                                     style: TextStyle(
-                                        color: Colors.black, fontSize: 10.sp),
+                                        color: const Color.fromARGB(
+                                            255, 99, 99, 99),
+                                        fontSize: 12.sp),
                                   ),
                                 ],
                               ),
@@ -163,7 +168,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     future: _usersFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return Center(
+                            child: CircularProgressIndicator(strokeWidth: 2));
                       }
                       if (snapshot.hasError) {
                         return Center(child: Text('Error loading users'));
@@ -180,41 +186,106 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                           final user = users[index];
                           return Card(
                             child: Container(
+                              color: Colors.white,
                               width: constraints
                                   .maxWidth, // Set width to screen width
-                              child: ListTile(
-                                tileColor: Colors.white,
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 12.w),
-                                leading: Text('${user['id'] ?? ''}',
-                                    style: TextStyle(
-                                        fontSize:
-                                            constraints.maxWidth * 0.035)),
-                                title: Text('${user['name'] ?? 'Unknown'}',
-                                    style: TextStyle(
-                                        fontSize:
-                                            constraints.maxWidth * 0.035)),
-                                trailing: Container(
-                                  width: 96.w,
-                                  alignment: Alignment.centerRight,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        icon: Icon(Icons.edit,
+                              child: Padding(
+                                padding: EdgeInsets.all(16.w),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: constraints.maxWidth * 0.15,
+                                      height: constraints.maxWidth * 0.15,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id'] ?? 'Icon'}.png',
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            // If the image fails to load, use Icon.png
+                                            return Image.network(
+                                              'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/Icon.png',
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text('${user['name'] ?? 'Unknown'}',
+                                              style: TextStyle(
+                                                  fontSize:
+                                                      constraints.maxWidth *
+                                                          0.040),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1),
+                                          SizedBox(height: 4.h),
+                                          Text('ID: ${user['id'] ?? ''}',
+                                              style: TextStyle(
+                                                  fontSize:
+                                                      constraints.maxWidth *
+                                                          0.035)),
+                                        ],
+                                      ),
+                                    ),
+                                    /*Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () => editUser(user),
+                                          child: Container(
+                                            width: constraints.maxWidth * 0.06,
+                                            height: constraints.maxWidth * 0.06,
+                                            child: Icon(Icons.edit,
+                                                color: Colors.black,
+                                                size: constraints.maxWidth *
+                                                    0.05),
+                                          ),
+                                        ),
+                                        SizedBox(height: 12.h),
+                                        GestureDetector(
+                                          onTap: () =>
+                                              deleteUser(int.parse(user['id'])),
+                                          child: Container(
+                                            width: constraints.maxWidth * 0.06,
+                                            height: constraints.maxWidth * 0.06,
+                                            child: Icon(Icons.delete,
+                                                color: Colors.red,
+                                                size: constraints.maxWidth *
+                                                    0.05),
+                                          ),
+                                        ),
+                                      ],
+                                    ),*/
+                                    SizedBox(
+                                      width: 8.w,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                UserDetailScreen(
+                                                    userId: user['id'],
+                                                    userName: user['name'] ?? 'Unknown',
+                                                    profileImageUrl: 'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id'] ?? 'Icon'}.png'),
+                                        ));
+                                      },
+                                      child: Container(
+                                        width: constraints.maxWidth * 0.15,
+                                        height: constraints.maxWidth * 0.15,
+                                        child: Icon(Icons.chevron_right,
                                             color: Colors.blue,
-                                            size: constraints.maxWidth * 0.05),
-                                        onPressed: () => editUser(user),
+                                            size: constraints.maxWidth * 0.1),
                                       ),
-                                      IconButton(
-                                        icon: Icon(Icons.delete,
-                                            color: Colors.red,
-                                            size: constraints.maxWidth * 0.05),
-                                        onPressed: () =>
-                                            deleteUser(int.parse(user['id'])),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

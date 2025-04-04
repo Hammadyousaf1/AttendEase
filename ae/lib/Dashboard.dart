@@ -35,10 +35,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       // Fetch attendance for the selected date
       final attendanceResponse = await supabase
-          .from('attendance')
-          .select()
-          .gte('timestamp', '$formattedDate 00:00:00')
-          .lt('timestamp', '$formattedDate 23:59:59');
+          .from('attendance2')
+          .select('user_id, user_name, time_in, time_out')
+          .gte('time_in', '$formattedDate 00:00:00')
+          .lt('time_in', '$formattedDate 23:59:59');
 
       // Fetch total enrolled users
       final usersResponse = await supabase.from('users').select();
@@ -203,25 +203,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
               'Daily Report',
               style: TextStyle(fontSize: 18.sp),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 16.h),
 
             Row(
               children: [
                 Text('ID', style: TextStyle(fontSize: 14.sp)),
-                SizedBox(width: 28.w),
+                SizedBox(width: 20.w),
                 Text('Name', style: TextStyle(fontSize: 14.sp)),
-                SizedBox(width: 140.w),
+                SizedBox(width: 40.w),
                 Expanded(
-                    child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text('Time', style: TextStyle(fontSize: 14.sp))))
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('Time In', style: TextStyle(fontSize: 12.sp)),
+                    SizedBox(width: 20.w),
+                    Text('Time Out', style: TextStyle(fontSize: 12.sp)),
+                  ],
+                ))
               ],
             ),
 
             // Attendance List
             Expanded(
               child: isLoading
-                  ? Center(child: CircularProgressIndicator())
+                  ? Center(child: CircularProgressIndicator(strokeWidth: 2))
                   : attendanceList.isEmpty
                       ? Center(
                           child: Text(
@@ -235,6 +240,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           itemBuilder: (context, index) {
                             var student = attendanceList[index];
                             return Container(
+                              padding: EdgeInsets.only(
+                                  bottom: 4.h), // Added bottom padding
                               decoration: BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
@@ -246,32 +253,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: Row(
                                 children: [
                                   SizedBox(
-                                    width: 50.w,
+                                    width: 40.w,
                                     child: Text(
                                       student['user_id'],
                                       style: TextStyle(
-                                          fontSize: 14.sp,
+                                          fontSize: 12.sp,
                                           color: Colors.black.withOpacity(0.7)),
                                     ),
                                   ),
-                                  SizedBox(width: 0.w),
                                   SizedBox(
-                                    width: 150.w,
+                                    width: 130.w,
                                     child: Text(
                                       student['user_name'],
                                       style: TextStyle(
-                                          fontSize: 14.sp,
+                                          fontSize: 12.sp,
                                           color: Colors.black.withOpacity(0.7)),
                                     ),
                                   ),
                                   Expanded(
-                                    child: Text(
-                                      DateFormat.jm().format(
-                                          DateTime.parse(student['timestamp'])),
-                                      style: TextStyle(
-                                          fontSize: 14.sp,
-                                          color: Colors.black.withOpacity(0.7)),
-                                      textAlign: TextAlign.end,
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          DateFormat.jm().format(DateTime.parse(
+                                              student['time_in'])),
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              color: Colors.black
+                                                  .withOpacity(0.7)),
+                                        ),
+                                        SizedBox(width: 16.w),
+                                        Text(
+                                          student['time_out'] != null
+                                              ? DateFormat.jm().format(
+                                                  DateTime.parse(
+                                                      student['time_out']))
+                                              : 'N/A',
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              color: Colors.black
+                                                  .withOpacity(0.7)),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],

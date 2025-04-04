@@ -31,8 +31,8 @@ class _ReportsScreenState extends State<searchuser> {
 
     try {
       final response = await _supabase
-          .from('attendance')
-          .select()
+          .from('attendance2')
+          .select('user_id, user_name, time_out')
           .or('user_id.ilike.%$query%,user_name.ilike.%$query%');
 
       setState(() {
@@ -52,15 +52,14 @@ class _ReportsScreenState extends State<searchuser> {
       print("Applying filter: $filter");
 
       _filteredResults = _searchResults.where((record) {
-        if (record['timestamp'] == null)
-          return false; // Ensure timestamp exists
+        if (record['time_out'] == null) return false; // Ensure timestamp exists
 
         DateTime recordDate;
         try {
           // Convert ISO timestamp to DateTime (Ensure it's in Local Time)
-          recordDate = DateTime.parse(record['timestamp']).toLocal();
+          recordDate = DateTime.parse(record['time_out']).toLocal();
         } catch (e) {
-          print("Invalid timestamp: ${record['timestamp']}");
+          print("Invalid timestamp: ${record['time_out']}");
           return false;
         }
 
@@ -243,7 +242,7 @@ class _ReportsScreenState extends State<searchuser> {
 
                         /// Convert ISO Timestamp to Readable Date & Time
                         DateTime parsedDate =
-                            DateTime.parse(result['timestamp']);
+                            DateTime.parse(result['time_out']);
                         String formattedDate =
                             DateFormat('yyyy-MM-dd').format(parsedDate);
                         String formattedTime =
@@ -253,7 +252,10 @@ class _ReportsScreenState extends State<searchuser> {
                           padding: const EdgeInsets.symmetric(vertical: 0.0),
                           child: Container(
                             padding: EdgeInsets.only(
-                                top: 8, bottom: 4, left: 0, right: 4), // Reduced top padding from 16 to 8
+                                top: 8,
+                                bottom: 4,
+                                left: 0,
+                                right: 4), // Reduced top padding from 16 to 8
                             decoration: BoxDecoration(
                               border: Border(
                                 bottom: BorderSide(
@@ -266,18 +268,18 @@ class _ReportsScreenState extends State<searchuser> {
                               children: [
                                 Text(result['user_id'] ?? 'N/A',
                                     style: TextStyle(
-                                        fontSize: 14.sp,
+                                        fontSize: 12.sp,
                                         fontWeight: FontWeight.w200)),
-                                SizedBox(width: 25.w),
+                                SizedBox(width: 28.w),
                                 Text(result['user_name'] ?? 'Unknown',
                                     style: TextStyle(
-                                        fontSize: 14.sp,
+                                        fontSize: 12.sp,
                                         fontWeight: FontWeight.w100)),
                                 Expanded(child: Container()),
                                 Text(
                                     DateFormat('dd-MM-yyyy').format(parsedDate),
                                     style: TextStyle(
-                                        fontSize: 14.sp,
+                                        fontSize: 12.sp,
                                         fontWeight: FontWeight.w100)),
                               ],
                             ),
