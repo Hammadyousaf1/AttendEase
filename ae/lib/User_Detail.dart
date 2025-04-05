@@ -1,6 +1,7 @@
 import 'package:ae/User_Input_Screen.dart';
 import 'package:ae/User_Management.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
@@ -27,233 +28,55 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   String? profileImageUrl;
   final supabase = Supabase.instance.client;
 
+  int attendanceStreak = 0;
+  int workingHours = 0;
+
   @override
   void initState() {
     super.initState();
     profileImageUrl = widget.profileImageUrl;
+    fetchUserData();
   }
 
-  Future<void> deleteUser() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: const Text('Are you sure you want to delete this user?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      try {
-        setState(() => isLoading = true);
-
-        // Delete user from database
-        await supabase.from('users').delete().eq('id', widget.userId);
-
-        // Delete profile picture if exists
-        final fileName = '${widget.userId}.png';
-        try {
-          await supabase.storage.from('profile_pictures').remove([fileName]);
-        } catch (e) {
-          // Ignore if image doesn't exist
-        }
-
-        // Navigate back to user management and restart it
-        if (mounted) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => UserManagementScreen()),
-            (Route<dynamic> route) => false,
-          );
-        }
-      } catch (e) {
-        setState(() => isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete user: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> editUser() async {
-    final nameController = TextEditingController(text: widget.userName);
-    final whatsappController = TextEditingController();
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit User'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: whatsappController,
-              decoration: const InputDecoration(
-                labelText: 'WhatsApp Number',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.phone,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              try {
-                setState(() => isLoading = true);
-                await supabase.from('users').update({
-                  'name': nameController.text,
-                  'phone': whatsappController.text,
-                }).eq('id', widget.userId);
-                Navigator.pop(context, true);
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Failed to update user: $e')),
-                );
-                Navigator.pop(context, false);
-              } finally {
-                setState(() => isLoading = false);
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-
-    if (result == true) {
-      // Refresh the user details if edit was successful
-      Navigator.pop(context, true);
-    }
-  }
-
-  Future<void> _showImageOptions() async {
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Profile Picture'),
-        content: const Text('What would you like to do?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'upload'),
-            child: const Text('Upload New'),
-          ),
-          if (profileImageUrl != null)
-            TextButton(
-              onPressed: () => Navigator.pop(context, 'delete'),
-              child: const Text('Delete Current',
-                  style: TextStyle(color: Colors.red)),
-            ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
-      ),
-    );
-
-    if (result == 'upload') {
-      await updateProfilePicture();
-    } else if (result == 'delete') {
-      await deleteProfilePicture();
-    }
-  }
-
-  Future<void> deleteProfilePicture() async {
+  Future<void> fetchUserData() async {
     try {
-      setState(() => isLoading = true);
-      final fileName = '${widget.userId}.png';
+      // Get current week's Monday
+      final now = DateTime.now();
+      final monday = now.subtract(Duration(days: now.weekday - 1));
+      final sunday = monday.add(const Duration(days: 6));
+      final mondayStart = DateTime(monday.year, monday.month, monday.day);
+      final sundayEnd =
+          DateTime(sunday.year, sunday.month, sunday.day, 23, 59, 59);
 
-      await supabase.storage.from('profile_pictures').remove([fileName]);
+      // Get working hours from 'attendance2' table
+      final response = await supabase
+          .from('attendance2')
+          .select()
+          .eq('Phone', widget.userId)
+          .gte('timestamp', mondayStart.toIso8601String())
+          .lte('timestamp', sundayEnd.toIso8601String());
+
+      Duration totalDuration = Duration.zero;
+
+      for (var record in response) {
+        if (record['working_hours'] != null) {
+          final durationStr = record['working_hours'] as String;
+          final parts = durationStr.split(':');
+          if (parts.length >= 3) {
+            final hours = int.tryParse(parts[0]) ?? 0;
+            final minutes = int.tryParse(parts[1]) ?? 0;
+            final seconds = int.tryParse(parts[2].split('.')[0]) ?? 0;
+            totalDuration +=
+                Duration(hours: hours, minutes: minutes, seconds: seconds);
+          }
+        }
+      }
 
       setState(() {
-        profileImageUrl = null;
-        isLoading = false;
+        workingHours = totalDuration.inHours; // only hours
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile picture deleted successfully')),
-      );
     } catch (e) {
-      setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete profile picture: $e')),
-      );
-    }
-  }
-
-  Future<void> updateProfilePicture() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      try {
-        setState(() => isLoading = true);
-        final imageBytes = await File(pickedFile.path).readAsBytes();
-        final image = img.decodeImage(imageBytes);
-        final pngBytes = img.encodePng(image!);
-        final tempFile = File('${pickedFile.path}.png');
-        await tempFile.writeAsBytes(pngBytes);
-
-        final fileName = '${widget.userId}.png';
-
-        // Delete existing image if it exists
-        try {
-          final existingFiles = await supabase.storage
-              .from('profile_pictures')
-              .list(path: fileName);
-
-          if (existingFiles.isNotEmpty) {
-            await supabase.storage.from('profile_pictures').remove([fileName]);
-          }
-        } catch (e) {
-          // If file doesn't exist, continue with upload
-        }
-
-        // Upload new file
-        await supabase.storage.from('profile_pictures').upload(
-              fileName,
-              tempFile,
-              fileOptions: FileOptions(contentType: 'image/png', upsert: true),
-            );
-
-        final newImageUrl = await supabase.storage
-            .from('profile_pictures')
-            .createSignedUrl(fileName, 3600);
-
-        await tempFile.delete();
-
-        setState(() {
-          profileImageUrl = newImageUrl;
-          isLoading = false;
-        });
-      } catch (e) {
-        setState(() => isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update profile picture: $e')),
-        );
-      }
+      print('Error fetching working hours: $e');
     }
   }
 
@@ -337,23 +160,167 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     ],
                   ),
                 ),
-                Column(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
-                      onPressed: isLoading ? null : editUser,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: isLoading ? null : deleteUser,
-                    ),
-                  ],
-                ),
+              ],
+            ),
+            SizedBox(height: 20),
+
+            // Yellow container and streak/working hours section
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: workingHours < 40
+                    ? Colors.yellow.shade100
+                    : Colors.green.shade100,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    workingHours < 40 ? Icons.warning : Icons.check_circle,
+                    color: workingHours < 40 ? Colors.orange : Colors.green,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    workingHours < 40
+                        ? " Hours Below Required!"
+                        : " Attendance Full!",
+                    style: TextStyle(fontSize: 14.sp),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16.h),
+            Row(
+              children: [
+                Expanded(
+                    child: _buildStatCard(
+                        "Attendance Streak", "$attendanceStreak 🔥")),
+                SizedBox(width: 10.w),
+                Expanded(
+                    child: _buildStatCard("Working Hours", "$workingHours ⏳")),
               ],
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildStatCard(String title, String value) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black12),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Column(
+        children: [
+          Text(title,
+              style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue)),
+          SizedBox(height: 4.h),
+          Text(value,
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showImageOptions() async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Profile Picture'),
+        content: const Text('What would you like to do?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'upload'),
+            child: const Text('Upload New'),
+          ),
+          if (profileImageUrl != null)
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'delete'),
+              child: const Text('Delete Current',
+                  style: TextStyle(color: Colors.red)),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == 'upload') {
+      await updateProfilePicture();
+    } else if (result == 'delete') {
+      await deleteProfilePicture();
+    }
+  }
+
+  Future<void> updateProfilePicture() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      try {
+        setState(() => isLoading = true);
+        final imageBytes = await File(pickedFile.path).readAsBytes();
+        final image = img.decodeImage(imageBytes);
+        final pngBytes = img.encodePng(image!);
+        final tempFile = File('${pickedFile.path}.png');
+        await tempFile.writeAsBytes(pngBytes);
+
+        final fileName = '${widget.userId}.png';
+
+        await supabase.storage.from('profile_pictures').upload(
+              fileName,
+              tempFile,
+              fileOptions: FileOptions(contentType: 'image/png', upsert: true),
+            );
+
+        final newImageUrl = await supabase.storage
+            .from('profile_pictures')
+            .createSignedUrl(fileName, 3600);
+
+        await tempFile.delete();
+
+        setState(() {
+          profileImageUrl = newImageUrl;
+          isLoading = false;
+        });
+      } catch (e) {
+        setState(() => isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update profile picture: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> deleteProfilePicture() async {
+    try {
+      setState(() => isLoading = true);
+      final fileName = '${widget.userId}.png';
+
+      await supabase.storage.from('profile_pictures').remove([fileName]);
+
+      setState(() {
+        profileImageUrl = null;
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile picture deleted successfully')),
+      );
+    } catch (e) {
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete profile picture: $e')),
+      );
+    }
   }
 }
