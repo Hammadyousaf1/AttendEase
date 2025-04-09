@@ -1,9 +1,7 @@
-import 'package:ae/User_Input_Screen.dart';
-import 'package:ae/User_Management.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:image/image.dart' as img;
 
@@ -24,211 +22,114 @@ class UserDetailScreen extends StatefulWidget {
 }
 
 class _UserDetailScreenState extends State<UserDetailScreen> {
+  final supabase = Supabase.instance.client;
+  int workingHours = 0;
+  int attendanceStreak = 0;
   bool isLoading = false;
   String? profileImageUrl;
-  final supabase = Supabase.instance.client;
-
-  int attendanceStreak = 0;
-  int workingHours = 0;
+  String? phoneNumber; // Added phone number variable
 
   @override
   void initState() {
     super.initState();
     profileImageUrl = widget.profileImageUrl;
-    fetchUserData();
+    fetchAttendanceData();
+    fetchUserPhoneNumber(); // Fetch phone number on initialization
   }
 
-  Future<void> fetchUserData() async {
+  Future<void> fetchAttendanceData() async {
+    setState(() => isLoading = true);
     try {
-      // Get current week's Monday
-      final now = DateTime.now();
-      final monday = now.subtract(Duration(days: now.weekday - 1));
-      final sunday = monday.add(const Duration(days: 6));
-      final mondayStart = DateTime(monday.year, monday.month, monday.day);
-      final sundayEnd =
-          DateTime(sunday.year, sunday.month, sunday.day, 23, 59, 59);
-
-      // Get working hours from 'attendance2' table
-      final response = await supabase
-          .from('attendance2')
-          .select()
-          .eq('Phone', widget.userId)
-          .gte('timestamp', mondayStart.toIso8601String())
-          .lte('timestamp', sundayEnd.toIso8601String());
-
-      Duration totalDuration = Duration.zero;
-
-      for (var record in response) {
-        if (record['working_hours'] != null) {
-          final durationStr = record['working_hours'] as String;
-          final parts = durationStr.split(':');
-          if (parts.length >= 3) {
-            final hours = int.tryParse(parts[0]) ?? 0;
-            final minutes = int.tryParse(parts[1]) ?? 0;
-            final seconds = int.tryParse(parts[2].split('.')[0]) ?? 0;
-            totalDuration +=
-                Duration(hours: hours, minutes: minutes, seconds: seconds);
-          }
-        }
-      }
-
-      setState(() {
-        workingHours = totalDuration.inHours; // only hours
-      });
+      await Future.wait([
+        fetchWorkingHours(),
+        fetchAttendanceStreak(),
+      ]);
     } catch (e) {
-      print('Error fetching working hours: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading data: ${e.toString()}')),
+      );
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('User Details')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: profileImageUrl != null
-                            ? Image.network(
-                                profileImageUrl!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(Icons.person, size: 50),
-                              )
-                            : const Icon(Icons.person, size: 50),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: isLoading ? null : _showImageOptions,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: isLoading
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Icon(
-                                  Icons.edit,
-                                  color: Colors.white,
-                                  size: 16,
-                                ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.userName,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'ID: ${widget.userId}',
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
+  Future<void> fetchUserPhoneNumber() async {
+    // New function to fetch phone number
+    try {
+      final response = await supabase
+          .from('attendance2')
+          .select('Phone')
+          .eq('user_name', widget.userName)
+          .limit(1);
 
-            // Yellow container and streak/working hours section
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: workingHours < 40
-                    ? Colors.yellow.shade100
-                    : Colors.green.shade100,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    workingHours < 40 ? Icons.warning : Icons.check_circle,
-                    color: workingHours < 40 ? Colors.orange : Colors.green,
-                  ),
-                  SizedBox(width: 8.w),
-                  Text(
-                    workingHours < 40
-                        ? " Hours Below Required!"
-                        : " Attendance Full!",
-                    style: TextStyle(fontSize: 14.sp),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Row(
-              children: [
-                Expanded(
-                    child: _buildStatCard(
-                        "Attendance Streak", "$attendanceStreak 🔥")),
-                SizedBox(width: 10.w),
-                Expanded(
-                    child: _buildStatCard("Working Hours", "$workingHours ⏳")),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+      setState(() {
+        phoneNumber = response[0]['Phone'];
+      });
+    } catch (e) {
+      print('Error fetching phone number: $e');
+    }
   }
 
-  Widget _buildStatCard(String title, String value) {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black12),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: Column(
-        children: [
-          Text(title,
-              style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue)),
-          SizedBox(height: 4.h),
-          Text(value,
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
+  Future<void> fetchWorkingHours() async {
+    try {
+      final response = await supabase
+          .from('attendance2')
+          .select('time_in, time_out')
+          .eq('user_name', widget.userName);
+
+      double totalHours = 0;
+      for (final record in response) {
+        if (record['time_in'] != null && record['time_out'] != null) {
+          final timeIn = DateTime.parse(record['time_in'].toString());
+          final timeOut = DateTime.parse(record['time_out'].toString());
+          totalHours += timeOut.difference(timeIn).inHours.toDouble();
+        }
+      }
+      setState(() => workingHours = totalHours.round());
+    } catch (e) {
+      print('Error fetching working hours: $e');
+      rethrow;
+    }
   }
 
+  Future<void> fetchAttendanceStreak() async {
+    try {
+      final response = await supabase
+          .from('attendance2')
+          .select('time_in')
+          .eq('user_name', widget.userName)
+          .order('time_in', ascending: false);
+
+      int streak = 0;
+      DateTime? prevDate;
+
+      for (final record in response) {
+        if (record['time_in'] == null) continue;
+
+        final parsedDate = DateTime.parse(record['time_in'].toString()).toUtc();
+        final currentDate =
+            DateTime(parsedDate.year, parsedDate.month, parsedDate.day);
+
+        if (prevDate == null) {
+          streak = 1;
+          prevDate = currentDate;
+        } else if (prevDate.difference(currentDate).inDays == 1) {
+          streak++;
+          prevDate = currentDate;
+        } else if (prevDate.isAfter(currentDate)) {
+          continue;
+        } else {
+          break;
+        }
+      }
+      setState(() => attendanceStreak = streak);
+    } catch (e) {
+      print('Error fetching attendance streak: $e');
+      rethrow;
+    }
+  }
+
+  // New function for showing image options (upload or delete)
   Future<void> _showImageOptions() async {
     final result = await showDialog<String>(
       context: context,
@@ -261,6 +162,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     }
   }
 
+  // Function to upload a new profile picture
   Future<void> updateProfilePicture() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -323,4 +225,261 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       );
     }
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('User Details')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Profile UI with edit functionality
+            Row(
+              children: [
+                Stack(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: profileImageUrl != null
+                            ? Image.network(
+                                profileImageUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(Icons.person, size: 50),
+                              )
+                            : const Icon(Icons.person, size: 50),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: isLoading
+                            ? null
+                            : _showImageOptions, // Open image options dialog
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: isLoading
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.userName,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'ID: ${widget.userId}',
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Phone: ${phoneNumber ?? "kalia"}', // Added phone number display
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
+                    IconButton(
+                        onPressed: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Confirm Deletion'),
+                                content: Text(
+                                    'Are you sure you want to delete this user?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: Text('Delete'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          if (confirmed == true) {
+                            // Call the delete function here
+                            await supabase
+                                .from('users')
+                                .delete()
+                                .eq('id', widget.userId);
+                            Navigator.pop(
+                                context); // Move back to the previous screen
+                          }
+                        },
+                        icon: Icon(Icons.delete))
+                  ],
+                )
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            const SizedBox(width: 8),
+            Image.asset(
+              workingHours < 20
+                  ? 'assets/indicator3.png'
+                  : (workingHours < 35
+                      ? 'assetsindicator2.png'
+                      : 'assets/indicator1.png'),
+              height: 60.h,
+            ),
+            const SizedBox(height: 16),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                      "Attendance\n    Streak", "$attendanceStreak 🔥"),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildStatCard("Working Hours", "$workingHours ⏳"),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildRewards(
+                      Image.asset(
+                        'assets/level1.gif',
+                        height: 80, // Increased height from 30 to 50
+                      ),
+                      'Level 1',
+                      "20 Working\nHours"),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  _buildRewards(
+                      Image.asset(
+                        'assets/level2.gif',
+                        height: 80, // Increased height from 30 to 50
+                      ),
+                      'Level 2',
+                      "30 Working\nHours"),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  _buildRewards(
+                      Image.asset(
+                        'assets/level3.gif',
+                        height: 80, // Increased height from 30 to 50
+                      ),
+                      'Level 3',
+                      "40 Working\nHours"),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value) {
+    return Card(
+      child: Container(
+        height: 100.h,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.blue),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(title,
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue)),
+            const SizedBox(height: 8),
+            Text(value,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Widget _buildRewards(Image image, String title, String desc) {
+  return Container(
+    width: 130.w,
+    padding: EdgeInsets.all(6),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(color: Colors.blue),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        image,
+        const SizedBox(height: 10),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.blue,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          desc,
+          style: const TextStyle(fontSize: 14),
+        ),
+      ],
+    ),
+  );
 }
