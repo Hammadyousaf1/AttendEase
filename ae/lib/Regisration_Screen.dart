@@ -24,6 +24,7 @@ class _RegistrationScreenState extends State<Registrationscreen> {
   List<String> capturedImages = [];
   static const int requiredImages = 5;
   int _frameCount = 0;
+  bool _faceDetectedOnce = false;
 
   @override
   void initState() {
@@ -79,21 +80,13 @@ class _RegistrationScreenState extends State<Registrationscreen> {
     _isCapturing = true;
 
     try {
-      for (int i = capturedImages.length; i < requiredImages; i++) {
+      for (int i = 0; i < requiredImages; i++) {
         if (_cameraController?.value.isInitialized ?? false) {
           try {
-            // Wait for a face to be detected before capturing an image
-
-            // Capture the image
             final XFile image = await _cameraController!.takePicture();
             setState(() {
               capturedImages.add(image.path);
             });
-
-            if (i < requiredImages - 1) {
-              await Future.delayed(Duration(
-                  milliseconds: 100)); // Add a small delay between captures
-            }
           } catch (e) {
             print("Error capturing image: $e");
             ScaffoldMessenger.of(context).showSnackBar(
@@ -106,6 +99,7 @@ class _RegistrationScreenState extends State<Registrationscreen> {
       }
 
       if (!mounted) return;
+      await _stopFaceDetection(); // Stop face detection before showing dialog
       await _showCapturedImagesDialog();
     } catch (e) {
       print("Error capturing images: $e");
@@ -114,10 +108,18 @@ class _RegistrationScreenState extends State<Registrationscreen> {
       );
     } finally {
       _isCapturing = false;
+      _faceDetectedOnce = false;
       if (_cameraController != null &&
           _cameraController!.value.isStreamingImages) {
         await _cameraController!.stopImageStream();
       }
+    }
+  }
+
+  Future<void> _stopFaceDetection() async {
+    if (_cameraController != null &&
+        _cameraController!.value.isStreamingImages) {
+      await _cameraController!.stopImageStream();
     }
   }
 
@@ -156,18 +158,14 @@ class _RegistrationScreenState extends State<Registrationscreen> {
           actions: [
             TextButton(
               onPressed: () async {
-                // Clear captured images
-                setState(() {
-                  capturedImages.clear();
-                  _isCapturing = false;
-                });
-
-                // Close the dialog
-                Navigator.pop(context);
-
-                // Restart the camera and face detection
-                await _initializeCamera();
-                _startFaceDetection();
+                await _stopCameraAndDispose();
+                if (!mounted) return;
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Registrationscreen(),
+                  ),
+                );
               },
               child: Text('Retry'),
             ),
@@ -195,12 +193,11 @@ class _RegistrationScreenState extends State<Registrationscreen> {
     if (_cameraController == null) return;
 
     _cameraController!.startImageStream((CameraImage image) async {
-      if (_isDetecting) return; // Skip if already detecting
+      if (_isDetecting) return;
       _isDetecting = true;
 
       _frameCount++;
       if (_frameCount % 3 != 0) {
-        // Process every 3rd frame
         _isDetecting = false;
         return;
       }
@@ -254,11 +251,9 @@ class _RegistrationScreenState extends State<Registrationscreen> {
           }).toList();
         });
 
-        // Start capturing images if a face is detected and not already capturing
-        if (_faces.isNotEmpty &&
-            !_isCapturing &&
-            capturedImages.length < requiredImages) {
-          _captureImages(); // Call the _captureImages method
+        if (_faces.isNotEmpty && !_isCapturing && !_faceDetectedOnce) {
+          _faceDetectedOnce = true;
+          _captureImages();
         }
       } catch (e) {
         print("Error in face detection: $e");
@@ -429,13 +424,12 @@ class _RegistrationScreenState extends State<Registrationscreen> {
               );
             }).toList(),
             Positioned(
-              bottom: 20,
-              right: 20,
+              bottom: 48,
+              right: 36,
               child: FloatingActionButton(
                 onPressed: _toggleCamera,
-                child: Icon(Icons.switch_camera,
-                    color: Colors.white), // Changed icon color to white
-                backgroundColor: Color(0xFF1E4FFE), // Added background color
+                child: Icon(Icons.switch_camera, color: Colors.white),
+                backgroundColor: Colors.blue, // Changed to standard blue color
               ),
             ),
           ],

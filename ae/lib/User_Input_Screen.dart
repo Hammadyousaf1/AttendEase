@@ -1,3 +1,4 @@
+import 'package:ae/Regisration_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -36,7 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _submitData() async {
     if (_nameController.text.isEmpty ||
         _idController.text.isEmpty ||
-        _phoneController.text.length != 11) {
+        _phoneController.text.length != 13) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(
@@ -59,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       } else {
         // Create new user
         var request = http.MultipartRequest(
-            'POST', Uri.parse('http://192.168.100.6:5000/train'));
+            'POST', Uri.parse('http://192.168.100.4:5000/train'));
         request.fields['name'] = _nameController.text;
         request.fields['id'] = _idController.text;
         request.fields['phone'] = _phoneController.text;
@@ -137,7 +138,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 IconButton(
                   icon: Icon(Icons.arrow_back,
                       color: Color.fromARGB(255, 0, 0, 0), size: 24.w),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => Registrationscreen()),
+                  ),
                 ),
                 Image.asset(
                   'assets/logo5.png',

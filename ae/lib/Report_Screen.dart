@@ -221,7 +221,7 @@ class _ReportsScreenState extends State<searchuser> {
             Row(
               children: [
                 Text('ID'),
-                SizedBox(width: 16.w),
+                SizedBox(width: 28.w),
                 Text('Name'),
                 Expanded(child: Container()),
                 Padding(
@@ -238,6 +238,11 @@ class _ReportsScreenState extends State<searchuser> {
                   : ListView.builder(
                       itemCount: _filteredResults.length,
                       itemBuilder: (context, index) {
+                        // Sort results by date in descending order (most recent first)
+                        _filteredResults.sort((a, b) =>
+                            DateTime.parse(b['time_out'])
+                                .compareTo(DateTime.parse(a['time_out'])));
+
                         final result = _filteredResults[index];
 
                         /// Convert ISO Timestamp to Readable Date & Time
@@ -252,7 +257,7 @@ class _ReportsScreenState extends State<searchuser> {
                           padding: const EdgeInsets.symmetric(vertical: 0.0),
                           child: Container(
                             padding: EdgeInsets.only(
-                                top: 8,
+                                top: 12,
                                 bottom: 4,
                                 left: 0,
                                 right: 4), // Reduced top padding from 16 to 8

@@ -65,7 +65,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   }
 
   void _startFaceDetection() {
-    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
+    if (_cameraController == null || !_cameraController!.value.isInitialized)
+      return;
 
     _cameraController!.startImageStream((CameraImage image) async {
       if (_isDetecting) return;
@@ -100,7 +101,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
           }
         }
 
-        if (_cameraController == null || !_cameraController!.value.isInitialized) {
+        if (_cameraController == null ||
+            !_cameraController!.value.isInitialized) {
           _isDetecting = false;
           return;
         }
@@ -176,7 +178,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   Future<void> _sendImageToServer(File imageFile) async {
     try {
       final request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.100.6:5000/recognize'));
+          'POST', Uri.parse('http://192.168.100.4:5000/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));
@@ -302,7 +304,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
     Color statusColor = Colors.red;
 
     if (attendanceMarked) {
-      statusText = "Attendance marked for $recognizedPersonName";
+      statusText = "Marked $recognizedPersonName";
       statusColor = Colors.green;
       Future.delayed(Duration(seconds: 3), () {
         setState(() {
@@ -310,10 +312,9 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
         });
       });
     } else if (_faces.isNotEmpty) {
-        statusText = "Recognizing...";
-        statusColor = const Color(0xFF1E4FFE);
-      }
-     else if (_isDetecting) {
+      statusText = "Recognizing...";
+      statusColor = Colors.blue;
+    } else if (_isDetecting) {
       statusText = "Recognizing...";
       statusColor = Colors.yellow;
     }
@@ -326,7 +327,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
             color: Colors.black,
             child: AspectRatio(
               aspectRatio: _cameraController!.value.aspectRatio,
-              child: CameraPreview(_cameraController!), // Improved camera preview aspect ratio
+              child: CameraPreview(
+                  _cameraController!), // Improved camera preview aspect ratio
             ),
           ),
           Positioned(
@@ -337,17 +339,19 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
               onPressed: () async {
                 await _stopCameraAndDispose(); // Ensure proper cleanup
                 if (mounted) {
-                  Navigator.of(context).pushReplacementNamed('/'); // Navigate to main screen
+                  Navigator.of(context)
+                      .pushReplacementNamed('/'); // Navigate to main screen
                 }
               },
             ),
           ),
           Positioned(
-            top: 40,
-            right: 16,
-            child: IconButton(
-              icon: Icon(Icons.switch_camera, color: Color(0xFF1E4FFE)),
+            bottom: 48,
+            right: 36,
+            child: FloatingActionButton(
               onPressed: _switchCamera,
+              child: Icon(Icons.switch_camera, color: Colors.white),
+              backgroundColor: Colors.blue,
             ),
           ),
           Positioned(
@@ -390,12 +394,15 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: isRecognized ? Colors.green : Colors.white, width: 6),
+                      border: Border.all(
+                          color: isRecognized ? Colors.green : Colors.white,
+                          width: 6),
                       borderRadius: BorderRadius.circular(12), // Added radius
                     ),
                   ),
                   Positioned(
-                    top: 10, // Adjust as needed to position the text above the rectangle
+                    top:
+                        10, // Adjust as needed to position the text above the rectangle
                     left: 0,
                     right: 0,
                     child: Container(
@@ -404,7 +411,9 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                         isRecognized ? recognizedPersonName : "",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: isRecognized ? const Color.fromARGB(255, 255, 255, 255) : Colors.white,
+                          color: isRecognized
+                              ? const Color.fromARGB(255, 255, 255, 255)
+                              : Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
