@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -259,14 +260,14 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
 
   void _switchCamera() {
     setState(() {
-      _isFrontCamera = !_isFrontCamera; // Toggle camera
+      _isFrontCamera = !_isFrontCamera;
     });
-    _restartCamera(); // Restart camera with the new setting
+    _restartCamera();
   }
 
   @override
   void dispose() {
-    super.dispose(); // Call super.dispose() first
+    super.dispose();
     _stopCameraAndDispose();
   }
 
@@ -275,7 +276,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
     double scaleY = screenSize.height / imageSize.height;
 
     double left, right;
-    double offsetX = 300.0;
+    double offsetX = 300.w;
 
     if (_isFrontCamera) {
       left = rect.left * scaleX - offsetX;
@@ -332,10 +333,9 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
             ),
           ),
           Positioned(
-            top: 40,
-            left: 16,
-            child: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white),
+            bottom: 48,
+            left: 36,
+            child: FloatingActionButton(
               onPressed: () async {
                 await _stopCameraAndDispose(); // Ensure proper cleanup
                 if (mounted) {
@@ -343,6 +343,9 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                       .pushReplacementNamed('/'); // Navigate to main screen
                 }
               },
+              child: Icon(Icons.arrow_back, color: Colors.white),
+              backgroundColor: Colors.black26,
+              mini: true,
             ),
           ),
           Positioned(
@@ -351,25 +354,25 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
             child: FloatingActionButton(
               onPressed: _switchCamera,
               child: Icon(Icons.switch_camera, color: Colors.white),
-              backgroundColor: Colors.blue,
+              backgroundColor: Colors.black26,
             ),
           ),
           Positioned(
-            top: 120,
+            top: 120.h, // Use .h for responsive height
             left: 0,
             right: 0,
             child: Center(
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w), // Use .h and .w for responsive padding
                 decoration: BoxDecoration(
                   color: statusColor.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8.r), // Use .r for responsive border radius
                 ),
                 child: Text(
                   statusText,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 18.sp, // Use .sp for responsive font size
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -396,13 +399,13 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                     decoration: BoxDecoration(
                       border: Border.all(
                           color: isRecognized ? Colors.green : Colors.white,
-                          width: 6),
+                          width: 6.w),
                       borderRadius: BorderRadius.circular(12), // Added radius
                     ),
                   ),
                   Positioned(
                     top:
-                        10, // Adjust as needed to position the text above the rectangle
+                        10.h, // Adjust as needed to position the text above the rectangle
                     left: 0,
                     right: 0,
                     child: Container(
@@ -415,7 +418,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                               ? const Color.fromARGB(255, 255, 255, 255)
                               : Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 18.sp,
                         ),
                       ),
                     ),

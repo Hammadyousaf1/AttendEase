@@ -1,8 +1,13 @@
+import 'package:ae/Dashboard.dart';
+import 'package:ae/Home_Screen.dart';
+import 'package:ae/Recognition_Screen.dart';
 import 'package:ae/Regisration_Screen.dart';
+import 'package:ae/User_Management.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -23,6 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final SupabaseClient supabase = Supabase.instance.client;
   bool _isSubmitting = false;
   final ScrollController _scrollController = ScrollController();
+  int _selectedIndex = 1;
 
   @override
   void initState() {
@@ -32,6 +38,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _idController.text = widget.userData!['id'] ?? '';
       _phoneController.text = widget.userData!['phone'] ?? '';
     }
+  }
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   Future<void> _submitData() async {
@@ -272,6 +283,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             SizedBox(height: 20.h), // Added extra space for better scrolling
           ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        color: Colors.white,
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            } else if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FaceRectScreen()),
+              );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserManagementScreen()),
+              );
+            } else if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DashboardScreen()),
+              );
+            } else {
+              _onItemTapped(index);
+            }
+          },
+          type: BottomNavigationBarType.fixed,
+          items:  <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home, size: 24.w),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.scanFace, size: 24.w),
+              label: 'Attendance',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people, size: 24.w),
+              label: 'Users',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard, size: 24.w),
+              label: 'Dashboard',
+            ),
+          ],
+          selectedItemColor: Colors.blue,
+          unselectedItemColor: Colors.black54,
+          selectedLabelStyle: TextStyle(fontSize: 10.sp),
+          unselectedLabelStyle: TextStyle(fontSize: 10.sp),
         ),
       ),
     );
