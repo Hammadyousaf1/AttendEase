@@ -48,7 +48,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _submitData() async {
     if (_nameController.text.isEmpty ||
         _idController.text.isEmpty ||
-        _phoneController.text.length != 13) {
+        _phoneController.text.length != 11) {
+      // Check for phone number length
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(
@@ -62,40 +63,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      if (widget.userData != null) {
-        // Update existing user
-        await supabase.from('users').update({
-          'name': _nameController.text,
-          'phone': _phoneController.text,
-        }).eq('id', widget.userData!['id']);
-      } else {
-        // Create new user
-        var request = http.MultipartRequest(
-            'POST', Uri.parse('http://192.168.100.4:5000/train'));
-        request.fields['name'] = _nameController.text;
-        request.fields['id'] = _idController.text;
-        request.fields['phone'] = _phoneController.text;
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('http://192.168.100.2:5000/train'));
+      request.fields['name'] = _nameController.text;
+      request.fields['id'] = _idController.text;
+      request.fields['phone'] =
+          _phoneController.text; // Add phone number to request
 
-        for (var imagePath in widget.capturedImages) {
-          request.files
-              .add(await http.MultipartFile.fromPath('images', imagePath));
-        }
-
-        var response = await request.send();
-
-        if (response.statusCode == 200) {
-          // Also add to Supabase
-          await supabase.from('users').insert({
-            'id': _idController.text,
-            'name': _nameController.text,
-            'phone': _phoneController.text,
-          });
-        } else {
-          throw Exception('Failed to upload data');
-        }
+      for (var imagePath in widget.capturedImages) {
+        request.files
+            .add(await http.MultipartFile.fromPath('images', imagePath));
       }
 
-      _showSuccessDialog();
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        _showSuccessDialog();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to upload data!')),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),

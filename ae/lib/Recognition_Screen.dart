@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:ae/Home_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +26,10 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   int _frameCount = 0;
   String recognizedPersonName = "";
   bool attendanceMarked = false;
+  bool freezeStatus = false;
+  bool timeInMarked = false;
+  bool timeOutMarked = false;
+  DateTime? _lastRequestTime;
 
   @override
   void initState() {
@@ -178,8 +183,15 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
 
   Future<void> _sendImageToServer(File imageFile) async {
     try {
+      // Check if 90 seconds have passed since last request
+      if (_lastRequestTime != null && 
+          DateTime.now().difference(_lastRequestTime!) < Duration(seconds: 10)) {
+        print("Waiting for 90 seconds between requests");
+        return;
+      }
+
       final request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.100.4:5000/recognize'));
+          'POST', Uri.parse('http://192.168.100.2:5000/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));
@@ -194,13 +206,41 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       if (response.statusCode == 200) {
         final responseData = await response.stream.bytesToString();
         final data = jsonDecode(responseData);
+
         setState(() {
           recognizedPersonName = data['recognized_name'];
+          Future.delayed(Duration(seconds: 10), () {
+            if (mounted) {
+              setState(() {
+                recognizedPersonName = "";
+              });
+            }
+          });
           attendanceMarked = data['attendance_marked'];
+          freezeStatus = data['freeze'];
+          timeInMarked = data['time_in'];
+          Future.delayed(Duration(seconds: 2), () {
+            if (mounted) {
+              setState(() {
+                timeInMarked = false;
+              });
+            }
+          });
+          timeOutMarked = data['time_out'];
+          Future.delayed(Duration(seconds: 2), () {
+            if (mounted) {
+              setState(() {
+                timeOutMarked = false;
+              });
+            }
+          });
         });
+
         print("Image sent successfully");
+        _lastRequestTime = DateTime.now(); // Update last request time
+        
       } else {
-        print("Failed to send image: ${response.statusCode}");
+        print("Failed to send image. Status code: ${response.statusCode}");
       }
     } catch (e) {
       print("Error sending image to server: $e");
@@ -303,8 +343,17 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
 
     String statusText = "Face the camera";
     Color statusColor = Colors.red;
+    
 
-    if (attendanceMarked) {
+    if (freezeStatus) {
+      statusText = "Attendance Freezed";
+      statusColor = const Color.fromARGB(255, 111, 80, 251);
+      Future.delayed(Duration(seconds: 3), () {
+        setState(() {
+          freezeStatus = false; // Reset attendance status after 3 seconds
+        });
+      });
+    } else if (attendanceMarked) {
       statusText = "Marked $recognizedPersonName";
       statusColor = Colors.green;
       Future.delayed(Duration(seconds: 3), () {
@@ -315,6 +364,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
     } else if (_faces.isNotEmpty) {
       statusText = "Recognizing...";
       statusColor = Colors.blue;
+      
     } else if (_isDetecting) {
       statusText = "Recognizing...";
       statusColor = Colors.yellow;
@@ -339,8 +389,10 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
               onPressed: () async {
                 await _stopCameraAndDispose(); // Ensure proper cleanup
                 if (mounted) {
-                  Navigator.of(context)
-                      .pushReplacementNamed('/'); // Navigate to main screen
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                  );
                 }
               },
               child: Icon(Icons.arrow_back, color: Colors.white),
@@ -357,28 +409,78 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
               backgroundColor: Colors.black26,
             ),
           ),
+          
           Positioned(
             top: 120.h, // Use .h for responsive height
             left: 0,
             right: 0,
             child: Center(
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w), // Use .h and .w for responsive padding
+                padding: EdgeInsets.symmetric(
+                    vertical: 8.h,
+                    horizontal: 16.w), // Use .h and .w for responsive padding
                 decoration: BoxDecoration(
                   color: statusColor.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(8.r), // Use .r for responsive border radius
+                  borderRadius: BorderRadius.circular(
+                      8.r), // Use .r for responsive border radius
                 ),
                 child: Text(
                   statusText,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18.sp, // Use .sp for responsive font size
-                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp, // Use .sp for responsive font size
+                    
                   ),
                 ),
               ),
             ),
           ),
+          if (timeInMarked)
+            Positioned(
+              bottom: 70,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                      vertical: 8.h, horizontal: 16.w),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Text(
+                    "Time In",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          if (timeOutMarked)
+            Positioned(
+              bottom: 70,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                      vertical: 8.h, horizontal: 16.w),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Text(
+                    "Time Out",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ..._faces.map((face) {
             final Rect faceRect = _transformRect(
               face.boundingBox,
@@ -404,8 +506,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                     ),
                   ),
                   Positioned(
-                    top:
-                        10.h, // Adjust as needed to position the text above the rectangle
+                    top: 10
+                        .h, // Adjust as needed to position the text above the rectangle
                     left: 0,
                     right: 0,
                     child: Container(
@@ -426,6 +528,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                 ],
               ),
             );
+
+            
           }).toList(),
         ],
       ),
