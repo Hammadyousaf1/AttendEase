@@ -2,7 +2,6 @@ import 'package:ae/Dashboard.dart';
 import 'package:ae/Home_Screen.dart';
 import 'package:ae/Recognition_Screen.dart';
 import 'package:ae/User_Detail.dart';
-import 'package:ae/User_Input_Screen.dart';
 import 'package:ae/Regisration_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,7 +14,7 @@ class UserManagementScreen extends StatefulWidget {
 }
 
 class _UserManagementScreenState extends State<UserManagementScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final SupabaseClient supabase = Supabase.instance.client;
   late Future<List<Map<String, dynamic>>> _usersFuture;
   List<Map<String, dynamic>> _allUsers = [];
@@ -24,8 +23,13 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   TextEditingController _searchController = TextEditingController();
 
   bool isMenuOpen = false;
+  bool isAnimatingOut = false; // ✅ NEW: To delay widget removal
   late AnimationController _animationController;
   late Animation<double> _rotateAnimation;
+  late AnimationController controller2;
+  late AnimationController controller3;
+  late Animation<Offset> animation;
+  late Animation<Offset> animation2;
   int _selectedIndex = 2;
 
   @override
@@ -36,6 +40,22 @@ class _UserManagementScreenState extends State<UserManagementScreen>
         AnimationController(duration: Duration(milliseconds: 800), vsync: this);
     _rotateAnimation =
         Tween<double>(begin: 0, end: 0.5).animate(_animationController);
+    controller2 =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    controller3 =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    animation = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
+      CurvedAnimation(
+        parent: controller2,
+        curve: Curves.easeOut,
+      ),
+    );
+    animation2 = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
+      CurvedAnimation(
+        parent: controller3,
+        curve: Curves.easeOut,
+      ),
+    );
   }
 
   void _onItemTapped(int index) {
@@ -68,20 +88,38 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   }
 
   void toggleMenu() {
-    setState(() {
-      isMenuOpen = !isMenuOpen;
-      if (isMenuOpen) {
-        _animationController.forward();
-      } else {
-        _animationController.reverse();
-      }
-    });
+    if (isMenuOpen) {
+      setState(() {
+        isAnimatingOut = true; // ✅ Delay widget removal
+      });
+      _animationController.reverse();
+      controller2.reverse();
+      controller3.reverse();
+
+      Future.delayed(Duration(milliseconds: 500), () {
+        if (mounted) {
+          setState(() {
+            isMenuOpen = false;
+            isAnimatingOut = false;
+          });
+        }
+      });
+    } else {
+      setState(() {
+        isMenuOpen = true;
+      });
+      _animationController.forward();
+      controller2.forward();
+      controller3.forward();
+    }
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _animationController.dispose();
+    controller2.dispose();
+    controller3.dispose();
     super.dispose();
   }
 
@@ -100,14 +138,13 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: 24.w),
+                      icon:
+                          Icon(Icons.arrow_back, color: Colors.black, size: 24),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Image.asset('assets/logo5.png', height: 55.h),
                   ],
                 ),
-                SizedBox(height: 4.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -129,11 +166,9 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                       fontWeight: FontWeight.w600,
                                       color: Colors.grey,
                                       fontSize: 12.sp)),
-                              Text(
-                                '${_filteredUsers.length}',
-                                style: TextStyle(
-                                    color: Colors.grey, fontSize: 12.sp),
-                              ),
+                              Text('${_filteredUsers.length}',
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 12.sp)),
                             ],
                           ),
                         ),
@@ -144,7 +179,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                 if (showSearchBar) ...[
                   SizedBox(height: 24.h),
                   SizedBox(
-                    height: 48.h, // Reduced height
+                    height: 48.h,
                     child: TextField(
                       controller: _searchController,
                       onChanged: filterUsers,
@@ -155,8 +190,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         prefixIcon: Icon(Icons.search, size: 20.w),
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 8.h), // Adjust padding
+                        contentPadding: EdgeInsets.symmetric(vertical: 8.h),
                       ),
                     ),
                   ),
@@ -265,7 +299,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
       floatingActionButton: Stack(
         alignment: Alignment.bottomRight,
         children: [
-          if (isMenuOpen) ...[
+          if (isMenuOpen || isAnimatingOut) ...[
             Padding(
               padding: EdgeInsets.only(bottom: 136.h, right: 8.w),
               child: GestureDetector(
@@ -276,31 +310,9 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                         builder: (context) => Registrationscreen()),
                   );
                 },
-                child: Container(
-                  width: 48.0,
-                  height: 48.0,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.black.withOpacity(0.3),
-                      width: 1.w,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
-                        blurRadius: 4.r,
-                        offset: Offset(0, 3.h),
-                      ),
-                      BoxShadow(
-                        color: Color.fromARGB(255, 33, 32, 32),
-                        offset: Offset(3.w, 4.h),
-                      ),
-                    ],
-                  ),
-                  child: Icon(Icons.add,
-                      color: const Color.fromARGB(255, 0, 0, 0)),
+                child: SlideTransition(
+                  position: animation,
+                  child: _buildMiniFAB(icon: Icons.add),
                 ),
               ),
             ),
@@ -317,31 +329,9 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                     }
                   });
                 },
-                child: Container(
-                  width: 48.0,
-                  height: 48.0,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.black.withOpacity(0.3),
-                      width: 1.w,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
-                        blurRadius: 4.r,
-                        offset: Offset(0, 3.h),
-                      ),
-                      BoxShadow(
-                        color: Color.fromARGB(255, 33, 32, 32),
-                        offset: Offset(3.w, 4.h),
-                      ),
-                    ],
-                  ),
-                  child: Icon(Icons.search,
-                      color: const Color.fromARGB(255, 0, 0, 0)),
+                child: SlideTransition(
+                  position: animation2,
+                  child: _buildMiniFAB(icon: Icons.search),
                 ),
               ),
             ),
@@ -378,59 +368,90 @@ class _UserManagementScreenState extends State<UserManagementScreen>
           ),
         ],
       ),
-      bottomNavigationBar: Container(
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
+
+  Widget _buildMiniFAB({required IconData icon}) {
+    return Container(
+      width: 48.0,
+      height: 48.0,
+      decoration: BoxDecoration(
         color: Colors.white,
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            if (index == 0) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
-              );
-            } else if (index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => FaceRectScreen()),
-              );
-            } else if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => UserManagementScreen()),
-              );
-            } else if (index == 3) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DashboardScreen()),
-              );
-            } else {
-              _onItemTapped(index);
-            }
-          },
-          type: BottomNavigationBarType.fixed,
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home, size: 24.w),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(LucideIcons.scanFace, size: 24.w),
-              label: 'Attendance',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.people, size: 24.w),
-              label: 'Users',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard, size: 24.w),
-              label: 'Dashboard',
-            ),
-          ],
-          selectedItemColor: Colors.blue,
-          unselectedItemColor: Colors.black54,
-          selectedLabelStyle: TextStyle(fontSize: 10.sp),
-          unselectedLabelStyle: TextStyle(fontSize: 10.sp),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Colors.black.withOpacity(0.3),
+          width: 1.w,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 4.r,
+            offset: Offset(0, 3.h),
+          ),
+          BoxShadow(
+            color: Color.fromARGB(255, 33, 32, 32),
+            offset: Offset(3.w, 4.h),
+          ),
+        ],
+      ),
+      child: Icon(icon, color: Colors.black),
+    );
+  }
+
+  Widget _buildBottomNavBar() {
+    return Container(
+      color: Colors.white,
+      child: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+          } else if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => FaceRectScreen()),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => UserManagementScreen()),
+            );
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DashboardScreen()),
+            );
+          } else {
+            _onItemTapped(index);
+          }
+        },
+        type: BottomNavigationBarType.fixed,
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, size: 24.w),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.scanFace, size: 24.w),
+            label: 'Attendance',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people, size: 24.w),
+            label: 'Users',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard, size: 24.w),
+            label: 'Dashboard',
+          ),
+        ],
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.black54,
+        selectedLabelStyle: TextStyle(fontSize: 10.sp),
+        unselectedLabelStyle: TextStyle(fontSize: 10.sp),
       ),
     );
   }
