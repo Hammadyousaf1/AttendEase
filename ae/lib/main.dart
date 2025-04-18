@@ -1,4 +1,5 @@
-import 'package:ae/Navigation_bar.dart';
+import 'package:ae/Home_Screen.dart';
+import 'package:ae/Unused/Navigation_bar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
           ),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: Nav(),
+        home: HomeScreen(),
       ),
     );
   }

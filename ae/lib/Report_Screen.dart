@@ -1,6 +1,11 @@
+import 'package:ae/Dashboard.dart';
+import 'package:ae/Home_Screen.dart';
+import 'package:ae/Recognition_Screen.dart';
+import 'package:ae/User_Management.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class searchuser extends StatefulWidget {
@@ -16,6 +21,7 @@ class _ReportsScreenState extends State<searchuser> {
   List<Map<String, dynamic>> _filteredResults = [];
   final _supabase = Supabase.instance.client;
   String _selectedFilter = 'all';
+  int _selectedIndex = 3;
 
   /// Search Attendance from Supabase
   void _performSearch(String query) async {
@@ -42,6 +48,12 @@ class _ReportsScreenState extends State<searchuser> {
     } catch (e) {
       print('Error searching: $e');
     }
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   void _applyFilter(String filter) {
@@ -221,7 +233,7 @@ class _ReportsScreenState extends State<searchuser> {
             Row(
               children: [
                 Text('ID'),
-                SizedBox(width: 16.w),
+                SizedBox(width: 28.w),
                 Text('Name'),
                 Expanded(child: Container()),
                 Padding(
@@ -238,6 +250,11 @@ class _ReportsScreenState extends State<searchuser> {
                   : ListView.builder(
                       itemCount: _filteredResults.length,
                       itemBuilder: (context, index) {
+                        // Sort results by date in descending order (most recent first)
+                        _filteredResults.sort((a, b) =>
+                            DateTime.parse(b['time_out'])
+                                .compareTo(DateTime.parse(a['time_out'])));
+
                         final result = _filteredResults[index];
 
                         /// Convert ISO Timestamp to Readable Date & Time
@@ -252,7 +269,7 @@ class _ReportsScreenState extends State<searchuser> {
                           padding: const EdgeInsets.symmetric(vertical: 0.0),
                           child: Container(
                             padding: EdgeInsets.only(
-                                top: 8,
+                                top: 12,
                                 bottom: 4,
                                 left: 0,
                                 right: 4), // Reduced top padding from 16 to 8
@@ -289,6 +306,60 @@ class _ReportsScreenState extends State<searchuser> {
                     ),
             ),
           ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        color: Colors.white,
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            } else if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FaceRectScreen()),
+              );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserManagementScreen()),
+              );
+            } else if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DashboardScreen()),
+              );
+            } else {
+              _onItemTapped(index);
+            }
+          },
+          type: BottomNavigationBarType.fixed,
+          items:  <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home, size: 24.w),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.scanFace, size: 24.w),
+              label: 'Attendance',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people, size: 24.w),
+              label: 'Users',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard, size: 24.w),
+              label: 'Dashboard',
+            ),
+          ],
+          selectedItemColor: Colors.blue,
+          unselectedItemColor: Colors.black54,
+          selectedLabelStyle: TextStyle(fontSize: 10.sp),
+          unselectedLabelStyle: TextStyle(fontSize: 10.sp),
         ),
       ),
     );

@@ -1,9 +1,12 @@
+import 'package:ae/Dashboard.dart';
 import 'package:ae/Home_Screen.dart';
+import 'package:ae/Recognition_Screen.dart';
 import 'package:ae/User_Detail.dart';
 import 'package:ae/User_Input_Screen.dart';
 import 'package:ae/Regisration_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserManagementScreen extends StatefulWidget {
@@ -11,58 +14,75 @@ class UserManagementScreen extends StatefulWidget {
   _UserManagementScreenState createState() => _UserManagementScreenState();
 }
 
-class _UserManagementScreenState extends State<UserManagementScreen> {
+class _UserManagementScreenState extends State<UserManagementScreen>
+    with SingleTickerProviderStateMixin {
   final SupabaseClient supabase = Supabase.instance.client;
   late Future<List<Map<String, dynamic>>> _usersFuture;
+  List<Map<String, dynamic>> _allUsers = [];
+  List<Map<String, dynamic>> _filteredUsers = [];
+  bool showSearchBar = false;
+  TextEditingController _searchController = TextEditingController();
+
+  bool isMenuOpen = false;
+  late AnimationController _animationController;
+  late Animation<double> _rotateAnimation;
+  int _selectedIndex = 2;
 
   @override
   void initState() {
     super.initState();
     _usersFuture = fetchUsers();
+    _animationController =
+        AnimationController(duration: Duration(milliseconds: 800), vsync: this);
+    _rotateAnimation =
+        Tween<double>(begin: 0, end: 0.5).animate(_animationController);
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   Future<List<Map<String, dynamic>>> fetchUsers() async {
     try {
       final response = await supabase.from('users').select();
-      return response;
+      _allUsers = List<Map<String, dynamic>>.from(response);
+      _filteredUsers = _allUsers;
+      return _filteredUsers;
     } catch (e) {
       print('Error fetching users: $e');
       return [];
     }
   }
 
-  Future<void> deleteUser(int userId) async {
-    try {
-      await supabase.from('users').delete().eq('id', userId);
-      setState(() {
-        _usersFuture = fetchUsers(); // Refetch users after deletion
-      });
-    } catch (e) {
-      print('Error deleting user: $e');
-    }
+  void filterUsers(String query) {
+    setState(() {
+      _filteredUsers = _allUsers.where((user) {
+        final name = (user['name'] ?? '').toString().toLowerCase();
+        final id = (user['id'] ?? '').toString().toLowerCase();
+        return name.contains(query.toLowerCase()) ||
+            id.contains(query.toLowerCase());
+      }).toList();
+    });
   }
 
-  Future<void> editUser(Map<String, dynamic> userData) async {
-    try {
-      final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ProfileScreen(
-            userData: userData,
-            capturedImages: [],
-          ),
-        ),
-      );
-
-      if (result == true) {
-        // Refresh the users list if edit was successful
-        setState(() {
-          _usersFuture = fetchUsers();
-        });
+  void toggleMenu() {
+    setState(() {
+      isMenuOpen = !isMenuOpen;
+      if (isMenuOpen) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
       }
-    } catch (e) {
-      print('Error navigating to edit screen: $e');
-    }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -70,7 +90,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.all(20.w), // Responsive padding
+        padding: EdgeInsets.all(20.w),
         child: LayoutBuilder(
           builder: (context, constraints) {
             return Column(
@@ -81,115 +101,103 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.arrow_back,
-                          color: Color.fromARGB(255, 0, 0, 0),
-                          size: 24.w), // Responsive icon size
+                          color: Colors.black, size: 24.w),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    Image.asset(
-                      'assets/logo5.png',
-                      height: 55.h,
-                    ),
+                    Image.asset('assets/logo5.png', height: 55.h),
                   ],
                 ),
                 SizedBox(height: 4.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 0.0),
-                      child: Text(
-                        'User\nManagement',
-                        style: TextStyle(color: Colors.black, fontSize: 20.sp),
-                      ),
+                    Text(
+                      'User\nManagement',
+                      style: TextStyle(color: Colors.black, fontSize: 20.sp),
                     ),
-                    FutureBuilder<List<Map<String, dynamic>>>(
-                      future: _usersFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator(strokeWidth: 2);
-                        }
-                        if (snapshot.hasError) {
-                          return Text('Error',
-                              style: TextStyle(color: Colors.red));
-                        }
-                        return Padding(
-                          padding: EdgeInsets.only(
-                              right: 3.5.w), // Added right padding
-                          child: Container(
-                            width: constraints.maxWidth * 0.20,
-                            height: constraints.maxHeight * 0.07,
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 255, 255, 255),
-                              /*boxShadow: [
-                                BoxShadow(
-                                  color: Color.fromARGB(255, 40, 40, 40),
-                                  offset: Offset(3.w, 3.5.h),
-                                ),
-                              ],
-                              border: Border.all(
-                                color: Colors.black.withOpacity(0.3),
-                                width: 1.w,
+                    Padding(
+                      padding: EdgeInsets.only(right: 3.5.w, bottom: 3.5.w),
+                      child: Container(
+                        width: constraints.maxWidth * 0.20,
+                        height: constraints.maxHeight * 0.05,
+                        child: Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Total ',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey,
+                                      fontSize: 12.sp)),
+                              Text(
+                                '${_filteredUsers.length}',
+                                style: TextStyle(
+                                    color: Colors.grey, fontSize: 12.sp),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(8.r),
-                              ),*/
-                            ),
-                            child: Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Total ',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color.fromARGB(
-                                            255, 99, 99, 99),
-                                        fontSize: 12.sp),
-                                  ),
-                                  Text(
-                                    '${snapshot.data?.length ?? 0}',
-                                    style: TextStyle(
-                                        color: const Color.fromARGB(
-                                            255, 99, 99, 99),
-                                        fontSize: 12.sp),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            ],
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
                   ],
                 ),
+                if (showSearchBar) ...[
+                  SizedBox(height: 24.h),
+                  SizedBox(
+                    height: 48.h, // Reduced height
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: filterUsers,
+                      decoration: InputDecoration(
+                        hintText: 'Search by name or ID',
+                        hintStyle: TextStyle(fontSize: 12.sp),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        prefixIcon: Icon(Icons.search, size: 20.w),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 8.h), // Adjust padding
+                      ),
+                    ),
+                  ),
+                ],
+                SizedBox(height: 0.h),
                 Expanded(
                   child: FutureBuilder<List<Map<String, dynamic>>>(
                     future: _usersFuture,
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
+                      if (snapshot.connectionState == ConnectionState.waiting)
                         return Center(
                             child: CircularProgressIndicator(strokeWidth: 2));
-                      }
-                      if (snapshot.hasError) {
+                      if (snapshot.hasError)
                         return Center(child: Text('Error loading users'));
-                      }
-                      final users = snapshot.data ?? [];
 
-                      // Sort users by id (as string)
-                      users.sort((a, b) =>
-                          (a['id'] as String).compareTo(b['id'] as String));
+                      final users = _filteredUsers;
+
+                      users.sort((a, b) => (a['id'] ?? '')
+                          .toString()
+                          .compareTo((b['id'] ?? '').toString()));
 
                       return ListView.builder(
                         itemCount: users.length,
                         itemBuilder: (context, index) {
                           final user = users[index];
                           return Card(
-                            child: Container(
-                              color: Colors.white,
-                              width: constraints
-                                  .maxWidth, // Set width to screen width
-                              child: Padding(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => UserDetailScreen(
+                                      userId: user['id'],
+                                      profileImageUrl:
+                                          'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id']}.png',
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                color: Colors.white,
+                                width: constraints.maxWidth,
                                 padding: EdgeInsets.all(16.w),
                                 child: Row(
                                   children: [
@@ -199,11 +207,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(8),
                                         child: Image.network(
-                                          'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id'] ?? 'Icon'}.png',
+                                          'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id']}.png',
                                           fit: BoxFit.cover,
                                           errorBuilder:
                                               (context, error, stackTrace) {
-                                            // If the image fails to load, use Icon.png
                                             return Image.network(
                                               'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/Icon.png',
                                               fit: BoxFit.cover,
@@ -223,8 +230,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                                   fontSize:
                                                       constraints.maxWidth *
                                                           0.040),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1),
+                                              overflow: TextOverflow.ellipsis),
                                           SizedBox(height: 4.h),
                                           Text('ID: ${user['id'] ?? ''}',
                                               style: TextStyle(
@@ -234,56 +240,12 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                         ],
                                       ),
                                     ),
-                                    /*Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () => editUser(user),
-                                          child: Container(
-                                            width: constraints.maxWidth * 0.06,
-                                            height: constraints.maxWidth * 0.06,
-                                            child: Icon(Icons.edit,
-                                                color: Colors.black,
-                                                size: constraints.maxWidth *
-                                                    0.05),
-                                          ),
-                                        ),
-                                        SizedBox(height: 12.h),
-                                        GestureDetector(
-                                          onTap: () =>
-                                              deleteUser(int.parse(user['id'])),
-                                          child: Container(
-                                            width: constraints.maxWidth * 0.06,
-                                            height: constraints.maxWidth * 0.06,
-                                            child: Icon(Icons.delete,
-                                                color: Colors.red,
-                                                size: constraints.maxWidth *
-                                                    0.05),
-                                          ),
-                                        ),
-                                      ],
-                                    ),*/
-                                    SizedBox(
-                                      width: 8.w,
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                UserDetailScreen(
-                                                    userId: user['id'],
-                                                    userName: user['name'] ?? 'Unknown',
-                                                    profileImageUrl: 'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id'] ?? 'Icon'}.png'),
-                                        ));
-                                      },
-                                      child: Container(
-                                        width: constraints.maxWidth * 0.15,
-                                        height: constraints.maxWidth * 0.15,
-                                        child: Icon(Icons.chevron_right,
-                                            color: Colors.blue,
-                                            size: constraints.maxWidth * 0.1),
-                                      ),
+                                    Container(
+                                      width: constraints.maxWidth * 0.15,
+                                      height: constraints.maxWidth * 0.15,
+                                      child: Icon(Icons.chevron_right,
+                                          color: Colors.blue,
+                                          size: constraints.maxWidth * 0.1),
                                     ),
                                   ],
                                 ),
@@ -295,50 +257,179 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     },
                   ),
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => Registrationscreen(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.15,
-                      height: MediaQuery.of(context).size.height * 0.08,
-                      padding: EdgeInsets.all(0.w),
-                      margin: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).size.height * 0.008),
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        border: Border.all(
-                          color: Colors.black.withOpacity(0.3),
-                          width: 1.w,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color.fromARGB(255, 0, 0, 0)
-                                .withOpacity(0.4),
-                            blurRadius: 4.r,
-                            offset: Offset(0, 3.h),
-                          ),
-                          BoxShadow(
-                            color: Color.fromARGB(255, 8, 84, 146),
-                            offset: Offset(3.w, 4.h),
-                          ),
-                        ],
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Icon(Icons.add,
-                          color: Colors.white, size: 28.w, weight: 3.0),
-                    ),
-                  ),
-                ),
               ],
             );
           },
+        ),
+      ),
+      floatingActionButton: Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          if (isMenuOpen) ...[
+            Padding(
+              padding: EdgeInsets.only(bottom: 136.h, right: 8.w),
+              child: GestureDetector(
+                onTap: () {
+                  toggleMenu();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => Registrationscreen()),
+                  );
+                },
+                child: Container(
+                  width: 48.0,
+                  height: 48.0,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.black.withOpacity(0.3),
+                      width: 1.w,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
+                        blurRadius: 4.r,
+                        offset: Offset(0, 3.h),
+                      ),
+                      BoxShadow(
+                        color: Color.fromARGB(255, 33, 32, 32),
+                        offset: Offset(3.w, 4.h),
+                      ),
+                    ],
+                  ),
+                  child: Icon(Icons.add,
+                      color: const Color.fromARGB(255, 0, 0, 0)),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 75.h, right: 8.w),
+              child: GestureDetector(
+                onTap: () {
+                  toggleMenu();
+                  setState(() {
+                    showSearchBar = !showSearchBar;
+                    if (!showSearchBar) {
+                      _searchController.clear();
+                      filterUsers('');
+                    }
+                  });
+                },
+                child: Container(
+                  width: 48.0,
+                  height: 48.0,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.black.withOpacity(0.3),
+                      width: 1.w,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
+                        blurRadius: 4.r,
+                        offset: Offset(0, 3.h),
+                      ),
+                      BoxShadow(
+                        color: Color.fromARGB(255, 33, 32, 32),
+                        offset: Offset(3.w, 4.h),
+                      ),
+                    ],
+                  ),
+                  child: Icon(Icons.search,
+                      color: const Color.fromARGB(255, 0, 0, 0)),
+                ),
+              ),
+            ),
+          ],
+          GestureDetector(
+            onTap: toggleMenu,
+            child: Container(
+              width: 64.0,
+              height: 64.0,
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                border: Border.all(
+                  color: Colors.black.withOpacity(0.3),
+                  width: 1.w,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
+                    blurRadius: 4.r,
+                    offset: Offset(0, 5.h),
+                  ),
+                  BoxShadow(
+                    color: Color.fromARGB(255, 8, 84, 146),
+                    offset: Offset(4.w, 5.h),
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: RotationTransition(
+                turns: _rotateAnimation,
+                child: Icon(Icons.menu, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        color: Colors.white,
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            } else if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FaceRectScreen()),
+              );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserManagementScreen()),
+              );
+            } else if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DashboardScreen()),
+              );
+            } else {
+              _onItemTapped(index);
+            }
+          },
+          type: BottomNavigationBarType.fixed,
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home, size: 24.w),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.scanFace, size: 24.w),
+              label: 'Attendance',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people, size: 24.w),
+              label: 'Users',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard, size: 24.w),
+              label: 'Dashboard',
+            ),
+          ],
+          selectedItemColor: Colors.blue,
+          unselectedItemColor: Colors.black54,
+          selectedLabelStyle: TextStyle(fontSize: 10.sp),
+          unselectedLabelStyle: TextStyle(fontSize: 10.sp),
         ),
       ),
     );

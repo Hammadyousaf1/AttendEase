@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:typed_data';
 import 'package:ae/User_Input_Screen.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ class _RegistrationScreenState extends State<Registrationscreen> {
   List<String> capturedImages = [];
   static const int requiredImages = 5;
   int _frameCount = 0;
+  bool _faceDetectedOnce = false;
 
   @override
   void initState() {
@@ -79,21 +81,13 @@ class _RegistrationScreenState extends State<Registrationscreen> {
     _isCapturing = true;
 
     try {
-      for (int i = capturedImages.length; i < requiredImages; i++) {
+      for (int i = 0; i < requiredImages; i++) {
         if (_cameraController?.value.isInitialized ?? false) {
           try {
-            // Wait for a face to be detected before capturing an image
-
-            // Capture the image
             final XFile image = await _cameraController!.takePicture();
             setState(() {
               capturedImages.add(image.path);
             });
-
-            if (i < requiredImages - 1) {
-              await Future.delayed(Duration(
-                  milliseconds: 100)); // Add a small delay between captures
-            }
           } catch (e) {
             print("Error capturing image: $e");
             ScaffoldMessenger.of(context).showSnackBar(
@@ -106,6 +100,7 @@ class _RegistrationScreenState extends State<Registrationscreen> {
       }
 
       if (!mounted) return;
+      await _stopFaceDetection(); // Stop face detection before showing dialog
       await _showCapturedImagesDialog();
     } catch (e) {
       print("Error capturing images: $e");
@@ -114,10 +109,18 @@ class _RegistrationScreenState extends State<Registrationscreen> {
       );
     } finally {
       _isCapturing = false;
+      _faceDetectedOnce = false;
       if (_cameraController != null &&
           _cameraController!.value.isStreamingImages) {
         await _cameraController!.stopImageStream();
       }
+    }
+  }
+
+  Future<void> _stopFaceDetection() async {
+    if (_cameraController != null &&
+        _cameraController!.value.isStreamingImages) {
+      await _cameraController!.stopImageStream();
     }
   }
 
@@ -130,12 +133,13 @@ class _RegistrationScreenState extends State<Registrationscreen> {
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
+          backgroundColor: Colors.white,
           title: Text(
               'Review Images (${currentImageIndex + 1}/${capturedImages.length})',
-              style: TextStyle(fontSize: 16)),
+              style: TextStyle(fontSize: 16.sp)),
           content: Container(
             width: double.maxFinite,
-            height: 300,
+            height: 300.h,
             child: PageView.builder(
               controller: _pageController,
               onPageChanged: (index) {
@@ -147,32 +151,57 @@ class _RegistrationScreenState extends State<Registrationscreen> {
               itemBuilder: (context, index) {
                 return Image.file(
                   File(capturedImages[index]),
-                  height: 280,
+                  height: 280.h,
                   fit: BoxFit.cover,
                 );
               },
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () async {
-                // Clear captured images
-                setState(() {
-                  capturedImages.clear();
-                  _isCapturing = false;
-                });
-
-                // Close the dialog
-                Navigator.pop(context);
-
-                // Restart the camera and face detection
-                await _initializeCamera();
-                _startFaceDetection();
+            GestureDetector(
+              onTap: () async {
+                await _stopCameraAndDispose();
+                if (!mounted) return;
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Registrationscreen(),
+                  ),
+                );
               },
-              child: Text('Retry'),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(
+                    color: Colors.black.withOpacity(0.3),
+                    width: 1.w,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color:
+                          const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
+                      blurRadius: 4.r,
+                      offset: Offset(0, 3.h),
+                    ),
+                    BoxShadow(
+                      color: const Color.fromARGB(255, 0, 0, 0),
+                      offset: Offset(3.w, 4.h),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  'Retry',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
             ),
-            TextButton(
-              onPressed: () async {
+            GestureDetector(
+              onTap: () async {
                 await _stopCameraAndDispose();
                 if (!mounted) return;
                 Navigator.pushReplacement(
@@ -183,7 +212,36 @@ class _RegistrationScreenState extends State<Registrationscreen> {
                   ),
                 );
               },
-              child: Text('Continue'),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(
+                    color: Colors.black.withOpacity(0.3),
+                    width: 1.w,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color:
+                          const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
+                      blurRadius: 4.r,
+                      offset: Offset(0, 3.h),
+                    ),
+                    BoxShadow(
+                      color: Color.fromARGB(255, 8, 84, 146),
+                      offset: Offset(3.w, 4.h),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  'Continue',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -195,12 +253,11 @@ class _RegistrationScreenState extends State<Registrationscreen> {
     if (_cameraController == null) return;
 
     _cameraController!.startImageStream((CameraImage image) async {
-      if (_isDetecting) return; // Skip if already detecting
+      if (_isDetecting) return;
       _isDetecting = true;
 
       _frameCount++;
       if (_frameCount % 3 != 0) {
-        // Process every 3rd frame
         _isDetecting = false;
         return;
       }
@@ -254,11 +311,9 @@ class _RegistrationScreenState extends State<Registrationscreen> {
           }).toList();
         });
 
-        // Start capturing images if a face is detected and not already capturing
-        if (_faces.isNotEmpty &&
-            !_isCapturing &&
-            capturedImages.length < requiredImages) {
-          _captureImages(); // Call the _captureImages method
+        if (_faces.isNotEmpty && !_isCapturing && !_faceDetectedOnce) {
+          _faceDetectedOnce = true;
+          _captureImages();
         }
       } catch (e) {
         print("Error in face detection: $e");
@@ -337,7 +392,7 @@ class _RegistrationScreenState extends State<Registrationscreen> {
     double scaleY = screenSize.height / imageSize.height;
 
     double left, right;
-    double offsetX = 300.0;
+    double offsetX = 300.w; // Use responsive width unit
 
     if (_isFrontCamera) {
       left = rect.left * scaleX - offsetX;
@@ -383,25 +438,25 @@ class _RegistrationScreenState extends State<Registrationscreen> {
                   _cameraController!), // Improved camera preview aspect ratio
             ),
             Positioned(
-              top: 50,
+              top: 50.h, // Use .h for responsive height
               left: 0,
               right: 0,
               child: Column(
                 children: [
                   SizedBox(
-                    height: 16, // Set the desired height
+                    height: 16.h, // Responsive height
                     child: LinearProgressIndicator(
                       value: captureProgress,
                       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                     ),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 8.h), // Responsive spacing
                   Text(
                     "Capturing...",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 12,
+                      fontSize: 12.sp, // Responsive font size
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -422,20 +477,35 @@ class _RegistrationScreenState extends State<Registrationscreen> {
                 height: faceRect.height,
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green, width: 6),
-                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.green, 
+                      width: 6.w // Responsive border width
+                    ),
+                    borderRadius: BorderRadius.circular(12.r), // Responsive border radius
                   ),
                 ),
               );
             }).toList(),
             Positioned(
-              bottom: 20,
-              right: 20,
+              bottom: 48.h,
+              right: 36.w,
               child: FloatingActionButton(
                 onPressed: _toggleCamera,
-                child: Icon(Icons.switch_camera,
-                    color: Colors.white), // Changed icon color to white
-                backgroundColor: Color(0xFF1E4FFE), // Added background color
+                child: Icon(Icons.switch_camera, color: Colors.white, size: 24.w),
+                backgroundColor: Colors.black26,
+                mini: true,
+              ),
+            ),
+            Positioned(
+              bottom: 48.h,
+              left: 36.w,
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Icon(Icons.arrow_back, color: Colors.white, size: 24.w),
+                backgroundColor: Colors.black26,
+                mini: true,
               ),
             ),
           ],
