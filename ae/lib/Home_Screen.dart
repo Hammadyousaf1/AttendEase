@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   FadeTransition(
                     opacity: animation2,
                     child: Text(
-                      'Today is',
+                      'Today Is',
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.secondary,
                           fontSize: 18.sp),
