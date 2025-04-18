@@ -48,7 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _submitData() async {
     if (_nameController.text.isEmpty ||
         _idController.text.isEmpty ||
-        _phoneController.text.length != 11) {
+        _phoneController.text.length != 13) {
       // Check for phone number length
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -64,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.100.2:5000/train'));
+          'POST', Uri.parse('http://192.168.100.6:5000/train'));
       request.fields['name'] = _nameController.text;
       request.fields['id'] = _idController.text;
       request.fields['phone'] =
@@ -211,6 +211,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               decoration: InputDecoration(
                 labelText: "Whatsapp No",
                 labelStyle: TextStyle(fontSize: 14.sp, color: Colors.black),
+                prefixText: "+92 ",
+                prefixStyle: TextStyle(fontSize: 14.sp, color: Colors.black),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
                   borderSide: BorderSide(color: Colors.black),
