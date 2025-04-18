@@ -28,12 +28,7 @@ dependencies:
   carousel_slider: ^5.0.0
   google_nav_bar: ^5.0.7
   fl_chart: ^0.70.2
-<<<<<<< HEAD
-  shared_preferences: ^2.5.3
-  
-=======
   lucide_icons: ^0.257.0
->>>>>>> ad3b6ce7ae7dfa82f91941a5d9c3765bac41096b
 
 dev_dependencies:
   flutter_test:
@@ -42,11 +37,11 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
 
 flutter:
+  uses-material-design: true
   assets:
     - assets/
-  uses-material-design: true
 
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/Icon.png" # Path to your new app icon
+  image_path: "assets/Icon.png"

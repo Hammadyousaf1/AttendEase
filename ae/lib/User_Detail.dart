@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ae/Dashboard.dart';
 import 'package:ae/Home_Screen.dart';
 import 'package:ae/Recognition_Screen.dart';
@@ -5,12 +7,11 @@ import 'package:ae/User_Management.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image/image.dart' as img;
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:image/image.dart' as img;
 
 class UserDetailScreen extends StatefulWidget {
   final String userId;
@@ -1726,7 +1727,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             }
           },
           type: BottomNavigationBarType.fixed,
-          items:  <BottomNavigationBarItem>[
+          items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home, size: 24.w),
               label: 'Home',
