@@ -205,10 +205,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Attendance Summary Cards
             Row(
               children: [
-                Expanded(child: _buildCard("Marked", markedCount.toString())),
+                Expanded(
+                    child:
+                        _buildCard("Marked", markedCount.toString() + " ☑️ ")),
                 SizedBox(width: 10.w),
                 Expanded(
-                    child: _buildCard("Enrolled", enrolledCount.toString())),
+                    child: _buildCard(
+                        "Enrolled", enrolledCount.toString() + " 🎓")),
               ],
             ),
             SizedBox(height: 20.h),
@@ -221,17 +224,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             Row(
               children: [
-                Text('ID', style: TextStyle(fontSize: 14.sp)),
+                Text('ID',
+                    style: TextStyle(
+                        fontSize: 12.sp, fontWeight: FontWeight.w500)),
                 SizedBox(width: 20.w),
-                Text('Name', style: TextStyle(fontSize: 14.sp)),
+                Text('Name',
+                    style: TextStyle(
+                        fontSize: 12.sp, fontWeight: FontWeight.w500)),
                 SizedBox(width: 40.w),
                 Expanded(
                     child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('Time In', style: TextStyle(fontSize: 12.sp)),
+                    Text('Time In',
+                        style: TextStyle(
+                            fontSize: 12.sp, fontWeight: FontWeight.w500)),
                     SizedBox(width: 20.w),
-                    Text('Time Out', style: TextStyle(fontSize: 12.sp)),
+                    Text('Time Out',
+                        style: TextStyle(
+                            fontSize: 12.sp, fontWeight: FontWeight.w500)),
                   ],
                 ))
               ],
@@ -295,7 +306,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               color: Colors.black
                                                   .withOpacity(0.7)),
                                         ),
-                                        SizedBox(width: 16.w),
+                                        SizedBox(width: 12.w),
                                         Text(
                                           student['time_out'] != null
                                               ? DateFormat.jm().format(
@@ -390,7 +401,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             }
           },
           type: BottomNavigationBarType.fixed,
-          items:  <BottomNavigationBarItem>[
+          items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home, size: 24.w),
               label: 'Home',
@@ -437,7 +448,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           Text(title, style: TextStyle(fontSize: 18.sp, color: Colors.blue)),
           SizedBox(height: 8.h),
-          Text(value, style: TextStyle(fontSize: 20.sp, color: Colors.blue)),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 20.sp,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold)),
         ],
       ),
     );

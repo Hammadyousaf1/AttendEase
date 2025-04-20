@@ -200,6 +200,9 @@ class _RegistrationScreenState extends State<Registrationscreen> {
                 ),
               ),
             ),
+            SizedBox(
+              width: 4.w,
+            ),
             GestureDetector(
               onTap: () async {
                 await _stopCameraAndDispose();
@@ -448,7 +451,7 @@ class _RegistrationScreenState extends State<Registrationscreen> {
                     child: LinearProgressIndicator(
                       value: captureProgress,
                       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
                     ),
                   ),
                   SizedBox(height: 8.h), // Responsive spacing
@@ -478,10 +481,11 @@ class _RegistrationScreenState extends State<Registrationscreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Colors.green, 
-                      width: 6.w // Responsive border width
-                    ),
-                    borderRadius: BorderRadius.circular(12.r), // Responsive border radius
+                        color: Colors.blue,
+                        width: 6.w // Responsive border width
+                        ),
+                    borderRadius:
+                        BorderRadius.circular(12.r), // Responsive border radius
                   ),
                 ),
               );
@@ -489,23 +493,33 @@ class _RegistrationScreenState extends State<Registrationscreen> {
             Positioned(
               bottom: 48.h,
               right: 36.w,
-              child: FloatingActionButton(
-                onPressed: _toggleCamera,
-                child: Icon(Icons.switch_camera, color: Colors.white, size: 24.w),
-                backgroundColor: Colors.black26,
-                mini: true,
+              child: GestureDetector(
+                onTap: _toggleCamera,
+                child: Container(
+                  width: 40.w,
+                  height: 40.w,
+                  child: Center(
+                    child: Icon(Icons.switch_camera,
+                        color: Colors.white, size: 24.w),
+                  ),
+                ),
               ),
             ),
             Positioned(
               bottom: 48.h,
               left: 36.w,
-              child: FloatingActionButton(
-                onPressed: () {
+              child: GestureDetector(
+                onTap: () {
                   Navigator.of(context).pop();
                 },
-                child: Icon(Icons.arrow_back, color: Colors.white, size: 24.w),
-                backgroundColor: Colors.black26,
-                mini: true,
+                child: Container(
+                  width: 40.w,
+                  height: 40.w,
+                  child: Center(
+                    child:
+                        Icon(Icons.arrow_back, color: Colors.white, size: 24.w),
+                  ),
+                ),
               ),
             ),
           ],

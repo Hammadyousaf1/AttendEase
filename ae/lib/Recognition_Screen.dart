@@ -192,7 +192,9 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       }
 
       final request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.100.6:5000/recognize'));
+          'POST',
+          Uri.parse(
+              'https://5797de82-6eb3-4c86-912d-12640d40b0d1-00-3glnzqcu1moa3.sisko.replit.dev/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));
@@ -383,8 +385,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
           Positioned(
             bottom: 48,
             left: 36,
-            child: FloatingActionButton(
-              onPressed: () async {
+            child: GestureDetector(
+              onTap: () async {
                 await _stopCameraAndDispose(); // Ensure proper cleanup
                 if (mounted) {
                   Navigator.pushReplacement(
@@ -393,18 +395,27 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                   );
                 }
               },
-              child: Icon(Icons.arrow_back, color: Colors.white),
-              backgroundColor: Colors.black26,
-              mini: true,
+              child: Container(
+                width: 40,
+                height: 40,
+                child: Center(
+                  child: Icon(Icons.arrow_back, color: Colors.white, size: 24),
+                ),
+              ),
             ),
           ),
           Positioned(
             bottom: 48,
             right: 36,
-            child: FloatingActionButton(
-              onPressed: _switchCamera,
-              child: Icon(Icons.switch_camera, color: Colors.white),
-              backgroundColor: Colors.black26,
+            child: GestureDetector(
+              onTap: _switchCamera,
+              child: Container(
+                width: 40,
+                height: 40,
+                child: Center(
+                  child: Icon(Icons.switch_camera, color: Colors.white, size: 24),
+                ),
+              ),
             ),
           ),
           Positioned(

@@ -801,7 +801,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               workingHours < 20
                   ? 'assets/indicator3.png'
                   : (workingHours < 35
-                      ? 'assetsindicator2.png'
+                      ? 'assets/indicator2.png'
                       : 'assets/indicator1.png'),
               height: 64.h,
             ),
