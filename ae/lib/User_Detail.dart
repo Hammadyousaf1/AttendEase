@@ -33,6 +33,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   bool isAttendanceFrozen = false;
   int _selectedIndex = 2;
   int workingHours = 0;
+  int totalworkinghours = 0;
   int attendanceStreak = 0;
   bool isLoading = false;
   String? profileImageUrl;
@@ -46,6 +47,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     fetchAttendanceData();
     checkFreezeStatus();
     fetchUserPhoneNumber(); // Fetch phone number on initialization
+    fetchWorkingHours();
   }
 
   void _onItemTapped(int index) {
@@ -74,6 +76,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       await Future.wait([
         fetchWorkingHours(),
         fetchAttendanceStreak(),
+        calculateTotalWorkingHours(),
       ]);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -135,6 +138,31 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       setState(() => workingHours = totalHours.round());
     } catch (e) {
       print('Error fetching working hours: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> calculateTotalWorkingHours() async {
+    try {
+      // Fetch all attendance records for the user
+      final response = await supabase
+          .from('attendance2')
+          .select('time_in, time_out')
+          .eq('user_id', widget.userId);
+
+      double totalHours = 0;
+      for (final record in response) {
+        if (record['time_in'] != null && record['time_out'] != null) {
+          final timeIn = DateTime.parse(record['time_in'].toString());
+          final timeOut = DateTime.parse(record['time_out'].toString());
+
+          // Calculate hours for each record and add to total
+          totalHours += timeOut.difference(timeIn).inHours.toDouble();
+        }
+      }
+      setState(() => totalworkinghours = totalHours.round());
+    } catch (e) {
+      print('Error calculating total working hours: $e');
       rethrow;
     }
   }
@@ -795,7 +823,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 )
               ],
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 12.h),
 
             Image.asset(
               workingHours < 20
@@ -805,12 +833,12 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                       : 'assets/indicator1.png'),
               height: 64.h,
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 12.h),
             Text(
               "Weekly Tracker",
               style: TextStyle(fontSize: 16.sp),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 2.h),
             Row(
               children: [
                 Expanded(
@@ -824,14 +852,14 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               ],
             ),
             SizedBox(
-              height: 20.h,
+              height: 16.h,
             ),
 
             Text(
               "Rewards",
               style: TextStyle(fontSize: 16.sp),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 2.h),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -842,8 +870,12 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                         height: 80.h,
                       ),
                       'Level 1',
-                      "50 Working\nHours",
-                      isActive: workingHours > 50 && workingHours < 75),
+                      totalworkinghours >= 75
+                          ? "50 Hours\nCompleted"
+                          : "50 Working\nHours",
+                      isActive:
+                          totalworkinghours > 50 && totalworkinghours < 75,
+                      isCompleted: totalworkinghours >= 75),
                   SizedBox(
                     width: 12.w,
                   ),
@@ -853,8 +885,12 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                         height: 80.h,
                       ),
                       'Level 2',
-                      "75 Working\nHours",
-                      isActive: workingHours > 75 && workingHours < 100),
+                      totalworkinghours >= 100
+                          ? "75 Hours\nCompleted"
+                          : "75 Working\nHours",
+                      isActive:
+                          totalworkinghours > 75 && totalworkinghours < 100,
+                      isCompleted: totalworkinghours >= 100),
                   SizedBox(
                     width: 12.w,
                   ),
@@ -864,8 +900,24 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                         height: 80.h,
                       ),
                       'Level 3',
-                      "100 Working\nHours",
-                      isActive: workingHours >= 100),
+                      totalworkinghours >= 150
+                          ? "100 Hours\nCompleted"
+                          : "100 Working\nHours",
+                      isActive:
+                          totalworkinghours > 100 && totalworkinghours < 150,
+                      isCompleted: totalworkinghours >= 150),
+                  SizedBox(
+                    width: 12.w,
+                  ),
+                  _buildRewards(
+                      Image.asset(
+                        'assets/level3.gif',
+                        height: 80.h,
+                      ),
+                      'Level 4',
+                      "150 Working\nHours",
+                      isActive: totalworkinghours >= 150,
+                      isCompleted: false),
                 ],
               ),
             ),
@@ -1793,7 +1845,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 }
 
 Widget _buildRewards(Image image, String title, String desc,
-    {bool isActive = true}) {
+    {bool isActive = true, bool isCompleted = false}) {
   return Container(
     width: 140.w,
     padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
@@ -1801,7 +1853,9 @@ Widget _buildRewards(Image image, String title, String desc,
       borderRadius: BorderRadius.circular(12.r),
       border: Border.all(
           color: isActive ? Colors.black26 : Colors.grey, width: 1.w),
-      color: isActive ? Colors.white : Colors.grey[200],
+      color: isCompleted
+          ? Colors.white
+          : (isActive ? Colors.white : Colors.grey[200]),
       boxShadow: [
         BoxShadow(
           color: Colors.black.withOpacity(0.2),
@@ -1815,7 +1869,7 @@ Widget _buildRewards(Image image, String title, String desc,
       children: [
         ColorFiltered(
           colorFilter: ColorFilter.mode(
-            isActive
+            isCompleted || isActive
                 ? Colors.transparent
                 : const Color.fromARGB(255, 240, 238, 238),
             BlendMode.saturation,
@@ -1828,7 +1882,9 @@ Widget _buildRewards(Image image, String title, String desc,
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
-            color: isActive ? Colors.blue : Colors.grey[600],
+            color: isCompleted
+                ? Colors.green
+                : (isActive ? Colors.blue : Colors.grey[600]),
           ),
         ),
         SizedBox(height: 8.h),
@@ -1836,7 +1892,9 @@ Widget _buildRewards(Image image, String title, String desc,
           desc,
           style: TextStyle(
             fontSize: 12.sp,
-            color: isActive ? Colors.black : Colors.grey[600],
+            color: isCompleted
+                ? Colors.black
+                : (isActive ? Colors.black : Colors.grey[600]),
           ),
         ),
       ],
