@@ -184,14 +184,15 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
   Future<void> _sendImageToServer(File imageFile) async {
     try {
       // Check if 90 seconds have passed since last request
-      if (_lastRequestTime != null && 
-          DateTime.now().difference(_lastRequestTime!) < Duration(seconds: 10)) {
+      if (_lastRequestTime != null &&
+          DateTime.now().difference(_lastRequestTime!) <
+              Duration(seconds: 10)) {
         print("Waiting for 90 seconds between requests");
         return;
       }
 
       final request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.100.2:5000/recognize'));
+          'POST', Uri.parse('http://192.168.100.6:5000/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));
@@ -238,7 +239,6 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
 
         print("Image sent successfully");
         _lastRequestTime = DateTime.now(); // Update last request time
-        
       } else {
         print("Failed to send image. Status code: ${response.statusCode}");
       }
@@ -343,7 +343,6 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
 
     String statusText = "Face the camera";
     Color statusColor = Colors.red;
-    
 
     if (freezeStatus) {
       statusText = "Attendance Freezed";
@@ -364,7 +363,6 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
     } else if (_faces.isNotEmpty) {
       statusText = "Recognizing...";
       statusColor = Colors.blue;
-      
     } else if (_isDetecting) {
       statusText = "Recognizing...";
       statusColor = Colors.yellow;
@@ -409,7 +407,6 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
               backgroundColor: Colors.black26,
             ),
           ),
-          
           Positioned(
             top: 120.h, // Use .h for responsive height
             left: 0,
@@ -429,7 +426,6 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16.sp, // Use .sp for responsive font size
-                    
                   ),
                 ),
               ),
@@ -442,8 +438,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
               right: 0,
               child: Center(
                 child: Container(
-                  padding: EdgeInsets.symmetric(
-                      vertical: 8.h, horizontal: 16.w),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
                   decoration: BoxDecoration(
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(8.r),
@@ -465,8 +461,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
               right: 0,
               child: Center(
                 child: Container(
-                  padding: EdgeInsets.symmetric(
-                      vertical: 8.h, horizontal: 16.w),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
                   decoration: BoxDecoration(
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(8.r),
@@ -528,8 +524,6 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                 ],
               ),
             );
-
-            
           }).toList(),
         ],
       ),

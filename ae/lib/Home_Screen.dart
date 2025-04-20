@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
           SizedBox(
-            height: 8.h,
+            height: 4.h,
           ),
           Padding(
             padding: EdgeInsets.only(left: 24.w),
@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
                   SizedBox(
-                    height: 12.h,
+                    height: 8.h,
                   ),
                   FadeTransition(
                     opacity: animation2,
