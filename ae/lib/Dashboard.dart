@@ -217,7 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             SizedBox(height: 20.h),
 
             Text(
-              'Daily Report',
+              'Today Report',
               style: TextStyle(fontSize: 18.sp),
             ),
             SizedBox(height: 16.h),
@@ -255,7 +255,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   : attendanceList.isEmpty
                       ? Center(
                           child: Text(
-                            "No records found for this date.",
+                            "No records found.",
                             style: TextStyle(
                                 fontSize: 12.sp, color: Colors.black26),
                           ),

@@ -355,32 +355,41 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 8.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.w),
-                  onPressed: () => Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => UserManagementScreen(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Refresh all data
+          await Future.wait([
+            fetchAttendanceData(),
+            checkFreezeStatus(),
+            fetchUserPhoneNumber(),
+            fetchWorkingHours(),
+          ]);
+        },
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 8.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.w),
+                    onPressed: () => Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => UserManagementScreen(),
+                      ),
                     ),
                   ),
-                ),
-                Image.asset(
-                  'assets/logo5.png',
-                  height: 55.h,
-                ),
-              ],
-            ),
-            SizedBox(height: 4.h),
-            // Profile UI with edit functionality
-            Row(
+                  Image.asset(
+                    'assets/logo5.png',
+                    height: 55.h,
+                  ),
+                ],
+              ),
+              SizedBox(height: 4.h),
+              Row(
               children: [
                 Stack(
                   children: [
@@ -828,7 +837,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             Image.asset(
               workingHours < 20
                   ? 'assets/indicator3.png'
-                  : (workingHours < 35
+                  : (workingHours < 40
                       ? 'assets/indicator2.png'
                       : 'assets/indicator1.png'),
               height: 64.h,
@@ -1746,7 +1755,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                         ),
                     ],
                   )
-          ],
+          
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Container(
