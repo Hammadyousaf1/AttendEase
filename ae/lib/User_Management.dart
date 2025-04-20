@@ -31,6 +31,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   late Animation<Offset> animation;
   late Animation<Offset> animation2;
   int _selectedIndex = 2;
+  late List<Animation<Offset>> slide;
+  late AnimationController controller4;
 
   @override
   void initState() {
@@ -56,6 +58,11 @@ class _UserManagementScreenState extends State<UserManagementScreen>
         curve: Curves.easeOut,
       ),
     );
+
+    controller4 =
+        AnimationController(vsync: this, duration: Duration(seconds: 3));
+
+    controller4.forward();
   }
 
   void _onItemTapped(int index) {
@@ -200,11 +207,13 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                   child: FutureBuilder<List<Map<String, dynamic>>>(
                     future: _usersFuture,
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting)
+                      if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(
                             child: CircularProgressIndicator(strokeWidth: 2));
-                      if (snapshot.hasError)
+                      }
+                      if (snapshot.hasError) {
                         return Center(child: Text('Error loading users'));
+                      }
 
                       final users = _filteredUsers;
 
@@ -216,72 +225,83 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                         itemCount: users.length,
                         itemBuilder: (context, index) {
                           final user = users[index];
-                          return Card(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => UserDetailScreen(
-                                      userId: user['id'],
-                                      profileImageUrl:
-                                          'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id']}.png',
+                          return SlideTransition(
+                            position: Tween<Offset>(
+                              begin: Offset(-1, 0),
+                              end: Offset.zero,
+                            ).animate(CurvedAnimation(
+                                parent: controller4,
+                                curve:
+                                    Interval(index * (1 / users.length), 1))),
+                            child: Card(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => UserDetailScreen(
+                                        userId: user['id'],
+                                        profileImageUrl:
+                                            'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id']}.png',
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                color: Colors.white,
-                                width: constraints.maxWidth,
-                                padding: EdgeInsets.all(16.w),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: constraints.maxWidth * 0.15,
-                                      height: constraints.maxWidth * 0.15,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.network(
-                                          'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id']}.png',
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Image.network(
-                                              'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/Icon.png',
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
+                                  );
+                                },
+                                child: Container(
+                                  color: Colors.white,
+                                  width: constraints.maxWidth,
+                                  padding: EdgeInsets.all(16.w),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: constraints.maxWidth * 0.15,
+                                        height: constraints.maxWidth * 0.15,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: Image.network(
+                                            'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id']}.png',
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Image.network(
+                                                'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/Icon.png',
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(width: 8.w),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text('${user['name'] ?? 'Unknown'}',
-                                              style: TextStyle(
-                                                  fontSize:
-                                                      constraints.maxWidth *
-                                                          0.040),
-                                              overflow: TextOverflow.ellipsis),
-                                          SizedBox(height: 4.h),
-                                          Text('ID: ${user['id'] ?? ''}',
-                                              style: TextStyle(
-                                                  fontSize:
-                                                      constraints.maxWidth *
-                                                          0.035)),
-                                        ],
+                                      SizedBox(width: 8.w),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text('${user['name'] ?? 'Unknown'}',
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        constraints.maxWidth *
+                                                            0.040),
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                            SizedBox(height: 4.h),
+                                            Text('ID: ${user['id'] ?? ''}',
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        constraints.maxWidth *
+                                                            0.035)),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    Container(
-                                      width: constraints.maxWidth * 0.15,
-                                      height: constraints.maxWidth * 0.15,
-                                      child: Icon(Icons.chevron_right,
-                                          color: Colors.blue,
-                                          size: constraints.maxWidth * 0.1),
-                                    ),
-                                  ],
+                                      Container(
+                                        width: constraints.maxWidth * 0.15,
+                                        height: constraints.maxWidth * 0.15,
+                                        child: Icon(Icons.chevron_right,
+                                            color: Colors.blue,
+                                            size: constraints.maxWidth * 0.1),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
