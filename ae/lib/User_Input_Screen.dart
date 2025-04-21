@@ -64,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.100.6:5000/train'));
+          'POST', Uri.parse('https://29dc-34-19-91-44.ngrok-free.app/train'));
       request.fields['name'] = _nameController.text;
       request.fields['id'] = _idController.text;
       request.fields['phone'] =
@@ -97,27 +97,89 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _showSuccessDialog() {
     showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-              widget.userData != null ? "Profile Updated" : "Profile Created"),
-          content: Text(widget.userData != null
-              ? "Your profile has been successfully updated!"
-              : "Your profile has been successfully registered!"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pop(context, true);
-              },
-              child: Text("OK"),
-            ),
-          ],
-        );
-      },
-    );
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            backgroundColor: Colors.white,
+                                            title: Center(
+                                                child: Text('Profile Created',
+                                                    style: TextStyle(
+                                                        fontSize: 16.sp))),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Center(
+                                                  child: Text(
+                                                    'Looks good!\nLets make attendance easy.',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 75, 75, 75),
+                                                        fontSize: 14.sp),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 24.h),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.pop(
+                                                        context); // Close success popup
+                                                    Navigator.pop(
+                                                        context); // Close edit dialog
+                                                    Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            HomeScreen(),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 24.w,
+                                                            vertical: 12.h),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.blue,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8.r),
+                                                      border: Border.all(
+                                                        color: Colors.black
+                                                            .withOpacity(0.3),
+                                                        width: 1.w,
+                                                      ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: const Color
+                                                                  .fromARGB(
+                                                                  255, 0, 0, 0)
+                                                              .withOpacity(0.4),
+                                                          blurRadius: 4.r,
+                                                          offset:
+                                                              Offset(0, 3.h),
+                                                        ),
+                                                        BoxShadow(
+                                                          color: Color.fromARGB(
+                                                              255, 8, 84, 146),
+                                                          offset:
+                                                              Offset(3.w, 4.h),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        'Got it!',
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 14.sp),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
   }
 
   @override
@@ -130,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 8.h),
+            SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -144,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 Image.asset(
                   'assets/logo5.png',
-                  height: 55.h,
+                  height: 41.h,
                 ),
               ],
             ),
@@ -211,8 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               decoration: InputDecoration(
                 labelText: "Whatsapp No",
                 labelStyle: TextStyle(fontSize: 14.sp, color: Colors.black),
-                prefixText: "+92 ",
-                prefixStyle: TextStyle(fontSize: 14.sp, color: Colors.black),
+                
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
                   borderSide: BorderSide(color: Colors.black),
@@ -226,6 +287,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   borderSide: BorderSide(color: Colors.black),
                 ),
               ),
+              onChanged: (value) {
+                if (value.isNotEmpty && value[0] == '0') {
+                  _phoneController.value = TextEditingValue(
+                    text: '+92${value.substring(1)}',
+                    selection: TextSelection.collapsed(offset: value.length + 2)
+                  );
+                }
+              },
             ),
             SizedBox(height: 20.h),
             GestureDetector(

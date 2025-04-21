@@ -140,7 +140,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
           builder: (context, constraints) {
             return Column(
               children: [
-                SizedBox(height: 8.h),
+                SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -149,9 +149,10 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                           Icon(Icons.arrow_back, color: Colors.black, size: 24),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    Image.asset('assets/logo5.png', height: 55.h),
+                    Image.asset('assets/logo5.png', height: 41.h),
                   ],
                 ),
+                SizedBox(height: 8.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

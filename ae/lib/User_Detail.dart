@@ -370,12 +370,13 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 8.h),
+              SizedBox(height: 12.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.w),
+                    icon:
+                        Icon(Icons.arrow_back, color: Colors.black, size: 24.w),
                     onPressed: () => Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
                         builder: (context) => UserManagementScreen(),
@@ -384,719 +385,329 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   ),
                   Image.asset(
                     'assets/logo5.png',
-                    height: 55.h,
+                    height: 41.h,
                   ),
                 ],
               ),
-              SizedBox(height: 4.h),
+              SizedBox(height: 12.h),
               Row(
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      width: 100.w,
-                      height: 100.h,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.r),
-                        child: profileImageUrl != null
-                            ? Image.network(
-                                profileImageUrl!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Icon(Icons.person, size: 50.w),
-                              )
-                            : Icon(Icons.person, size: 50.w),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 4.h,
-                      right: 4.w,
-                      child: GestureDetector(
-                        onTap: isLoading
-                            ? null
-                            : _showImageOptions, // Open image options dialog
-                        child: Container(
-                          padding: EdgeInsets.all(4.0.w),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4.r),
-                          ),
-                          child: isLoading
-                              ? SizedBox(
-                                  width: 16.w,
-                                  height: 16.h,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.w,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Icon(
-                                  Icons.edit,
-                                  color: Colors.black,
-                                  size: 16.w,
-                                ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(width: 8.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Stack(
                     children: [
-                      Text(
-                        userName,
-                        style: TextStyle(
-                          fontSize: 16.sp,
+                      Container(
+                        width: 100.w,
+                        height: 100.h,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.r),
+                          child: profileImageUrl != null
+                              ? Image.network(
+                                  profileImageUrl!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Icon(Icons.person, size: 50.w),
+                                )
+                              : Icon(Icons.person, size: 50.w),
+                        ),
                       ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        'ID: ${widget.userId}',
-                        style:
-                            TextStyle(fontSize: 12.sp, color: Colors.black87),
-                      ),
-                      SizedBox(height: 2.h),
-                      Text(
-                        'Phone: ${phoneNumber ?? "Not Found"}',
-                        style:
-                            TextStyle(fontSize: 12.sp, color: Colors.black87),
+                      Positioned(
+                        bottom: 4.h,
+                        right: 4.w,
+                        child: GestureDetector(
+                          onTap: isLoading
+                              ? null
+                              : _showImageOptions, // Open image options dialog
+                          child: Container(
+                            padding: EdgeInsets.all(4.0.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                            child: isLoading
+                                ? SizedBox(
+                                    width: 16.w,
+                                    height: 16.h,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.w,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.edit,
+                                    color: Colors.black,
+                                    size: 16.w,
+                                  ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                ),
-                Column(
-                  children: [
-                    IconButton(
-                      onPressed: () async {
-                        final TextEditingController nameController =
-                            TextEditingController(text: userName);
-                        final TextEditingController phoneController =
-                            TextEditingController(text: phoneNumber ?? '');
-
-                        await showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            backgroundColor: Colors.white,
-                            title: Center(
-                                child: Text('Edit User Info',
-                                    style: TextStyle(fontSize: 16.sp))),
-                            content: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  TextField(
-                                    controller: nameController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Name',
-                                      labelStyle: TextStyle(fontSize: 14.sp),
-                                    ),
-                                    style: TextStyle(fontSize: 14.sp),
-                                  ),
-                                  SizedBox(height: 16.h),
-                                  TextField(
-                                    controller: phoneController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Phone Number',
-                                      labelStyle: TextStyle(fontSize: 14.sp),
-                                    ),
-                                    keyboardType: TextInputType.phone,
-                                    style: TextStyle(fontSize: 14.sp),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            actions: [
-                              Center(
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.8,
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      try {
-                                        await supabase.from('users').update({
-                                          'name': nameController.text,
-                                          'phone': phoneController.text,
-                                        }).eq('id', widget.userId);
-
-                                        setState(() {
-                                          phoneNumber = phoneController.text;
-                                        });
-
-                                        // Show success popup
-                                        await showDialog(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            title: Center(
-                                                child: Text('Profile Updated',
-                                                    style: TextStyle(
-                                                        fontSize: 16.sp))),
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Center(
-                                                  child: Text(
-                                                    'Looks good!\nWe have saved your changes.',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        color: const Color
-                                                            .fromARGB(
-                                                            255, 75, 75, 75),
-                                                        fontSize: 14.sp),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 24.h),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    Navigator.pop(
-                                                        context); // Close success popup
-                                                    Navigator.pop(
-                                                        context); // Close edit dialog
-                                                    Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            UserDetailScreen(
-                                                          userId: widget.userId,
-                                                          profileImageUrl:
-                                                              profileImageUrl,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 24.w,
-                                                            vertical: 12.h),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.blue,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.r),
-                                                      border: Border.all(
-                                                        color: Colors.black
-                                                            .withOpacity(0.3),
-                                                        width: 1.w,
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: const Color
-                                                                  .fromARGB(
-                                                                  255, 0, 0, 0)
-                                                              .withOpacity(0.4),
-                                                          blurRadius: 4.r,
-                                                          offset:
-                                                              Offset(0, 3.h),
-                                                        ),
-                                                        BoxShadow(
-                                                          color: Color.fromARGB(
-                                                              255, 8, 84, 146),
-                                                          offset:
-                                                              Offset(3.w, 4.h),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Center(
-                                                      child: Text(
-                                                        'Got it!',
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 14.sp),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      } catch (e) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                              content: Text(
-                                                  'Error updating user: $e',
-                                                  style: TextStyle(
-                                                      fontSize: 14.sp))),
-                                        );
-                                      }
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 24.w, vertical: 12.h),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        borderRadius:
-                                            BorderRadius.circular(8.r),
-                                        border: Border.all(
-                                          color: Colors.black.withOpacity(0.3),
-                                          width: 1.w,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: const Color.fromARGB(
-                                                    255, 0, 0, 0)
-                                                .withOpacity(0.4),
-                                            blurRadius: 4.r,
-                                            offset: Offset(0, 3.h),
-                                          ),
-                                          BoxShadow(
-                                            color:
-                                                Color.fromARGB(255, 8, 84, 146),
-                                            offset: Offset(3.w, 4.h),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'Save',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14.sp),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          userName,
+                          style: TextStyle(
+                            fontSize: 16.sp,
                           ),
-                        );
-                      },
-                      icon: Icon(Icons.edit, color: Colors.black),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          'ID: ${widget.userId}',
+                          style:
+                              TextStyle(fontSize: 12.sp, color: Colors.black87),
+                        ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          'Phone: ${phoneNumber ?? "Not Found"}',
+                          style:
+                              TextStyle(fontSize: 12.sp, color: Colors.black87),
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      onPressed: () async {
-                        final confirmed = await showDialog<bool>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
+                  ),
+                  Column(
+                    children: [
+                      IconButton(
+                        onPressed: () async {
+                          final TextEditingController nameController =
+                              TextEditingController(text: userName);
+                          final TextEditingController phoneController =
+                              TextEditingController(text: phoneNumber ?? '');
+
+                          await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
                               backgroundColor: Colors.white,
                               title: Center(
-                                  child: Text('Confirm Deletion',
+                                  child: Text('Edit User Info',
                                       style: TextStyle(fontSize: 16.sp))),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Center(
-                                    child: Text(
-                                      'You’re about to erase your journey\nAll progress will be gone forever.',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: const Color.fromARGB(
-                                              255, 75, 75, 75),
-                                          fontSize: 14.sp),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              actions: [
-                                Column(
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Center(
-                                      child: SizedBox(
-                                        width: 300.w,
-                                        child: GestureDetector(
-                                          onTap: () async {
-                                            try {
-                                              await supabase
-                                                  .from('users')
-                                                  .delete()
-                                                  .eq('id', widget.userId);
-
-                                              Navigator.of(context)
-                                                  .pushReplacement(
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      UserManagementScreen(),
-                                                ),
-                                              );
-                                            } catch (e) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                    content: Text(
-                                                        'Error deleting user: $e',
-                                                        style: TextStyle(
-                                                            fontSize: 14.sp))),
-                                              );
-                                            }
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 24.w,
-                                                vertical: 12.h),
-                                            decoration: BoxDecoration(
-                                              color: Colors.blue,
-                                              borderRadius:
-                                                  BorderRadius.circular(8.r),
-                                              border: Border.all(
-                                                color: Colors.black
-                                                    .withOpacity(0.3),
-                                                width: 1.w,
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: const Color.fromARGB(
-                                                          255, 0, 0, 0)
-                                                      .withOpacity(0.4),
-                                                  blurRadius: 4.r,
-                                                  offset: Offset(0, 3.h),
-                                                ),
-                                                BoxShadow(
-                                                  color: Color.fromARGB(
-                                                      255, 8, 84, 146),
-                                                  offset: Offset(3.w, 4.h),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                'Proceed...',
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 14.sp),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                    TextField(
+                                      controller: nameController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Name',
+                                        labelStyle: TextStyle(fontSize: 14.sp),
                                       ),
+                                      style: TextStyle(fontSize: 14.sp),
                                     ),
-                                    SizedBox(height: 10.h),
-                                    Center(
-                                      child: SizedBox(
-                                        width: 300.w,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 24.w,
-                                                vertical: 12.h),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(8.r),
-                                              border: Border.all(
-                                                color: Colors.black
-                                                    .withOpacity(0.3),
-                                                width: 1.w,
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: const Color.fromARGB(
-                                                          255, 0, 0, 0)
-                                                      .withOpacity(0.4),
-                                                  blurRadius: 4.r,
-                                                  offset: Offset(0, 3.h),
-                                                ),
-                                                BoxShadow(
-                                                  color: Color.fromARGB(
-                                                      255, 33, 32, 32),
-                                                  offset: Offset(3.w, 4.h),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                'Cancel',
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14.sp),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                    SizedBox(height: 16.h),
+                                    TextField(
+                                      controller: phoneController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Phone Number',
+                                        labelStyle: TextStyle(fontSize: 14.sp),
                                       ),
+                                      keyboardType: TextInputType.phone,
+                                      style: TextStyle(fontSize: 14.sp),
                                     ),
                                   ],
                                 ),
+                              ),
+                              actions: [
+                                Center(
+                                  child: SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.8,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        try {
+                                          await supabase.from('users').update({
+                                            'name': nameController.text,
+                                            'phone': phoneController.text,
+                                          }).eq('id', widget.userId);
+
+                                          setState(() {
+                                            phoneNumber = phoneController.text;
+                                          });
+
+                                          // Show success popup
+                                          await showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              backgroundColor: Colors.white,
+                                              title: Center(
+                                                  child: Text('Profile Updated',
+                                                      style: TextStyle(
+                                                          fontSize: 16.sp))),
+                                              content: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Center(
+                                                    child: Text(
+                                                      'Looks good!\nWe have saved your changes.',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          color: const Color
+                                                              .fromARGB(
+                                                              255, 75, 75, 75),
+                                                          fontSize: 14.sp),
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 24.h),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.pop(
+                                                          context); // Close success popup
+                                                      Navigator.pop(
+                                                          context); // Close edit dialog
+                                                      Navigator.pushReplacement(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              UserDetailScreen(
+                                                            userId:
+                                                                widget.userId,
+                                                            profileImageUrl:
+                                                                profileImageUrl,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 24.w,
+                                                              vertical: 12.h),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.blue,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8.r),
+                                                        border: Border.all(
+                                                          color: Colors.black
+                                                              .withOpacity(0.3),
+                                                          width: 1.w,
+                                                        ),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    0,
+                                                                    0,
+                                                                    0)
+                                                                .withOpacity(
+                                                                    0.4),
+                                                            blurRadius: 4.r,
+                                                            offset:
+                                                                Offset(0, 3.h),
+                                                          ),
+                                                          BoxShadow(
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    8,
+                                                                    84,
+                                                                    146),
+                                                            offset: Offset(
+                                                                3.w, 4.h),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          'Got it!',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 14.sp),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'Error updating user: $e',
+                                                    style: TextStyle(
+                                                        fontSize: 14.sp))),
+                                          );
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 24.w, vertical: 12.h),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue,
+                                          borderRadius:
+                                              BorderRadius.circular(8.r),
+                                          border: Border.all(
+                                            color:
+                                                Colors.black.withOpacity(0.3),
+                                            width: 1.w,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: const Color.fromARGB(
+                                                      255, 0, 0, 0)
+                                                  .withOpacity(0.4),
+                                              blurRadius: 4.r,
+                                              offset: Offset(0, 3.h),
+                                            ),
+                                            BoxShadow(
+                                              color: Color.fromARGB(
+                                                  255, 8, 84, 146),
+                                              offset: Offset(3.w, 4.h),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'Save',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14.sp),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ],
-                            );
-                          },
-                        );
-                      },
-                      icon: Icon(Icons.delete, size: 24.w, color: Colors.black),
-                    ),
-                  ],
-                )
-              ],
-            ),
-            SizedBox(height: 12.h),
-
-            Image.asset(
-              workingHours < 20
-                  ? 'assets/indicator3.png'
-                  : (workingHours < 40
-                      ? 'assets/indicator2.png'
-                      : 'assets/indicator1.png'),
-              height: 64.h,
-            ),
-            SizedBox(height: 12.h),
-            Text(
-              "Weekly Tracker",
-              style: TextStyle(fontSize: 16.sp),
-            ),
-            SizedBox(height: 2.h),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                      "Attendance\nStreak", "$attendanceStreak 🔥"),
-                ),
-                SizedBox(width: 10.w),
-                Expanded(
-                  child: _buildStatCard("Working\nHours", "$workingHours ⏱️"),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 16.h,
-            ),
-
-            Text(
-              "Rewards",
-              style: TextStyle(fontSize: 16.sp),
-            ),
-            SizedBox(height: 2.h),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildRewards(
-                      Image.asset(
-                        'assets/level1.gif',
-                        height: 80.h,
+                            ),
+                          );
+                        },
+                        icon: Icon(Icons.edit, color: Colors.black),
                       ),
-                      'Level 1',
-                      totalworkinghours >= 75
-                          ? "50 Hours\nCompleted"
-                          : "50 Working\nHours",
-                      isActive:
-                          totalworkinghours > 50 && totalworkinghours < 75,
-                      isCompleted: totalworkinghours >= 75),
-                  SizedBox(
-                    width: 12.w,
-                  ),
-                  _buildRewards(
-                      Image.asset(
-                        'assets/level2.gif',
-                        height: 80.h,
-                      ),
-                      'Level 2',
-                      totalworkinghours >= 100
-                          ? "75 Hours\nCompleted"
-                          : "75 Working\nHours",
-                      isActive:
-                          totalworkinghours > 75 && totalworkinghours < 100,
-                      isCompleted: totalworkinghours >= 100),
-                  SizedBox(
-                    width: 12.w,
-                  ),
-                  _buildRewards(
-                      Image.asset(
-                        'assets/level3.gif',
-                        height: 80.h,
-                      ),
-                      'Level 3',
-                      totalworkinghours >= 150
-                          ? "100 Hours\nCompleted"
-                          : "100 Working\nHours",
-                      isActive:
-                          totalworkinghours > 100 && totalworkinghours < 150,
-                      isCompleted: totalworkinghours >= 150),
-                  SizedBox(
-                    width: 12.w,
-                  ),
-                  _buildRewards(
-                      Image.asset(
-                        'assets/level3.gif',
-                        height: 80.h,
-                      ),
-                      'Level 4',
-                      "150 Working\nHours",
-                      isActive: totalworkinghours >= 150,
-                      isCompleted: false),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 20.h,
-            ),
-            isLoading
-                ? Center(child: CircularProgressIndicator())
-                : Column(
-                    children: [
-                      if (!isAttendanceFrozen)
-                        // Freeze Attendance button (your exact existing code)
-                        GestureDetector(
-                          onTap: () async {
-                            DateTime? startDate;
-                            DateTime? endDate;
-                            final startController = TextEditingController();
-                            final endController = TextEditingController();
-
-                            await showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
+                      IconButton(
+                        onPressed: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
                                 backgroundColor: Colors.white,
                                 title: Center(
-                                    child: Text('Choose Duration',
+                                    child: Text('Confirm Deletion',
                                         style: TextStyle(fontSize: 16.sp))),
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    TextField(
-                                      controller: startController,
-                                      readOnly: true,
-                                      style: TextStyle(
-                                          fontSize: 14
-                                              .sp), // Added to reduce text size
-                                      decoration: InputDecoration(
-                                        labelText: 'Start Date',
-                                        suffixIcon: IconButton(
-                                          icon: Icon(Icons.calendar_today),
-                                          onPressed: () async {
-                                            final picked = await showDatePicker(
-                                              context: context,
-                                              initialDate: DateTime.now(),
-                                              firstDate: DateTime(2000),
-                                              lastDate: DateTime(2100),
-                                              builder: (context, child) {
-                                                return Theme(
-                                                  data: Theme.of(context)
-                                                      .copyWith(
-                                                    textTheme: GoogleFonts
-                                                        .kronaOneTextTheme(
-                                                      TextTheme(
-                                                        bodySmall: TextStyle(
-                                                            fontSize: 12.sp,
-                                                            color: Colors.grey),
-                                                      ),
-                                                    ),
-                                                    datePickerTheme:
-                                                        DatePickerThemeData(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.r),
-                                                      ),
-                                                      dayStyle:
-                                                          GoogleFonts.kronaOne(
-                                                              fontSize: 12.sp,
-                                                              color:
-                                                                  Colors.blue),
-                                                      yearStyle:
-                                                          GoogleFonts.kronaOne(
-                                                              fontSize: 12.sp,
-                                                              color:
-                                                                  Colors.grey),
-                                                      headerHeadlineStyle:
-                                                          GoogleFonts.kronaOne(
-                                                              fontSize: 24.sp,
-                                                              color:
-                                                                  Colors.black),
-                                                      weekdayStyle:
-                                                          GoogleFonts.kronaOne(
-                                                              fontSize: 12.sp,
-                                                              color:
-                                                                  Colors.grey),
-                                                    ),
-                                                  ),
-                                                  child: child!,
-                                                );
-                                              },
-                                            );
-                                            if (picked != null) {
-                                              startDate = picked;
-                                              startController.text =
-                                                  DateFormat('dd MMM yyyy')
-                                                      .format(picked);
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 16.h),
-                                    TextField(
-                                      controller: endController,
-                                      readOnly: true,
-                                      style: TextStyle(fontSize: 14.sp),
-                                      decoration: InputDecoration(
-                                        labelText: 'End Date',
-                                        suffixIcon: IconButton(
-                                          icon: Icon(Icons.calendar_today),
-                                          onPressed: () async {
-                                            final picked = await showDatePicker(
-                                              context: context,
-                                              initialDate: DateTime.now(),
-                                              firstDate: DateTime(2000),
-                                              lastDate: DateTime(2100),
-                                              builder: (context, child) {
-                                                return Theme(
-                                                  data: Theme.of(context)
-                                                      .copyWith(
-                                                    textTheme: GoogleFonts
-                                                        .kronaOneTextTheme(
-                                                      TextTheme(
-                                                        bodySmall: TextStyle(
-                                                            fontSize: 12.sp,
-                                                            color: Colors.grey),
-                                                      ),
-                                                    ),
-                                                    datePickerTheme:
-                                                        DatePickerThemeData(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.r),
-                                                      ),
-                                                      dayStyle:
-                                                          GoogleFonts.kronaOne(
-                                                              fontSize: 12.sp,
-                                                              color:
-                                                                  Colors.blue),
-                                                      yearStyle:
-                                                          GoogleFonts.kronaOne(
-                                                              fontSize: 12.sp,
-                                                              color:
-                                                                  Colors.grey),
-                                                      headerHeadlineStyle:
-                                                          GoogleFonts.kronaOne(
-                                                              fontSize: 24.sp,
-                                                              color:
-                                                                  Colors.black),
-                                                      weekdayStyle:
-                                                          GoogleFonts.kronaOne(
-                                                              fontSize: 12.sp,
-                                                              color:
-                                                                  Colors.grey),
-                                                    ),
-                                                  ),
-                                                  child: child!,
-                                                );
-                                              },
-                                            );
-                                            if (picked != null) {
-                                              endDate = picked;
-                                              endController.text =
-                                                  DateFormat('dd MMM yyyy')
-                                                      .format(picked);
-                                            }
-                                          },
-                                        ),
+                                    Center(
+                                      child: Text(
+                                        'You’re about to erase your journey\nAll progress will be gone forever.',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: const Color.fromARGB(
+                                                255, 75, 75, 75),
+                                            fontSize: 14.sp),
                                       ),
                                     ),
                                   ],
@@ -1104,48 +715,704 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                 actions: [
                                   Column(
                                     children: [
-                                      GestureDetector(
-                                        onTap: () async {
-                                          if (startDate != null &&
-                                              endDate != null) {
-                                            showDialog(
-                                              context: context,
-                                              barrierDismissible: false,
-                                              builder: (context) => Center(
-                                                child: Center(
-                                                  child:
-                                                      CircularProgressIndicator(),
+                                      Center(
+                                        child: SizedBox(
+                                          width: 300.w,
+                                          child: GestureDetector(
+                                            onTap: () async {
+                                              try {
+                                                await supabase
+                                                    .from('users')
+                                                    .delete()
+                                                    .eq('id', widget.userId);
+
+                                                Navigator.of(context)
+                                                    .pushReplacement(
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        UserManagementScreen(),
+                                                  ),
+                                                );
+                                              } catch (e) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                      content: Text(
+                                                          'Error deleting user: $e',
+                                                          style: TextStyle(
+                                                              fontSize:
+                                                                  14.sp))),
+                                                );
+                                              }
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 24.w,
+                                                  vertical: 12.h),
+                                              decoration: BoxDecoration(
+                                                color: Colors.blue,
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                                border: Border.all(
+                                                  color: Colors.black
+                                                      .withOpacity(0.3),
+                                                  width: 1.w,
+                                                ),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: const Color.fromARGB(
+                                                            255, 0, 0, 0)
+                                                        .withOpacity(0.4),
+                                                    blurRadius: 4.r,
+                                                    offset: Offset(0, 3.h),
+                                                  ),
+                                                  BoxShadow(
+                                                    color: Color.fromARGB(
+                                                        255, 8, 84, 146),
+                                                    offset: Offset(3.w, 4.h),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  'Proceed...',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14.sp),
                                                 ),
                                               ),
-                                            );
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 10.h),
+                                      Center(
+                                        child: SizedBox(
+                                          width: 300.w,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 24.w,
+                                                  vertical: 12.h),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                                border: Border.all(
+                                                  color: Colors.black
+                                                      .withOpacity(0.3),
+                                                  width: 1.w,
+                                                ),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: const Color.fromARGB(
+                                                            255, 0, 0, 0)
+                                                        .withOpacity(0.4),
+                                                    blurRadius: 4.r,
+                                                    offset: Offset(0, 3.h),
+                                                  ),
+                                                  BoxShadow(
+                                                    color: Color.fromARGB(
+                                                        255, 33, 32, 32),
+                                                    offset: Offset(3.w, 4.h),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 14.sp),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        icon:
+                            Icon(Icons.delete, size: 24.w, color: Colors.black),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+              SizedBox(height: 12.h),
+              Image.asset(
+                workingHours < 20
+                    ? 'assets/indicator3.png'
+                    : (workingHours < 40
+                        ? 'assets/indicator2.png'
+                        : 'assets/indicator1.png'),
+                height: 64.h,
+              ),
+              SizedBox(height: 12.h),
+              Text(
+                "Weekly Tracker",
+                style: TextStyle(fontSize: 16.sp),
+              ),
+              SizedBox(height: 2.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                        "Attendance\nStreak", "$attendanceStreak 🔥"),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: _buildStatCard("Working\nHours", "$workingHours ⏱️"),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 16.h,
+              ),
+              Text(
+                "Rewards",
+                style: TextStyle(fontSize: 16.sp),
+              ),
+              SizedBox(height: 2.h),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildRewards(
+                        Image.asset(
+                          'assets/level1.gif',
+                          height: 80.h,
+                        ),
+                        'Level 1',
+                        totalworkinghours >= 75
+                            ? "50 Hours\nCompleted"
+                            : "50 Working\nHours",
+                        isActive:
+                            totalworkinghours > 50 && totalworkinghours < 75,
+                        isCompleted: totalworkinghours >= 75),
+                    SizedBox(
+                      width: 12.w,
+                    ),
+                    _buildRewards(
+                        Image.asset(
+                          'assets/level2.gif',
+                          height: 80.h,
+                        ),
+                        'Level 2',
+                        totalworkinghours >= 100
+                            ? "75 Hours\nCompleted"
+                            : "75 Working\nHours",
+                        isActive:
+                            totalworkinghours > 75 && totalworkinghours < 100,
+                        isCompleted: totalworkinghours >= 100),
+                    SizedBox(
+                      width: 12.w,
+                    ),
+                    _buildRewards(
+                        Image.asset(
+                          'assets/level3.gif',
+                          height: 80.h,
+                        ),
+                        'Level 3',
+                        totalworkinghours >= 150
+                            ? "100 Hours\nCompleted"
+                            : "100 Working\nHours",
+                        isActive:
+                            totalworkinghours > 100 && totalworkinghours < 150,
+                        isCompleted: totalworkinghours >= 150),
+                    SizedBox(
+                      width: 12.w,
+                    ),
+                    _buildRewards(
+                        Image.asset(
+                          'assets/level3.gif',
+                          height: 80.h,
+                        ),
+                        'Level 4',
+                        "150 Working\nHours",
+                        isActive: totalworkinghours >= 150,
+                        isCompleted: false),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 12.h,
+              ),
+              isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : Column(
+                      children: [
+                        if (!isAttendanceFrozen)
+                          // Freeze Attendance button (your exact existing code)
+                          GestureDetector(
+                            onTap: () async {
+                              DateTime? startDate;
+                              DateTime? endDate;
+                              final startController = TextEditingController();
+                              final endController = TextEditingController();
 
-                                            try {
-                                              // Check if end date is in the past
-                                              if (endDate!
-                                                  .isBefore(DateTime.now())) {
-                                                // If end date is passed, clear the freeze
-                                                await supabase
-                                                    .from('users')
-                                                    .update({
-                                                  'freeze_start': null,
-                                                  'freeze_end': null,
-                                                }).eq('id', widget.userId);
-                                              } else {
-                                                // Set new freeze period
-                                                await supabase
-                                                    .from('users')
-                                                    .update({
-                                                  'freeze_start': startDate!
-                                                      .toIso8601String(),
-                                                  'freeze_end': endDate!
-                                                      .toIso8601String(),
-                                                }).eq('id', widget.userId);
+                              await showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  backgroundColor: Colors.white,
+                                  title: Center(
+                                      child: Text('Choose Duration',
+                                          style: TextStyle(fontSize: 16.sp))),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextField(
+                                        controller: startController,
+                                        readOnly: true,
+                                        style: TextStyle(
+                                            fontSize: 14
+                                                .sp), // Added to reduce text size
+                                        decoration: InputDecoration(
+                                          labelText: 'Start Date',
+                                          suffixIcon: IconButton(
+                                            icon: Icon(Icons.calendar_today),
+                                            onPressed: () async {
+                                              final picked =
+                                                  await showDatePicker(
+                                                context: context,
+                                                initialDate: DateTime.now(),
+                                                firstDate: DateTime(2000),
+                                                lastDate: DateTime(2100),
+                                                builder: (context, child) {
+                                                  return Theme(
+                                                    data: Theme.of(context)
+                                                        .copyWith(
+                                                      textTheme: GoogleFonts
+                                                          .kronaOneTextTheme(
+                                                        TextTheme(
+                                                          bodySmall: TextStyle(
+                                                              fontSize: 12.sp,
+                                                              color:
+                                                                  Colors.grey),
+                                                        ),
+                                                      ),
+                                                      datePickerTheme:
+                                                          DatePickerThemeData(
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      8.r),
+                                                        ),
+                                                        dayStyle: GoogleFonts
+                                                            .kronaOne(
+                                                                fontSize: 12.sp,
+                                                                color: Colors
+                                                                    .blue),
+                                                        yearStyle: GoogleFonts
+                                                            .kronaOne(
+                                                                fontSize: 12.sp,
+                                                                color: Colors
+                                                                    .grey),
+                                                        headerHeadlineStyle:
+                                                            GoogleFonts.kronaOne(
+                                                                fontSize: 24.sp,
+                                                                color: Colors
+                                                                    .black),
+                                                        weekdayStyle:
+                                                            GoogleFonts.kronaOne(
+                                                                fontSize: 12.sp,
+                                                                color: Colors
+                                                                    .grey),
+                                                      ),
+                                                    ),
+                                                    child: child!,
+                                                  );
+                                                },
+                                              );
+                                              if (picked != null) {
+                                                startDate = picked;
+                                                startController.text =
+                                                    DateFormat('dd MMM yyyy')
+                                                        .format(picked);
                                               }
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 16.h),
+                                      TextField(
+                                        controller: endController,
+                                        readOnly: true,
+                                        style: TextStyle(fontSize: 14.sp),
+                                        decoration: InputDecoration(
+                                          labelText: 'End Date',
+                                          suffixIcon: IconButton(
+                                            icon: Icon(Icons.calendar_today),
+                                            onPressed: () async {
+                                              final picked =
+                                                  await showDatePicker(
+                                                context: context,
+                                                initialDate: DateTime.now(),
+                                                firstDate: DateTime(2000),
+                                                lastDate: DateTime(2100),
+                                                builder: (context, child) {
+                                                  return Theme(
+                                                    data: Theme.of(context)
+                                                        .copyWith(
+                                                      textTheme: GoogleFonts
+                                                          .kronaOneTextTheme(
+                                                        TextTheme(
+                                                          bodySmall: TextStyle(
+                                                              fontSize: 12.sp,
+                                                              color:
+                                                                  Colors.grey),
+                                                        ),
+                                                      ),
+                                                      datePickerTheme:
+                                                          DatePickerThemeData(
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      8.r),
+                                                        ),
+                                                        dayStyle: GoogleFonts
+                                                            .kronaOne(
+                                                                fontSize: 12.sp,
+                                                                color: Colors
+                                                                    .blue),
+                                                        yearStyle: GoogleFonts
+                                                            .kronaOne(
+                                                                fontSize: 12.sp,
+                                                                color: Colors
+                                                                    .grey),
+                                                        headerHeadlineStyle:
+                                                            GoogleFonts.kronaOne(
+                                                                fontSize: 24.sp,
+                                                                color: Colors
+                                                                    .black),
+                                                        weekdayStyle:
+                                                            GoogleFonts.kronaOne(
+                                                                fontSize: 12.sp,
+                                                                color: Colors
+                                                                    .grey),
+                                                      ),
+                                                    ),
+                                                    child: child!,
+                                                  );
+                                                },
+                                              );
+                                              if (picked != null) {
+                                                endDate = picked;
+                                                endController.text =
+                                                    DateFormat('dd MMM yyyy')
+                                                        .format(picked);
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    Column(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () async {
+                                            if (startDate != null &&
+                                                endDate != null) {
+                                              showDialog(
+                                                context: context,
+                                                barrierDismissible: false,
+                                                builder: (context) => Center(
+                                                  child: Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  ),
+                                                ),
+                                              );
 
-                                              Navigator.pop(
-                                                  context); // Close loading
-                                              Navigator.pop(
-                                                  context); // Close date picker
+                                              try {
+                                                // Check if end date is in the past
+                                                if (endDate!
+                                                    .isBefore(DateTime.now())) {
+                                                  // If end date is passed, clear the freeze
+                                                  await supabase
+                                                      .from('users')
+                                                      .update({
+                                                    'freeze_start': null,
+                                                    'freeze_end': null,
+                                                  }).eq('id', widget.userId);
+                                                } else {
+                                                  // Set new freeze period
+                                                  await supabase
+                                                      .from('users')
+                                                      .update({
+                                                    'freeze_start': startDate!
+                                                        .toIso8601String(),
+                                                    'freeze_end': endDate!
+                                                        .toIso8601String(),
+                                                  }).eq('id', widget.userId);
+                                                }
+
+                                                Navigator.pop(
+                                                    context); // Close loading
+                                                Navigator.pop(
+                                                    context); // Close date picker
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) => Center(
+                                                    child: AlertDialog(
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      contentPadding:
+                                                          EdgeInsets.all(24.w),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(16.r),
+                                                      ),
+                                                      content: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          Text(
+                                                            'Success',
+                                                            style: TextStyle(
+                                                              fontSize: 18.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                          SizedBox(
+                                                              height: 16.h),
+                                                          Text(
+                                                            endDate!.isBefore(
+                                                                    DateTime
+                                                                        .now())
+                                                                ? 'Attendance freeze cleared as end date has passed'
+                                                                : 'Attendance freeze for chosen duration',
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: TextStyle(
+                                                                fontSize:
+                                                                    14.sp),
+                                                          ),
+                                                          SizedBox(
+                                                              height: 24.h),
+                                                          Center(
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: () {
+                                                                Navigator.pop(
+                                                                    context);
+                                                                setState(() {
+                                                                  isAttendanceFrozen =
+                                                                      !endDate!.isBefore(
+                                                                          DateTime
+                                                                              .now());
+                                                                });
+                                                                fetchAttendanceData();
+                                                              },
+                                                              child: Container(
+                                                                width: 100.w,
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                        vertical:
+                                                                            12.h),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8.r),
+                                                                  border: Border
+                                                                      .all(
+                                                                    color: Colors
+                                                                        .black
+                                                                        .withOpacity(
+                                                                            0.3),
+                                                                    width: 1.w,
+                                                                  ),
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: const Color
+                                                                              .fromARGB(
+                                                                              255,
+                                                                              0,
+                                                                              0,
+                                                                              0)
+                                                                          .withOpacity(
+                                                                              0.4),
+                                                                      blurRadius:
+                                                                          4.r,
+                                                                      offset:
+                                                                          Offset(
+                                                                              0,
+                                                                              3.h),
+                                                                    ),
+                                                                    BoxShadow(
+                                                                      color: Color.fromARGB(
+                                                                          255,
+                                                                          33,
+                                                                          32,
+                                                                          32),
+                                                                      offset: Offset(
+                                                                          3.w,
+                                                                          4.h),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    'Got it',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          14.sp,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              } catch (e) {
+                                                Navigator.pop(
+                                                    context); // Close loading
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) => Center(
+                                                    child: AlertDialog(
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      contentPadding:
+                                                          EdgeInsets.all(24),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(16),
+                                                      ),
+                                                      content: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          Text(
+                                                            'Error',
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                          SizedBox(height: 16),
+                                                          Text(
+                                                            'Failed to set Freeze Period',
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                          SizedBox(height: 24),
+                                                          Center(
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: () =>
+                                                                  Navigator.pop(
+                                                                      context),
+                                                              child: Container(
+                                                                width: 100,
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                        vertical:
+                                                                            12),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8),
+                                                                  border: Border
+                                                                      .all(
+                                                                    color: Colors
+                                                                        .black
+                                                                        .withOpacity(
+                                                                            0.3),
+                                                                    width: 1.w,
+                                                                  ),
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: const Color
+                                                                              .fromARGB(
+                                                                              255,
+                                                                              0,
+                                                                              0,
+                                                                              0)
+                                                                          .withOpacity(
+                                                                              0.4),
+                                                                      blurRadius:
+                                                                          4.r,
+                                                                      offset:
+                                                                          Offset(
+                                                                              0,
+                                                                              3.h),
+                                                                    ),
+                                                                    BoxShadow(
+                                                                      color: Color.fromARGB(
+                                                                          255,
+                                                                          33,
+                                                                          32,
+                                                                          32),
+                                                                      offset: Offset(
+                                                                          3.w,
+                                                                          4.h),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    'Try later',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          14.sp,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            } else {
                                               showDialog(
                                                 context: context,
                                                 builder: (context) => Center(
@@ -1165,7 +1432,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                           MainAxisSize.min,
                                                       children: [
                                                         Text(
-                                                          'Success',
+                                                          'Error',
                                                           style: TextStyle(
                                                             fontSize: 18.sp,
                                                             fontWeight:
@@ -1176,31 +1443,20 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                         ),
                                                         SizedBox(height: 16.h),
                                                         Text(
-                                                          endDate!.isBefore(
-                                                                  DateTime
-                                                                      .now())
-                                                              ? 'Attendance freeze cleared as end date has passed'
-                                                              : 'Attendance freeze for chosen duration',
+                                                          'Please select both start and end dates',
                                                           textAlign:
                                                               TextAlign.center,
                                                           style: TextStyle(
-                                                              fontSize: 14.sp),
+                                                            fontSize: 14.sp,
+                                                          ),
                                                         ),
                                                         SizedBox(height: 24.h),
                                                         Center(
                                                           child:
                                                               GestureDetector(
-                                                            onTap: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                              setState(() {
-                                                                isAttendanceFrozen =
-                                                                    !endDate!.isBefore(
-                                                                        DateTime
-                                                                            .now());
-                                                              });
-                                                              fetchAttendanceData();
-                                                            },
+                                                            onTap: () =>
+                                                                Navigator.pop(
+                                                                    context),
                                                             child: Container(
                                                               width: 100.w,
                                                               padding: EdgeInsets
@@ -1256,124 +1512,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                               ),
                                                               child: Center(
                                                                 child: Text(
-                                                                  'Got it',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        14.sp,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            } catch (e) {
-                                              Navigator.pop(
-                                                  context); // Close loading
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) => Center(
-                                                  child: AlertDialog(
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    contentPadding:
-                                                        EdgeInsets.all(24),
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16),
-                                                    ),
-                                                    content: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Text(
-                                                          'Error',
-                                                          style: TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                        ),
-                                                        SizedBox(height: 16),
-                                                        Text(
-                                                          'Failed to set Freeze Period',
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                        ),
-                                                        SizedBox(height: 24),
-                                                        Center(
-                                                          child:
-                                                              GestureDetector(
-                                                            onTap: () =>
-                                                                Navigator.pop(
-                                                                    context),
-                                                            child: Container(
-                                                              width: 100,
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      vertical:
-                                                                          12),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .white,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8),
-                                                                border:
-                                                                    Border.all(
-                                                                  color: Colors
-                                                                      .black
-                                                                      .withOpacity(
-                                                                          0.3),
-                                                                  width: 1.w,
-                                                                ),
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                    color: const Color
-                                                                            .fromARGB(
-                                                                            255,
-                                                                            0,
-                                                                            0,
-                                                                            0)
-                                                                        .withOpacity(
-                                                                            0.4),
-                                                                    blurRadius:
-                                                                        4.r,
-                                                                    offset:
-                                                                        Offset(
-                                                                            0,
-                                                                            3.h),
-                                                                  ),
-                                                                  BoxShadow(
-                                                                    color: Color
-                                                                        .fromARGB(
-                                                                            255,
-                                                                            33,
-                                                                            32,
-                                                                            32),
-                                                                    offset:
-                                                                        Offset(
-                                                                            3.w,
-                                                                            4.h),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              child: Center(
-                                                                child: Text(
-                                                                  'Try later',
+                                                                  'OK',
                                                                   style:
                                                                       TextStyle(
                                                                     color: Colors
@@ -1392,196 +1531,196 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                 ),
                                               );
                                             }
-                                          } else {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) => Center(
-                                                child: AlertDialog(
-                                                  backgroundColor: Colors.white,
-                                                  contentPadding:
-                                                      EdgeInsets.all(24.w),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            16.r),
-                                                  ),
-                                                  content: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Text(
-                                                        'Error',
-                                                        style: TextStyle(
-                                                          fontSize: 18.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      SizedBox(height: 16.h),
-                                                      Text(
-                                                        'Please select both start and end dates',
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                          fontSize: 14.sp,
-                                                        ),
-                                                      ),
-                                                      SizedBox(height: 24.h),
-                                                      Center(
-                                                        child: GestureDetector(
-                                                          onTap: () =>
-                                                              Navigator.pop(
-                                                                  context),
-                                                          child: Container(
-                                                            width: 100.w,
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        12.h),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color:
-                                                                  Colors.white,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8.r),
-                                                              border:
-                                                                  Border.all(
-                                                                color: Colors
-                                                                    .black
-                                                                    .withOpacity(
-                                                                        0.3),
-                                                                width: 1.w,
-                                                              ),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: const Color
-                                                                          .fromARGB(
-                                                                          255,
-                                                                          0,
-                                                                          0,
-                                                                          0)
-                                                                      .withOpacity(
-                                                                          0.4),
-                                                                  blurRadius:
-                                                                      4.r,
-                                                                  offset:
-                                                                      Offset(0,
-                                                                          3.h),
-                                                                ),
-                                                                BoxShadow(
-                                                                  color: Color
-                                                                      .fromARGB(
-                                                                          255,
-                                                                          33,
-                                                                          32,
-                                                                          32),
-                                                                  offset:
-                                                                      Offset(
-                                                                          3.w,
-                                                                          4.h),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            child: Center(
-                                                              child: Text(
-                                                                'OK',
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize:
-                                                                      14.sp,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 12.h,
+                                                horizontal: 24.w),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue,
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
+                                              border: Border.all(
+                                                color: Colors.black
+                                                    .withOpacity(0.3),
+                                                width: 1.w,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color.fromARGB(
+                                                          255, 0, 0, 0)
+                                                      .withOpacity(0.6),
+                                                  blurRadius: 4.r,
+                                                  offset: Offset(0, 3.h),
                                                 ),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 12.h, horizontal: 24.w),
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue,
-                                            borderRadius:
-                                                BorderRadius.circular(8.r),
-                                            border: Border.all(
-                                              color:
-                                                  Colors.black.withOpacity(0.3),
-                                              width: 1.w,
+                                                BoxShadow(
+                                                  color: Color.fromARGB(
+                                                      255, 8, 84, 146),
+                                                  offset: Offset(4.w, 5.h),
+                                                ),
+                                              ],
                                             ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: const Color.fromARGB(
-                                                        255, 0, 0, 0)
-                                                    .withOpacity(0.6),
-                                                blurRadius: 4.r,
-                                                offset: Offset(0, 3.h),
-                                              ),
-                                              BoxShadow(
-                                                color: Color.fromARGB(
-                                                    255, 8, 84, 146),
-                                                offset: Offset(4.w, 5.h),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              'Save',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14.sp,
+                                            child: Center(
+                                              child: Text(
+                                                'Save',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14.sp,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      SizedBox(height: 12.h),
-                                      GestureDetector(
-                                        onTap: () => Navigator.pop(context),
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 12.h, horizontal: 24.w),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(8.r),
-                                            border: Border.all(
-                                              color:
-                                                  Colors.black.withOpacity(0.3),
-                                              width: 1.w,
+                                        SizedBox(height: 12.h),
+                                        GestureDetector(
+                                          onTap: () => Navigator.pop(context),
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 12.h,
+                                                horizontal: 24.w),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
+                                              border: Border.all(
+                                                color: Colors.black
+                                                    .withOpacity(0.3),
+                                                width: 1.w,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color.fromARGB(
+                                                          255, 0, 0, 0)
+                                                      .withOpacity(0.6),
+                                                  blurRadius: 4.r,
+                                                  offset: Offset(0, 3.h),
+                                                ),
+                                                BoxShadow(
+                                                  color: Color.fromARGB(
+                                                      255, 33, 32, 32),
+                                                  offset: Offset(4.w, 5.h),
+                                                ),
+                                              ],
                                             ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: const Color.fromARGB(
-                                                        255, 0, 0, 0)
-                                                    .withOpacity(0.6),
-                                                blurRadius: 4.r,
-                                                offset: Offset(0, 3.h),
+                                            child: Center(
+                                              child: Text(
+                                                'Cancel',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14.sp,
+                                                ),
                                               ),
-                                              BoxShadow(
-                                                color: Color.fromARGB(
-                                                    255, 33, 32, 32),
-                                                offset: Offset(4.w, 5.h),
-                                              ),
-                                            ],
+                                            ),
                                           ),
-                                          child: Center(
-                                            child: Text(
-                                              'Cancel',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14.sp,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 56.h,
+                              width: MediaQuery.of(context).size.width,
+                              padding: EdgeInsets.all(16.w),
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(12.r),
+                                border: Border.all(
+                                  color: Colors.black.withOpacity(0.3),
+                                  width: 1.w,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(255, 0, 0, 0)
+                                        .withOpacity(0.6),
+                                    blurRadius: 4.r,
+                                    offset: Offset(0, 3.h),
+                                  ),
+                                  BoxShadow(
+                                    color: Color.fromARGB(255, 8, 84, 146),
+                                    offset: Offset(5.w, 6.h),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                'Freeze Attendance',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14.sp),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        if (!isAttendanceFrozen) SizedBox(height: 12.h),
+                        if (isAttendanceFrozen)
+                          // Resume Attendance button (your exact existing code)
+                          GestureDetector(
+                            onTap: () async {
+                              try {
+                                await supabase.from('users').update({
+                                  'freeze_start': null,
+                                  'freeze_end': null,
+                                }).eq('id', widget.userId);
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    title: Center(
+                                        child: Text('Success',
+                                            style: TextStyle(fontSize: 20.sp))),
+                                    content: Text(
+                                      'Attendance resumed successfully',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 14.sp),
+                                    ),
+                                    actions: [
+                                      Center(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.pop(
+                                                context); // Close dialog
+                                            setState(() {
+                                              isAttendanceFrozen =
+                                                  false; // Update state
+                                            });
+                                            fetchAttendanceData(); // Refresh data
+                                          },
+                                          child: Container(
+                                            width: 100.w,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 16.w,
+                                                vertical: 8.h),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
+                                              border: Border.all(
+                                                color: Colors.black
+                                                    .withOpacity(0.3),
+                                                width: 1.w,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color.fromARGB(
+                                                          255, 0, 0, 0)
+                                                      .withOpacity(0.6),
+                                                  blurRadius: 4.r,
+                                                  offset: Offset(0, 3.h),
+                                                ),
+                                                BoxShadow(
+                                                  color: Color.fromARGB(
+                                                      255, 33, 32, 32),
+                                                  offset: Offset(4.w, 5.h),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                'OK',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14.sp,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1589,173 +1728,60 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                       ),
                                     ],
                                   ),
+                                );
+                              } catch (e) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    title: Text('Error'),
+                                    content:
+                                        Text('Failed to resume attendance: $e'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            },
+                            child: Container(
+                              height: 56.h,
+                              width: MediaQuery.of(context).size.width,
+                              padding: EdgeInsets.all(16.w),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12.r),
+                                border: Border.all(
+                                  color: Colors.black.withOpacity(0.3),
+                                  width: 1.w,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(255, 0, 0, 0)
+                                        .withOpacity(0.6),
+                                    blurRadius: 4.r,
+                                    offset: Offset(0, 3.h),
+                                  ),
+                                  BoxShadow(
+                                    color: Color.fromARGB(255, 33, 32, 32),
+                                    offset: Offset(5.w, 6.h),
+                                  ),
                                 ],
                               ),
-                            );
-                          },
-                          child: Container(
-                            height: 56.h,
-                            width: MediaQuery.of(context).size.width,
-                            padding: EdgeInsets.all(16.w),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                color: Colors.black.withOpacity(0.3),
-                                width: 1.w,
+                              child: Text(
+                                'Resume Attendance',
+                                style: TextStyle(
+                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                    fontSize: 14.sp),
+                                textAlign: TextAlign.center,
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color.fromARGB(255, 0, 0, 0)
-                                      .withOpacity(0.6),
-                                  blurRadius: 4.r,
-                                  offset: Offset(0, 3.h),
-                                ),
-                                BoxShadow(
-                                  color: Color.fromARGB(255, 8, 84, 146),
-                                  offset: Offset(5.w, 6.h),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              'Freeze Attendance',
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 14.sp),
-                              textAlign: TextAlign.center,
                             ),
                           ),
-                        ),
-                      if (!isAttendanceFrozen) SizedBox(height: 12.h),
-                      if (isAttendanceFrozen)
-                        // Resume Attendance button (your exact existing code)
-                        GestureDetector(
-                          onTap: () async {
-                            try {
-                              await supabase.from('users').update({
-                                'freeze_start': null,
-                                'freeze_end': null,
-                              }).eq('id', widget.userId);
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  backgroundColor: Colors.white,
-                                  title: Center(
-                                      child: Text('Success',
-                                          style: TextStyle(fontSize: 20.sp))),
-                                  content: Text(
-                                    'Attendance resumed successfully',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 14.sp),
-                                  ),
-                                  actions: [
-                                    Center(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.pop(
-                                              context); // Close dialog
-                                          setState(() {
-                                            isAttendanceFrozen =
-                                                false; // Update state
-                                          });
-                                          fetchAttendanceData(); // Refresh data
-                                        },
-                                        child: Container(
-                                          width: 100.w,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 16.w, vertical: 8.h),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(8.r),
-                                            border: Border.all(
-                                              color:
-                                                  Colors.black.withOpacity(0.3),
-                                              width: 1.w,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: const Color.fromARGB(
-                                                        255, 0, 0, 0)
-                                                    .withOpacity(0.6),
-                                                blurRadius: 4.r,
-                                                offset: Offset(0, 3.h),
-                                              ),
-                                              BoxShadow(
-                                                color: Color.fromARGB(
-                                                    255, 33, 32, 32),
-                                                offset: Offset(4.w, 5.h),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              'OK',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14.sp,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            } catch (e) {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  backgroundColor: Colors.white,
-                                  title: Text('Error'),
-                                  content:
-                                      Text('Failed to resume attendance: $e'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text('OK'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                          },
-                          child: Container(
-                            height: 56.h,
-                            width: MediaQuery.of(context).size.width,
-                            padding: EdgeInsets.all(16.w),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                color: Colors.black.withOpacity(0.3),
-                                width: 1.w,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color.fromARGB(255, 0, 0, 0)
-                                      .withOpacity(0.6),
-                                  blurRadius: 4.r,
-                                  offset: Offset(0, 3.h),
-                                ),
-                                BoxShadow(
-                                  color: Color.fromARGB(255, 33, 32, 32),
-                                  offset: Offset(5.w, 6.h),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              'Resume Attendance',
-                              style: TextStyle(
-                                  color: const Color.fromARGB(255, 0, 0, 0),
-                                  fontSize: 14.sp),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                    ],
-                  )
-          
+                      ],
+                    )
             ],
           ),
         ),

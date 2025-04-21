@@ -117,7 +117,7 @@ class _ReportsScreenState extends State<searchuser> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 8.h),
+            SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -128,11 +128,11 @@ class _ReportsScreenState extends State<searchuser> {
                 ),
                 Image.asset(
                   'assets/logo5.png',
-                  height: 55.h,
+                  height: 41.h,
                 ),
               ],
             ),
-            SizedBox(height: 4.h),
+            SizedBox(height: 8.h),
 
             /// Title
             Text(

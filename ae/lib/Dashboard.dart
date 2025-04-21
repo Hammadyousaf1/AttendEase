@@ -126,7 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 8.h),
+            SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -139,11 +139,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 Image.asset(
                   'assets/logo5.png',
-                  height: 55.h,
+                  height: 41.h,
                 ),
               ],
             ),
-            SizedBox(height: 4.h),
+            SizedBox(height: 8.h),
             Text(
               "Dashboard",
               style: TextStyle(fontSize: 20.sp),

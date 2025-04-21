@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            height: 32,
+            height: 36.h,
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -83,22 +83,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               opacity: animation2,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'WELCOME',
                     style: TextStyle(
                         color: Color.fromARGB(255, 7, 22, 47),
-                        fontSize: 28.sp,
+                        fontSize: 32.sp,
                         letterSpacing: -4.0), // Reduced letter spacing
                   ),
                   Image.asset(
                     'assets/logo5.png',
-                    height: 55.h,
+                    height: 41.h,
                   ),
                 ],
               ),
             ),
+          ),
+          SizedBox(
+            height: 4.h,
           ),
           FadeTransition(
             opacity: animation2,
