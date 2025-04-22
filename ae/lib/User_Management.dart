@@ -262,7 +262,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                         builder: (context) => UserDetailScreen(
                                           userId: user['id'],
                                           profileImageUrl:
-                                              'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id']}.png',
+                                              'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/${user['id']}.png',
                                         ),
                                       ),
                                     );
@@ -284,12 +284,12 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                             borderRadius:
                                                 BorderRadius.circular(8),
                                             child: Image.network(
-                                              'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/${user['id']}.png',
+                                              'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/${user['id']}.png',
                                               fit: BoxFit.cover,
                                               errorBuilder:
                                                   (context, error, stackTrace) {
                                                 return Image.network(
-                                                  'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile_pictures/Icon.png',
+                                                  'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/Icon.png',
                                                   fit: BoxFit.cover,
                                                 );
                                               },

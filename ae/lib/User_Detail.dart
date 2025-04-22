@@ -313,14 +313,14 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
         final fileName = '${widget.userId}.png';
 
-        await supabase.storage.from('profile_pictures').upload(
+        await supabase.storage.from('profile').upload(
               fileName,
               tempFile,
               fileOptions: FileOptions(contentType: 'image/png', upsert: true),
             );
 
         final newImageUrl = await supabase.storage
-            .from('profile_pictures')
+            .from('profile')
             .createSignedUrl(fileName, 3600);
 
         await tempFile.delete();
@@ -340,7 +340,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       setState(() => isLoading = true);
       final fileName = '${widget.userId}.png';
 
-      await supabase.storage.from('profile_pictures').remove([fileName]);
+      await supabase.storage.from('profile').remove([fileName]);
 
       setState(() {
         profileImageUrl = null;
