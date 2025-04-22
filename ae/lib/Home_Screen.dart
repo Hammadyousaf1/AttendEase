@@ -83,18 +83,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               opacity: animation2,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'WELCOME',
+                    'Welcome 👋🎉',
                     style: TextStyle(
                         color: Color.fromARGB(255, 7, 22, 47),
-                        fontSize: 32.sp,
-                        letterSpacing: -4.0), // Reduced letter spacing
-                  ),
-                  Image.asset(
-                    'assets/logo5.png',
-                    height: 41.h,
+                        fontSize: 24.sp,
+                        letterSpacing: -1.0), // Reduced letter spacing
                   ),
                 ],
               ),

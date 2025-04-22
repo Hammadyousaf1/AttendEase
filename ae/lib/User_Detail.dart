@@ -385,7 +385,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   ),
                   Image.asset(
                     'assets/logo5.png',
-                    height: 41.h,
+                    height: 28.h,
                   ),
                 ],
               ),

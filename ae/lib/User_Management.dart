@@ -149,7 +149,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                           Icon(Icons.arrow_back, color: Colors.black, size: 24),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    Image.asset('assets/logo5.png', height: 41.h),
+                    Image.asset('assets/logo5.png', height: 28.h),
                   ],
                 ),
                 SizedBox(height: 8.h),

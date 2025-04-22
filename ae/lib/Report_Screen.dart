@@ -128,7 +128,7 @@ class _ReportsScreenState extends State<searchuser> {
                 ),
                 Image.asset(
                   'assets/logo5.png',
-                  height: 41.h,
+                  height: 28.h,
                 ),
               ],
             ),

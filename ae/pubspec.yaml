@@ -41,11 +41,4 @@ flutter:
   assets:
     - assets/
 
-flutter_icons:
-  android: true
-  ios: true
-  adaptive_icon_background: "#000000"
-  adaptive_icon_foreground: "assets/Icon2.png"
-  image_path: null
-  
-  remove_alpha_ios: true
+

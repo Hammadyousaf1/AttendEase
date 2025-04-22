@@ -139,7 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 Image.asset(
                   'assets/logo5.png',
-                  height: 41.h,
+                  height: 28.h,
                 ),
               ],
             ),
