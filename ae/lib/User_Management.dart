@@ -250,85 +250,239 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                   curve: Curves.easeOutBack,
                                 ),
                               )),
-                              child: Card(
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                              child: Dismissible(
+                                key: ValueKey(user['id']),
+                                direction: DismissDirection.endToStart,
+                                background: Container(
+                                  margin: EdgeInsets.symmetric(vertical: 4.h),
+                                  padding: EdgeInsets.only(right: 16.w),
+                                  alignment: Alignment.centerRight,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(Icons.delete, color: Colors.white),
                                 ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => UserDetailScreen(
-                                          userId: user['id'],
-                                          profileImageUrl:
-                                              'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/${user['id']}.png',
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                    color: Colors.white,
-                                    width: constraints.maxWidth,
-                                    padding: EdgeInsets.all(16.w),
-                                    child: Row(
-                                      children: [
-                                        AnimatedContainer(
-                                          duration: Duration(milliseconds: 300),
-                                          curve: Curves.easeInOut,
-                                          width: constraints.maxWidth * 0.15,
-                                          height: constraints.maxWidth * 0.15,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: Image.network(
-                                              'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/${user['id']}.png',
-                                              fit: BoxFit.cover,
-                                              errorBuilder:
-                                                  (context, error, stackTrace) {
-                                                return Image.network(
-                                                  'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/Icon.png',
-                                                  fit: BoxFit.cover,
-                                                );
-                                              },
+                                confirmDismiss: (direction) async {
+                                  return await showDialog<bool>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        backgroundColor: Colors.white,
+                                        title: Center(
+                                            child: Text('Confirm Deletion',
+                                                style: TextStyle(fontSize: 16.sp))),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Center(
+                                              child: Text(
+                                                'You’re about to erase your journey\nAll progress will be gone forever.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: const Color.fromARGB(
+                                                        255, 75, 75, 75),
+                                                    fontSize: 14.sp),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        SizedBox(width: 8.w),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                        actions: [
+                                          Column(
                                             children: [
-                                              Text(
-                                                  '${user['name'] ?? 'Unknown'}',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          constraints.maxWidth *
-                                                              0.040),
-                                                  overflow:
-                                                      TextOverflow.ellipsis),
-                                              SizedBox(height: 4.h),
-                                              Text('ID: ${user['id'] ?? ''}',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          constraints.maxWidth *
-                                                              0.035)),
+                                              Center(
+                                                child: SizedBox(
+                                                  width: 300.w,
+                                                  child: GestureDetector(
+                                                    onTap: () => Navigator.of(context).pop(true),
+                                                    child: Container(
+                                                      padding: EdgeInsets.symmetric(
+                                                          horizontal: 24.w,
+                                                          vertical: 12.h),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.blue,
+                                                        borderRadius:
+                                                            BorderRadius.circular(8.r),
+                                                        border: Border.all(
+                                                          color: Colors.black
+                                                              .withOpacity(0.3),
+                                                          width: 1.w,
+                                                        ),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: const Color.fromARGB(
+                                                                    255, 0, 0, 0)
+                                                                .withOpacity(0.4),
+                                                            blurRadius: 4.r,
+                                                            offset: Offset(0, 3.h),
+                                                          ),
+                                                          BoxShadow(
+                                                            color: Color.fromARGB(
+                                                                255, 8, 84, 146),
+                                                            offset: Offset(3.w, 4.h),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          'Proceed...',
+                                                          style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 14.sp),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 10.h),
+                                              Center(
+                                                child: SizedBox(
+                                                  width: 300.w,
+                                                  child: GestureDetector(
+                                                    onTap: () => Navigator.of(context).pop(false),
+                                                    child: Container(
+                                                      padding: EdgeInsets.symmetric(
+                                                          horizontal: 24.w,
+                                                          vertical: 12.h),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(8.r),
+                                                        border: Border.all(
+                                                          color: Colors.black
+                                                              .withOpacity(0.3),
+                                                          width: 1.w,
+                                                        ),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: const Color.fromARGB(
+                                                                    255, 0, 0, 0)
+                                                                .withOpacity(0.4),
+                                                            blurRadius: 4.r,
+                                                            offset: Offset(0, 3.h),
+                                                          ),
+                                                          BoxShadow(
+                                                            color: Color.fromARGB(
+                                                                255, 33, 32, 32),
+                                                            offset: Offset(3.w, 4.h),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          'Cancel',
+                                                          style: TextStyle(
+                                                              color: Colors.black,
+                                                              fontSize: 14.sp),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
                                             ],
                                           ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                onDismissed: (direction) async {
+                                  try {
+                                    await supabase
+                                        .from('users')
+                                        .delete()
+                                        .eq('id', user['id']);
+                                    setState(() {
+                                      _filteredUsers.removeWhere((u) => u['id'] == user['id']);
+                                    });
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Failed to delete user')),
+                                    );
+                                  }
+                                },
+                                child: Card(
+                                  elevation: 2,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => UserDetailScreen(
+                                            userId: user['id'],
+                                            profileImageUrl:
+                                                'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/${user['id']}.png',
+                                          ),
                                         ),
-                                        AnimatedContainer(
-                                          duration: Duration(milliseconds: 300),
-                                          curve: Curves.easeInOut,
-                                          width: constraints.maxWidth * 0.15,
-                                          height: constraints.maxWidth * 0.15,
-                                          child: Icon(Icons.chevron_right,
-                                              color: Colors.blue,
-                                              size: constraints.maxWidth * 0.1),
-                                        ),
-                                      ],
+                                      );
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                      color: Colors.white,
+                                      width: constraints.maxWidth,
+                                      padding: EdgeInsets.all(16.w),
+                                      child: Row(
+                                        children: [
+                                          AnimatedContainer(
+                                            duration: Duration(milliseconds: 300),
+                                            curve: Curves.easeInOut,
+                                            width: constraints.maxWidth * 0.15,
+                                            height: constraints.maxWidth * 0.15,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: Image.network(
+                                                'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/${user['id']}.png',
+                                                fit: BoxFit.cover,
+                                                errorBuilder:
+                                                    (context, error, stackTrace) {
+                                                  return Image.network(
+                                                    'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/Icon.png',
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 8.w),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    '${user['name'] ?? 'Unknown'}',
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            constraints.maxWidth *
+                                                                0.040),
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
+                                                SizedBox(height: 4.h),
+                                                Text('ID: ${user['id'] ?? ''}',
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            constraints.maxWidth *
+                                                                0.035)),
+                                              ],
+                                            ),
+                                          ),
+                                          AnimatedContainer(
+                                            duration: Duration(milliseconds: 300),
+                                            curve: Curves.easeInOut,
+                                            width: constraints.maxWidth * 0.15,
+                                            height: constraints.maxWidth * 0.15,
+                                            child: Icon(Icons.chevron_right,
+                                                color: Colors.blue,
+                                                size: constraints.maxWidth * 0.1),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),

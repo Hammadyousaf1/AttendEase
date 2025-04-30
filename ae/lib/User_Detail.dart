@@ -1184,7 +1184,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                             MainAxisSize.min,
                                                         children: [
                                                           Text(
-                                                            'Success',
+                                                            'All Set',
                                                             style: TextStyle(
                                                               fontSize: 18.sp,
                                                               fontWeight:
@@ -1200,8 +1200,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                             endDate!.isBefore(
                                                                     DateTime
                                                                         .now())
-                                                                ? 'Attendance freeze cleared as end date has passed'
-                                                                : 'Attendance freeze for chosen duration',
+                                                                ? 'Attendance freeze\ncleared as end date\nhas passed'
+                                                                : 'Attendance freeze\nfor chosen duration',
                                                             textAlign: TextAlign
                                                                 .center,
                                                             style: TextStyle(
@@ -1225,7 +1225,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                                 fetchAttendanceData();
                                                               },
                                                               child: Container(
-                                                                width: 100.w,
+                                                                width: double
+                                                                    .infinity,
                                                                 padding: EdgeInsets
                                                                     .symmetric(
                                                                         vertical:
@@ -1233,7 +1234,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                                 decoration:
                                                                     BoxDecoration(
                                                                   color: Colors
-                                                                      .white,
+                                                                      .blue,
                                                                   borderRadius:
                                                                       BorderRadius
                                                                           .circular(
@@ -1281,7 +1282,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                                     style:
                                                                         TextStyle(
                                                                       color: Colors
-                                                                          .black,
+                                                                          .white,
                                                                       fontSize:
                                                                           14.sp,
                                                                     ),
@@ -1443,7 +1444,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                         ),
                                                         SizedBox(height: 16.h),
                                                         Text(
-                                                          'Please select both start and end dates',
+                                                          'Please select both\nstart and end dates',
                                                           textAlign:
                                                               TextAlign.center,
                                                           style: TextStyle(
@@ -1458,15 +1459,16 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                                 Navigator.pop(
                                                                     context),
                                                             child: Container(
-                                                              width: 100.w,
+                                                              width: double
+                                                                  .infinity,
                                                               padding: EdgeInsets
                                                                   .symmetric(
                                                                       vertical:
                                                                           12.h),
                                                               decoration:
                                                                   BoxDecoration(
-                                                                color: Colors
-                                                                    .white,
+                                                                color:
+                                                                    Colors.blue,
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
@@ -1516,7 +1518,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                                   style:
                                                                       TextStyle(
                                                                     color: Colors
-                                                                        .black,
+                                                                        .white,
                                                                     fontSize:
                                                                         14.sp,
                                                                   ),
@@ -1665,11 +1667,15 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                   context: context,
                                   builder: (context) => AlertDialog(
                                     backgroundColor: Colors.white,
+                                    contentPadding: EdgeInsets.all(24.w),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16.r),
+                                    ),
                                     title: Center(
-                                        child: Text('Success',
+                                        child: Text('Lets Go',
                                             style: TextStyle(fontSize: 20.sp))),
                                     content: Text(
-                                      'Attendance resumed successfully',
+                                      'Attendance\nresumed successfully',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(fontSize: 14.sp),
                                     ),
@@ -1686,12 +1692,11 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                             fetchAttendanceData(); // Refresh data
                                           },
                                           child: Container(
-                                            width: 100.w,
+                                            width: double.infinity,
                                             padding: EdgeInsets.symmetric(
-                                                horizontal: 16.w,
-                                                vertical: 8.h),
+                                                vertical: 12.h),
                                             decoration: BoxDecoration(
-                                              color: Colors.white,
+                                              color: Colors.blue,
                                               borderRadius:
                                                   BorderRadius.circular(8.r),
                                               border: Border.all(
@@ -1718,7 +1723,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                               child: Text(
                                                 'OK',
                                                 style: TextStyle(
-                                                  color: Colors.black,
+                                                  color: Colors.white,
                                                   fontSize: 14.sp,
                                                 ),
                                               ),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'dart:async';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<Offset> animation3;
 
   String currentime = '';
+  late Timer _timer;
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -51,17 +53,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     animation3 = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
         CurvedAnimation(parent: Controller3, curve: Curves.easeOutBack));
     Controller3.forward();
-    updateTime();
-  }
-
-  void updateTime() {
-    final String formattedTime =
-        DateFormat('hh:mm:ss a').format(DateTime.now());
-    setState(() {
-      currentime = formattedTime;
+    
+    // Initialize with current time immediately
+    currentime = DateFormat('hh:mm:ss a').format(DateTime.now());
+    
+    // Start timer to update every second
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (mounted) {
+        setState(() {
+          currentime = DateFormat('hh:mm:ss a').format(DateTime.now());
+        });
+      }
     });
   }
 
+  
   List<String> images = [
     'assets/Frame (3).png',
     'assets/Frame (2).png',

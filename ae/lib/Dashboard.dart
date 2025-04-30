@@ -265,12 +265,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           itemBuilder: (context, index) {
                             var student = attendanceList[index];
                             return Container(
-                              padding: EdgeInsets.only(
-                                  bottom: 4.h), // Added bottom padding
+                              padding: EdgeInsets.symmetric(
+                                  vertical:
+                                      6.h), // Added top and bottom padding
                               decoration: BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
-                                    color: Colors.blueGrey,
+                                    color: Colors.blueGrey.withOpacity(0.3),
                                     width: 1.w,
                                   ),
                                 ),
