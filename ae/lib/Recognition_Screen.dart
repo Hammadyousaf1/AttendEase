@@ -194,7 +194,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       final request = http.MultipartRequest(
           'POST',
           Uri.parse(
-              'http://192.168.100.2:5000/recognize'));
+              'http://13.201.209.98:5000/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));

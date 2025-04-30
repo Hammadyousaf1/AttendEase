@@ -64,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.100.2:5000/train'));
+          'POST', Uri.parse('http://13.201.209.98:5000/train'));
       request.fields['name'] = _nameController.text;
       request.fields['id'] = _idController.text;
       request.fields['phone'] =
