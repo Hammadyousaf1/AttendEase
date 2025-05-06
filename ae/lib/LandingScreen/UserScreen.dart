@@ -1,9 +1,10 @@
 import 'dart:io';
 
-import 'package:ae/Dashboard.dart';
-import 'package:ae/Home_Screen.dart';
-import 'package:ae/Recognition_Screen.dart';
-import 'package:ae/User_Management.dart';
+import 'package:ae/UserManagement/Dashboard.dart';
+import 'package:ae/LandingScreen/AdminScreen.dart';
+import 'package:ae/ModelScreen/Recognition_Screen.dart';
+import 'package:ae/UserManagement/User_Management.dart';
+import 'package:ae/auth/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,22 +14,15 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class UserDetailScreen extends StatefulWidget {
-  final String userId;
-
-  final String? profileImageUrl;
-
-  const UserDetailScreen({
-    super.key,
-    required this.userId,
-    this.profileImageUrl,
-  });
+class UserlandingScreen extends StatefulWidget {
+  final String? email;
+  const UserlandingScreen({super.key, this.email});
 
   @override
-  State<UserDetailScreen> createState() => _UserDetailScreenState();
+  State<UserlandingScreen> createState() => _UserDetailScreenState();
 }
 
-class _UserDetailScreenState extends State<UserDetailScreen> {
+class _UserDetailScreenState extends State<UserlandingScreen> {
   final supabase = Supabase.instance.client;
   bool isAttendanceFrozen = false;
   int _selectedIndex = 2;
@@ -38,16 +32,20 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   bool isLoading = false;
   String? profileImageUrl;
   String userName = '';
-  String? phoneNumber; // Added phone number variable
+  String? phoneNumber;
+  String? userId = '';
 
   @override
   void initState() {
     super.initState();
-    profileImageUrl = widget.profileImageUrl;
-    fetchAttendanceData();
-    checkFreezeStatus();
-    fetchUserPhoneNumber(); // Fetch phone number on initialization
-    fetchWorkingHours();
+    fetchUserId().then((_) {
+      profileImageUrl =
+          'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/${userId}.png';
+      fetchAttendanceData();
+      checkFreezeStatus();
+      fetchUserPhoneNumber(); // Fetch phone number on initialization
+      fetchWorkingHours();
+    });
   }
 
   void _onItemTapped(int index) {
@@ -56,11 +54,37 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     });
   }
 
+  Future<void> fetchUserId() async {
+    try {
+      final email = widget.email ??
+          (ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>?)?['email'] ??
+          Supabase.instance.client.auth.currentUser?.email ??
+          '';
+
+      if (email.isNotEmpty) {
+        final response = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', email)
+            .single();
+
+        setState(() {
+          userId = response['id'];
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching user ID: $e')),
+      );
+    }
+  }
+
   Future<void> checkFreezeStatus() async {
     final response = await supabase
         .from('users')
         .select('freeze_start, freeze_end')
-        .eq('id', widget.userId)
+        .eq('id', userId ?? '')
         .single();
 
     setState(() {
@@ -93,7 +117,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       final response = await supabase
           .from('users')
           .select('phone, name')
-          .eq('id', widget.userId)
+          .eq('id', userId ?? '')
           .limit(1);
 
       if (response.isNotEmpty) {
@@ -118,7 +142,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       final response = await supabase
           .from('attendance2')
           .select('time_in, time_out')
-          .eq('user_id', widget.userId)
+          .eq('user_id', userId ?? '')
           .gte('time_in', startOfWeek.toIso8601String())
           .lte('time_in', endOfWeek.toIso8601String());
 
@@ -148,7 +172,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       final response = await supabase
           .from('attendance2')
           .select('time_in, time_out')
-          .eq('user_id', widget.userId);
+          .eq('user_id', userId ?? '');
 
       double totalHours = 0;
       for (final record in response) {
@@ -172,7 +196,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       final response = await supabase
           .from('attendance2')
           .select('time_in')
-          .eq('user_id', widget.userId)
+          .eq('user_id', userId ?? '')
           .order('time_in', ascending: false);
 
       int streak = 0;
@@ -311,7 +335,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
         final tempFile = File('${pickedFile.path}.png');
         await tempFile.writeAsBytes(pngBytes);
 
-        final fileName = '${widget.userId}.png';
+        final fileName = '${userId}.png';
 
         await supabase.storage.from('profile').upload(
               fileName,
@@ -338,7 +362,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   Future<void> deleteProfilePicture() async {
     try {
       setState(() => isLoading = true);
-      final fileName = '${widget.userId}.png';
+      final fileName = '${userId}.png';
 
       await supabase.storage.from('profile').remove([fileName]);
 
@@ -349,6 +373,23 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     } catch (e) {
       setState(() => isLoading = false);
     }
+  }
+
+  Widget _buildWeeklyTracker() {
+    final now = DateTime.now();
+    final dayOfWeek = now.weekday;
+
+    if (dayOfWeek >= 3) {
+      return Image.asset(
+        workingHours < 20
+            ? 'assets/indicator3.png'
+            : (workingHours < 40
+                ? 'assets/indicator2.png'
+                : 'assets/indicator1.png'),
+        height: 64.h,
+      );
+    }
+    return SizedBox.shrink();
   }
 
   @override
@@ -363,6 +404,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             checkFreezeStatus(),
             fetchUserPhoneNumber(),
             fetchWorkingHours(),
+            fetchUserId(),
           ]);
         },
         child: SingleChildScrollView(
@@ -374,18 +416,20 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon:
-                        Icon(Icons.arrow_back, color: Colors.black, size: 24.w),
-                    onPressed: () => Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => UserManagementScreen(),
-                      ),
-                    ),
-                  ),
                   Image.asset(
                     'assets/logo5.png',
                     height: 28.h,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.logout, color: Colors.black, size: 24.w),
+                    onPressed: () async {
+                      await Supabase.instance.client.auth.signOut();
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => LoginScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -460,7 +504,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                         ),
                         SizedBox(height: 4.h),
                         Text(
-                          'ID: ${widget.userId}',
+                          'ID: ${userId}',
                           style:
                               TextStyle(fontSize: 12.sp, color: Colors.black87),
                         ),
@@ -525,7 +569,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                           await supabase.from('users').update({
                                             'name': nameController.text,
                                             'phone': phoneController.text,
-                                          }).eq('id', widget.userId);
+                                          }).eq('id', userId ?? '');
 
                                           setState(() {
                                             phoneNumber = phoneController.text;
@@ -565,13 +609,19 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                       Navigator.pushReplacement(
                                                         context,
                                                         MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              UserDetailScreen(
-                                                            userId:
-                                                                widget.userId,
-                                                            profileImageUrl:
-                                                                profileImageUrl,
-                                                          ),
+                                                          builder: (context) {
+                                                            // Create a new instance with the same email
+                                                            final newScreen =
+                                                                UserlandingScreen(
+                                                              email:
+                                                                  widget.email,
+                                                            );
+                                                            // Force rebuild by using a UniqueKey
+                                                            return KeyedSubtree(
+                                                              key: UniqueKey(),
+                                                              child: newScreen,
+                                                            );
+                                                          },
                                                         ),
                                                       );
                                                     },
@@ -702,7 +752,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                   children: [
                                     Center(
                                       child: Text(
-                                        'You’re about to erase your journey\nAll progress will be gone forever.',
+                                        'You are about to erase your journey\nAll progress will be gone forever.',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                             color: const Color.fromARGB(
@@ -724,7 +774,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                 await supabase
                                                     .from('users')
                                                     .delete()
-                                                    .eq('id', widget.userId);
+                                                    .eq('id', userId ?? '');
 
                                                 Navigator.of(context)
                                                     .pushReplacement(
@@ -848,14 +898,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 ],
               ),
               SizedBox(height: 12.h),
-              Image.asset(
-                workingHours < 20
-                    ? 'assets/indicator3.png'
-                    : (workingHours < 40
-                        ? 'assets/indicator2.png'
-                        : 'assets/indicator1.png'),
-                height: 64.h,
-              ),
+              _buildWeeklyTracker(),
               SizedBox(height: 12.h),
               Text(
                 "Weekly Tracker",
@@ -1148,7 +1191,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                       .update({
                                                     'freeze_start': null,
                                                     'freeze_end': null,
-                                                  }).eq('id', widget.userId);
+                                                  }).eq('id', userId ?? '');
                                                 } else {
                                                   // Set new freeze period
                                                   await supabase
@@ -1158,7 +1201,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                                         .toIso8601String(),
                                                     'freeze_end': endDate!
                                                         .toIso8601String(),
-                                                  }).eq('id', widget.userId);
+                                                  }).eq('id', userId ?? '');
                                                 }
 
                                                 Navigator.pop(
@@ -1662,7 +1705,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                 await supabase.from('users').update({
                                   'freeze_start': null,
                                   'freeze_end': null,
-                                }).eq('id', widget.userId);
+                                }).eq('id', userId ?? '');
                                 showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
@@ -1789,60 +1832,6 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     )
             ],
           ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        color: Colors.white,
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            if (index == 0) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
-              );
-            } else if (index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => FaceRectScreen()),
-              );
-            } else if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => UserManagementScreen()),
-              );
-            } else if (index == 3) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DashboardScreen()),
-              );
-            } else {
-              _onItemTapped(index);
-            }
-          },
-          type: BottomNavigationBarType.fixed,
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home, size: 24.w),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(LucideIcons.scanFace, size: 24.w),
-              label: 'Attendance',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.people, size: 24.w),
-              label: 'Users',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard, size: 24.w),
-              label: 'Dashboard',
-            ),
-          ],
-          selectedItemColor: Colors.blue,
-          unselectedItemColor: Colors.black54,
-          selectedLabelStyle: TextStyle(fontSize: 10.sp),
-          unselectedLabelStyle: TextStyle(fontSize: 10.sp),
         ),
       ),
     );

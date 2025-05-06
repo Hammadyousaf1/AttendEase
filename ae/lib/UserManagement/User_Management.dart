@@ -1,8 +1,8 @@
-import 'package:ae/Dashboard.dart';
-import 'package:ae/Home_Screen.dart';
-import 'package:ae/Recognition_Screen.dart';
-import 'package:ae/User_Detail.dart';
-import 'package:ae/Regisration_Screen.dart';
+import 'package:ae/UserManagement/Dashboard.dart';
+import 'package:ae/LandingScreen/AdminScreen.dart';
+import 'package:ae/ModelScreen/Recognition_Screen.dart';
+import 'package:ae/UserManagement/User_Detail.dart';
+import 'package:ae/ModelScreen/Regisration_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lucide_icons/lucide_icons.dart';

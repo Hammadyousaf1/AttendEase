@@ -1,8 +1,8 @@
-import 'package:ae/Dashboard.dart';
-import 'package:ae/Home_Screen.dart';
-import 'package:ae/Recognition_Screen.dart';
-import 'package:ae/Regisration_Screen.dart';
-import 'package:ae/User_Management.dart';
+import 'package:ae/UserManagement/Dashboard.dart';
+import 'package:ae/LandingScreen/AdminScreen.dart';
+import 'package:ae/ModelScreen/Recognition_Screen.dart';
+import 'package:ae/ModelScreen/Regisration_Screen.dart';
+import 'package:ae/UserManagement/User_Management.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -24,6 +24,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _idController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final SupabaseClient supabase = Supabase.instance.client;
   bool _isSubmitting = false;
@@ -36,6 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (widget.userData != null) {
       _nameController.text = widget.userData!['name'] ?? '';
       _idController.text = widget.userData!['id'] ?? '';
+      _emailController.text = widget.userData!['email'] ?? '';
       _phoneController.text = widget.userData!['phone'] ?? '';
     }
   }
@@ -47,7 +49,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _submitData() async {
     if (_nameController.text.isEmpty ||
-        _idController.text.isEmpty ||
+        _idController.text.isEmpty || 
+        _emailController.text.isEmpty ||
         _phoneController.text.length != 13) {
       // Check for phone number length
       ScaffoldMessenger.of(context).showSnackBar(
@@ -64,9 +67,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://13.201.209.98:5000/train'));
+          'POST', Uri.parse('http://192.168.100.3:5000/train'));
       request.fields['name'] = _nameController.text;
-      request.fields['id'] = _idController.text;
+      request.fields['user_id'] = _idController.text;
+      request.fields['email'] = _emailController.text;
       request.fields['phone'] =
           _phoneController.text; // Add phone number to request
 
@@ -296,6 +300,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 }
               },
             ),
+            SizedBox(height: 12.h),
+            TextField(
+              controller: _emailController,
+              enabled: widget.userData == null,
+              style: TextStyle(fontSize: 14.sp),
+              decoration: InputDecoration(
+                labelText: "Email",
+                labelStyle: TextStyle(fontSize: 14.sp, color: Colors.black),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+              ),
+            ),
             SizedBox(height: 20.h),
             GestureDetector(
               onTap: _isSubmitting ? null : _submitData,
@@ -324,9 +350,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Center(
                   child: _isSubmitting
-                      ? CircularProgressIndicator.adaptive(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator.adaptive(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                            SizedBox(width: 12.w),
+                            Text(
+                              "Training Model...",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ],
                         )
                       : Text(
                           widget.userData != null

@@ -1,7 +1,9 @@
-import 'package:ae/Dashboard.dart';
-import 'package:ae/Recognition_Screen.dart';
-import 'package:ae/Regisration_Screen.dart';
-import 'package:ae/User_Management.dart';
+import 'package:ae/UserManagement/Dashboard.dart';
+import 'package:ae/auth/LoginScreen.dart';
+import 'package:ae/auth/OnboardScreen.dart';
+import 'package:ae/ModelScreen/Recognition_Screen.dart';
+import 'package:ae/ModelScreen/Regisration_Screen.dart';
+import 'package:ae/UserManagement/User_Management.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,8 +11,11 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'dart:async';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String? email;
+  const HomeScreen({super.key, this.email});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -53,10 +58,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     animation3 = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
         CurvedAnimation(parent: Controller3, curve: Curves.easeOutBack));
     Controller3.forward();
-    
+
     // Initialize with current time immediately
     currentime = DateFormat('hh:mm:ss a').format(DateTime.now());
-    
+
     // Start timer to update every second
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
       if (mounted) {
@@ -67,7 +72,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
-  
   List<String> images = [
     'assets/Frame (3).png',
     'assets/Frame (2).png',
@@ -75,6 +79,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   ];
   @override
   Widget build(BuildContext context) {
+    final email = widget.email ??
+        (ModalRoute.of(context)?.settings.arguments
+            as Map<String, dynamic>?)?['email'] ??
+        Supabase.instance.client.auth.currentUser?.email ??
+        '';
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -97,6 +107,136 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         color: Color.fromARGB(255, 7, 22, 47),
                         fontSize: 24.sp,
                         letterSpacing: -1.0), // Reduced letter spacing
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            content: Container(
+                              height: 235,
+                              width: MediaQuery.of(context).size.width *
+                                  0.9, // Set width to 80% of screen width
+                              padding: EdgeInsets.all(8), // Added padding
+                              child: FutureBuilder(
+                                future: Supabase.instance.client
+                                    .from('auth_users')
+                                    .select()
+                                    .eq('email', email)
+                                    .single(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                        child: CircularProgressIndicator());
+                                  }
+                                  if (snapshot.hasError) {
+                                    return Text('Error loading user data');
+                                  }
+                                  final userData = snapshot.data;
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Column(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 45,
+                                            backgroundColor:
+                                                const Color.fromARGB(
+                                                    255, 208, 207, 207),
+                                            child: Icon(
+                                              Icons.person,
+                                              color: Colors.black,
+                                              size: 40,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            userData?['name'] ?? 'User',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          Text(
+                                            userData?['email']?.replaceAll(
+                                                    '@gmail.com', '') ??
+                                                '',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 24),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          await Supabase.instance.client.auth
+                                              .signOut();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LoginScreen()),
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 12, horizontal: 24),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color:
+                                                  Colors.black.withOpacity(0.3),
+                                              width: 1,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.3),
+                                                spreadRadius: 1.5,
+                                                blurRadius: 8,
+                                                offset: Offset(1, 2),
+                                              ),
+                                              BoxShadow(
+                                                color: Color.fromARGB(
+                                                    255, 8, 84, 146),
+                                                offset: Offset(3, 5),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.logout,
+                                                  size: 20,
+                                                  color: Colors.white),
+                                              SizedBox(width: 8),
+                                              Text('Logout',
+                                                  style: TextStyle(
+                                                      color: Colors.white)),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: CircleAvatar(
+                      backgroundColor: const Color.fromARGB(255, 217, 223, 227),
+                      child: Icon(Icons.person, color: Colors.black),
+                    ),
                   ),
                 ],
               ),

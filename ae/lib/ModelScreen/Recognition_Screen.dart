@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:ae/Home_Screen.dart';
+import 'package:ae/LandingScreen/AdminScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
@@ -194,7 +194,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       final request = http.MultipartRequest(
           'POST',
           Uri.parse(
-              'http://13.201.209.98:5000/recognize'));
+              'http://192.168.100.3:5000/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));

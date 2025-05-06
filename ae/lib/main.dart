@@ -1,6 +1,8 @@
-import 'package:ae/Home_Screen.dart';
-
-
+import 'package:ae/LandingScreen/AdminScreen.dart';
+import 'package:ae/LandingScreen/UserScreen.dart';
+import 'package:ae/auth/LoginScreen.dart';
+import 'package:ae/auth/OnboardScreen.dart';
+import 'package:ae/auth/SignupScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,8 +36,43 @@ class MyApp extends StatelessWidget {
           ),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: HomeScreen(),
+        home: AuthWrapper(),
       ),
     );
+  }
+}
+
+class AuthWrapper extends StatefulWidget {
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  Widget build(BuildContext context) {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user != null) {
+      return FutureBuilder(
+        future: Supabase.instance.client
+            .from('auth_users')
+            .select()
+            .eq('email', user.email!)
+            .single(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final response = snapshot.data as Map<String, dynamic>;
+            if (response['admin'] == true) {
+              return HomeScreen();
+            } else {
+              return UserlandingScreen(email: user.email);
+            }
+          }
+          return LoginScreen();
+        },
+      );
+    } else {
+      return LoginScreen();
+    }
   }
 }
