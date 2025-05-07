@@ -335,6 +335,23 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     }
   }
 
+  Widget _buildWeeklyTracker() {
+    final now = DateTime.now();
+    final dayOfWeek = now.weekday;
+
+    if (dayOfWeek >= 3) {
+      return Image.asset(
+        workingHours < 20
+            ? 'assets/indicator3.png'
+            : (workingHours < 40
+                ? 'assets/indicator2.png'
+                : 'assets/indicator1.png'),
+        height: 64.h,
+      );
+    }
+    return SizedBox.shrink();
+  }
+
   Future<void> deleteProfilePicture() async {
     try {
       setState(() => isLoading = true);
@@ -848,14 +865,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 ],
               ),
               SizedBox(height: 12.h),
-              Image.asset(
-                workingHours < 20
-                    ? 'assets/indicator3.png'
-                    : (workingHours < 40
-                        ? 'assets/indicator2.png'
-                        : 'assets/indicator1.png'),
-                height: 64.h,
-              ),
+              _buildWeeklyTracker(),
               SizedBox(height: 12.h),
               Text(
                 "Weekly Tracker",

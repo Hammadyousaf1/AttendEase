@@ -433,7 +433,7 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 12.h),
+               SizedBox(height: 12.h),
               Row(
                 children: [
                   Stack(
@@ -920,6 +920,97 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
               SizedBox(
                 height: 16.h,
               ),
+              Text(
+                "Attendance History",
+                style: TextStyle(fontSize: 16.sp),
+              ),
+              SizedBox(height: 2.h),
+              FutureBuilder(
+                future: supabase
+                    .from('attendance2')
+                    .select()
+                    .eq('user_id', userId ?? '')
+                    .order('time_in', ascending: false),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error loading attendance data'));
+                  }
+                  final attendanceList = snapshot.data as List<dynamic>? ?? [];
+                  if (attendanceList.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "No attendance records found",
+                        style:
+                            TextStyle(fontSize: 12.sp, color: Colors.black26),
+                      ),
+                    );
+                  }
+                  return Container(
+                    height: 150.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(
+                        color: Colors.black.withOpacity(0.3),
+                        width: 1.w,
+                      ),
+                    ),
+                    child: ListView.builder(
+                      padding: EdgeInsets.all(8.w),
+                      itemCount: attendanceList.length,
+                      itemBuilder: (context, index) {
+                        final record = attendanceList[index];
+                        return Container(
+                          padding: EdgeInsets.symmetric(vertical: 8.h),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.grey.withOpacity(0.3),
+                                width: 1.w,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  DateFormat('MMM d').format(
+                                      DateTime.parse(record['time_in'])),
+                                  style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: Colors.black.withOpacity(0.7)),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  'In: ${DateFormat.jm().format(DateTime.parse(record['time_in']))}',
+                                  style: TextStyle(
+                                      fontSize: 10.sp,
+                                      color: Colors.black.withOpacity(0.7)),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  record['time_out'] != null
+                                      ? 'Out: ${DateFormat.jm().format(DateTime.parse(record['time_out']))}'
+                                      : 'Out: N/A',
+                                  style: TextStyle(
+                                      fontSize: 10.sp,
+                                      color: Colors.black.withOpacity(0.7)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 12.h),
               Text(
                 "Rewards",
                 style: TextStyle(fontSize: 16.sp),

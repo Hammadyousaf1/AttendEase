@@ -50,6 +50,7 @@ class _SignupScreenState extends State<SignupScreen> {
         'email': _emailController.text.trim(),
         'password': _passwordController.text.trim(),
         'admin': widget.isAdmin,
+        'admin_id': widget.isAdmin ? authResponse.user!.id : null,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(

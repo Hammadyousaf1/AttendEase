@@ -17,11 +17,11 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final SupabaseClient supabase = Supabase.instance.client;
   TextEditingController _dateController = TextEditingController();
+  List<Map<String, dynamic>> attendanceList = [];
   DateTime selectedDate = DateTime.now();
   bool isLoading = false;
   int markedCount = 0;
   int enrolledCount = 0;
-  List<Map<String, dynamic>> attendanceList = [];
   int _selectedIndex = 3;
 
   @override
@@ -49,10 +49,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           .from('attendance2')
           .select('user_id, user_name, time_in, time_out')
           .gte('time_in', '$formattedDate 00:00:00')
-          .lt('time_in', '$formattedDate 23:59:59');
+          .lt('time_in', '$formattedDate 23:59:59')
+          .eq('admin_id', Supabase.instance.client.auth.currentUser!.id);
 
       // Fetch total enrolled users
-      final usersResponse = await supabase.from('users').select();
+      final usersResponse = await supabase.from('users').select().eq('admin_id', Supabase.instance.client.auth.currentUser!.id);
 
       setState(() {
         attendanceList = List<Map<String, dynamic>>.from(attendanceResponse);

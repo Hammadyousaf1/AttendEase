@@ -71,8 +71,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       request.fields['name'] = _nameController.text;
       request.fields['user_id'] = _idController.text;
       request.fields['email'] = _emailController.text;
-      request.fields['phone'] =
-          _phoneController.text; // Add phone number to request
+      request.fields['phone'] = _phoneController.text;
+      request.fields['admin_id'] = Supabase.instance.client.auth.currentUser!.id;
 
       for (var imagePath in widget.capturedImages) {
         request.files

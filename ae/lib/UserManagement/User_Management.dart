@@ -73,7 +73,12 @@ class _UserManagementScreenState extends State<UserManagementScreen>
 
   Future<List<Map<String, dynamic>>> fetchUsers() async {
     try {
-      final response = await supabase.from('users').select();
+      final authResponse = await supabase.auth.getUser();
+      final adminId = authResponse.user!.id;
+      final response = await supabase
+          .from('users')
+          .select()
+          .eq('admin_id', adminId);
       _allUsers = List<Map<String, dynamic>>.from(response);
       _filteredUsers = _allUsers;
       return _filteredUsers;
@@ -261,7 +266,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                     color: Colors.red,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Icon(Icons.delete, color: Colors.white),
+                                  child:
+                                      Icon(Icons.delete, color: Colors.white),
                                 ),
                                 confirmDismiss: (direction) async {
                                   return await showDialog<bool>(
@@ -271,7 +277,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                         backgroundColor: Colors.white,
                                         title: Center(
                                             child: Text('Confirm Deletion',
-                                                style: TextStyle(fontSize: 16.sp))),
+                                                style: TextStyle(
+                                                    fontSize: 16.sp))),
                                         content: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -294,15 +301,19 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                                 child: SizedBox(
                                                   width: 300.w,
                                                   child: GestureDetector(
-                                                    onTap: () => Navigator.of(context).pop(true),
+                                                    onTap: () =>
+                                                        Navigator.of(context)
+                                                            .pop(true),
                                                     child: Container(
-                                                      padding: EdgeInsets.symmetric(
-                                                          horizontal: 24.w,
-                                                          vertical: 12.h),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 24.w,
+                                                              vertical: 12.h),
                                                       decoration: BoxDecoration(
                                                         color: Colors.blue,
                                                         borderRadius:
-                                                            BorderRadius.circular(8.r),
+                                                            BorderRadius
+                                                                .circular(8.r),
                                                         border: Border.all(
                                                           color: Colors.black
                                                               .withOpacity(0.3),
@@ -310,16 +321,27 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                                         ),
                                                         boxShadow: [
                                                           BoxShadow(
-                                                            color: const Color.fromARGB(
-                                                                    255, 0, 0, 0)
-                                                                .withOpacity(0.4),
+                                                            color: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    0,
+                                                                    0,
+                                                                    0)
+                                                                .withOpacity(
+                                                                    0.4),
                                                             blurRadius: 4.r,
-                                                            offset: Offset(0, 3.h),
+                                                            offset:
+                                                                Offset(0, 3.h),
                                                           ),
                                                           BoxShadow(
-                                                            color: Color.fromARGB(
-                                                                255, 8, 84, 146),
-                                                            offset: Offset(3.w, 4.h),
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    8,
+                                                                    84,
+                                                                    146),
+                                                            offset: Offset(
+                                                                3.w, 4.h),
                                                           ),
                                                         ],
                                                       ),
@@ -327,7 +349,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                                         child: Text(
                                                           'Proceed...',
                                                           style: TextStyle(
-                                                              color: Colors.white,
+                                                              color:
+                                                                  Colors.white,
                                                               fontSize: 14.sp),
                                                         ),
                                                       ),
@@ -340,15 +363,19 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                                 child: SizedBox(
                                                   width: 300.w,
                                                   child: GestureDetector(
-                                                    onTap: () => Navigator.of(context).pop(false),
+                                                    onTap: () =>
+                                                        Navigator.of(context)
+                                                            .pop(false),
                                                     child: Container(
-                                                      padding: EdgeInsets.symmetric(
-                                                          horizontal: 24.w,
-                                                          vertical: 12.h),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 24.w,
+                                                              vertical: 12.h),
                                                       decoration: BoxDecoration(
                                                         color: Colors.white,
                                                         borderRadius:
-                                                            BorderRadius.circular(8.r),
+                                                            BorderRadius
+                                                                .circular(8.r),
                                                         border: Border.all(
                                                           color: Colors.black
                                                               .withOpacity(0.3),
@@ -356,16 +383,27 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                                         ),
                                                         boxShadow: [
                                                           BoxShadow(
-                                                            color: const Color.fromARGB(
-                                                                    255, 0, 0, 0)
-                                                                .withOpacity(0.4),
+                                                            color: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    0,
+                                                                    0,
+                                                                    0)
+                                                                .withOpacity(
+                                                                    0.4),
                                                             blurRadius: 4.r,
-                                                            offset: Offset(0, 3.h),
+                                                            offset:
+                                                                Offset(0, 3.h),
                                                           ),
                                                           BoxShadow(
-                                                            color: Color.fromARGB(
-                                                                255, 33, 32, 32),
-                                                            offset: Offset(3.w, 4.h),
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    33,
+                                                                    32,
+                                                                    32),
+                                                            offset: Offset(
+                                                                3.w, 4.h),
                                                           ),
                                                         ],
                                                       ),
@@ -373,7 +411,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                                         child: Text(
                                                           'Cancel',
                                                           style: TextStyle(
-                                                              color: Colors.black,
+                                                              color:
+                                                                  Colors.black,
                                                               fontSize: 14.sp),
                                                         ),
                                                       ),
@@ -395,11 +434,14 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                         .delete()
                                         .eq('id', user['id']);
                                     setState(() {
-                                      _filteredUsers.removeWhere((u) => u['id'] == user['id']);
+                                      _filteredUsers.removeWhere(
+                                          (u) => u['id'] == user['id']);
                                     });
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Failed to delete user')),
+                                      SnackBar(
+                                          content:
+                                              Text('Failed to delete user')),
                                     );
                                   }
                                 },
@@ -412,7 +454,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                     onTap: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
-                                          builder: (context) => UserDetailScreen(
+                                          builder: (context) =>
+                                              UserDetailScreen(
                                             userId: user['id'],
                                             profileImageUrl:
                                                 'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/${user['id']}.png',
@@ -429,7 +472,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                       child: Row(
                                         children: [
                                           AnimatedContainer(
-                                            duration: Duration(milliseconds: 300),
+                                            duration:
+                                                Duration(milliseconds: 300),
                                             curve: Curves.easeInOut,
                                             width: constraints.maxWidth * 0.15,
                                             height: constraints.maxWidth * 0.15,
@@ -439,8 +483,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                               child: Image.network(
                                                 'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/${user['id']}.png',
                                                 fit: BoxFit.cover,
-                                                errorBuilder:
-                                                    (context, error, stackTrace) {
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
                                                   return Image.network(
                                                     'https://arlexrfzqvahegtolcjp.supabase.co/storage/v1/object/public/profile/Icon.png',
                                                     fit: BoxFit.cover,
@@ -458,28 +502,30 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                                                 Text(
                                                     '${user['name'] ?? 'Unknown'}',
                                                     style: TextStyle(
-                                                        fontSize:
-                                                            constraints.maxWidth *
-                                                                0.040),
+                                                        fontSize: constraints
+                                                                .maxWidth *
+                                                            0.040),
                                                     overflow:
                                                         TextOverflow.ellipsis),
                                                 SizedBox(height: 4.h),
                                                 Text('ID: ${user['id'] ?? ''}',
                                                     style: TextStyle(
-                                                        fontSize:
-                                                            constraints.maxWidth *
-                                                                0.035)),
+                                                        fontSize: constraints
+                                                                .maxWidth *
+                                                            0.035)),
                                               ],
                                             ),
                                           ),
                                           AnimatedContainer(
-                                            duration: Duration(milliseconds: 300),
+                                            duration:
+                                                Duration(milliseconds: 300),
                                             curve: Curves.easeInOut,
                                             width: constraints.maxWidth * 0.15,
                                             height: constraints.maxWidth * 0.15,
                                             child: Icon(Icons.chevron_right,
                                                 color: Colors.blue,
-                                                size: constraints.maxWidth * 0.1),
+                                                size:
+                                                    constraints.maxWidth * 0.1),
                                           ),
                                         ],
                                       ),

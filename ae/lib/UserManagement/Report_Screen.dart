@@ -39,7 +39,8 @@ class _ReportsScreenState extends State<searchuser> {
       final response = await _supabase
           .from('attendance2')
           .select('user_id, user_name, time_out')
-          .or('user_id.ilike.%$query%,user_name.ilike.%$query%');
+          .or('user_id.ilike.%$query%,user_name.ilike.%$query%')
+          .eq('admin_id', _supabase.auth.currentUser!.id);
 
       setState(() {
         _searchResults = List<Map<String, dynamic>>.from(response);

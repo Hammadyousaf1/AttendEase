@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FaceRectScreen extends StatefulWidget {
   @override
@@ -192,9 +193,7 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       }
 
       final request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'http://192.168.100.3:5000/recognize'));
+          'POST', Uri.parse('http://192.168.100.3:5000/recognize'));
       request.files.add(await http.MultipartFile.fromPath(
           'image', imageFile.path,
           contentType: MediaType('image', 'jpeg')));
@@ -203,6 +202,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
       print("Sending timestamp: $currentTime");
 
       request.fields['timestamp'] = currentTime;
+      request.fields['admin_id'] =
+          Supabase.instance.client.auth.currentUser!.id;
 
       final response = await request.send();
 
@@ -413,7 +414,8 @@ class _FaceRectScreenState extends State<FaceRectScreen> {
                 width: 40,
                 height: 40,
                 child: Center(
-                  child: Icon(Icons.switch_camera, color: Colors.white, size: 24),
+                  child:
+                      Icon(Icons.switch_camera, color: Colors.white, size: 24),
                 ),
               ),
             ),
