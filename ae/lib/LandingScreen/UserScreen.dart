@@ -1400,10 +1400,7 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                                                                     ),
                                                                     BoxShadow(
                                                                       color: Color.fromARGB(
-                                                                          255,
-                                                                          33,
-                                                                          32,
-                                                                          32),
+                                                      255, 8, 84, 146),
                                                                       offset: Offset(
                                                                           3.w,
                                                                           4.h),
@@ -1516,10 +1513,7 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                                                                     ),
                                                                     BoxShadow(
                                                                       color: Color.fromARGB(
-                                                                          255,
-                                                                          33,
-                                                                          32,
-                                                                          32),
+                                                      255, 8, 84, 146),
                                                                       offset: Offset(
                                                                           3.w,
                                                                           4.h),
@@ -1633,12 +1627,8 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                                                                             3.h),
                                                                   ),
                                                                   BoxShadow(
-                                                                    color: Color
-                                                                        .fromARGB(
-                                                                            255,
-                                                                            33,
-                                                                            32,
-                                                                            32),
+                                                                    color: Color.fromARGB(
+                                                      255, 8, 84, 146),
                                                                     offset:
                                                                         Offset(
                                                                             3.w,
@@ -1848,7 +1838,7 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                                                 ),
                                                 BoxShadow(
                                                   color: Color.fromARGB(
-                                                      255, 33, 32, 32),
+                                                      255, 8, 84, 146),
                                                   offset: Offset(4.w, 5.h),
                                                 ),
                                               ],
