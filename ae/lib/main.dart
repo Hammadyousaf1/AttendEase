@@ -3,6 +3,7 @@ import 'package:ae/LandingScreen/UserScreen.dart';
 import 'package:ae/auth/LoginScreen.dart';
 import 'package:ae/auth/OnboardScreen.dart';
 import 'package:ae/auth/SignupScreen.dart';
+import 'package:ae/LandingScreen/UserLand.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -65,7 +66,20 @@ class _AuthWrapperState extends State<AuthWrapper> {
             if (response['admin'] == true) {
               return HomeScreen();
             } else {
-              return UserlandingScreen(email: user.email);
+              return FutureBuilder(
+                future: Supabase.instance.client
+                    .from('users')
+                    .select()
+                    .eq('email', user.email!)
+                    .single(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return UserlandingScreen(email: user.email);
+                  } else {
+                    return UserlandScreen(email: user.email);
+                  }
+                },
+              );
             }
           }
           return LoginScreen();

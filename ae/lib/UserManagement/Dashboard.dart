@@ -53,7 +53,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           .eq('admin_id', Supabase.instance.client.auth.currentUser!.id);
 
       // Fetch total enrolled users
-      final usersResponse = await supabase.from('users').select().eq('admin_id', Supabase.instance.client.auth.currentUser!.id);
+      final usersResponse = await supabase
+          .from('users')
+          .select()
+          .eq('admin_id', Supabase.instance.client.auth.currentUser!.id);
 
       setState(() {
         attendanceList = List<Map<String, dynamic>>.from(attendanceResponse);

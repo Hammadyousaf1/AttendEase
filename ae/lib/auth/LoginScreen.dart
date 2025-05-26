@@ -1,4 +1,5 @@
 import 'package:ae/LandingScreen/AdminScreen.dart';
+import 'package:ae/LandingScreen/UserLand.dart';
 import 'package:ae/auth/OnboardScreen.dart';
 import 'package:ae/auth/SignupScreen.dart';
 import 'package:ae/LandingScreen/UserScreen.dart';
@@ -61,16 +62,38 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => UserlandingScreen(
-                email: _emailController.text.trim(),
+          // Check if user exists in users table
+          final userResponse = await Supabase.instance.client
+              .from('users')
+              .select()
+              .eq('email', _emailController.text.trim())
+              .maybeSingle();
+
+          if (userResponse != null) {
+            // User exists, navigate to UserlandingScreen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserlandingScreen(
+                  email: _emailController.text.trim(),
+                ),
+                settings: RouteSettings(
+                    arguments: {'email': _emailController.text.trim()}),
               ),
-              settings: RouteSettings(
-                  arguments: {'email': _emailController.text.trim()}),
-            ),
-          );
+            );
+          } else {
+            // User doesn't exist, navigate to UserlandScreen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserlandScreen(
+                  email: _emailController.text.trim(),
+                ),
+                settings: RouteSettings(
+                    arguments: {'email': _emailController.text.trim()}),
+              ),
+            );
+          }
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -78,8 +101,11 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (error) {
+      String errorMessage = error.toString().contains('Invalid login credentials') 
+          ? 'Invalid Credentials' 
+          : error.toString();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: $error')),
+        SnackBar(content: Text(errorMessage)),
       );
     } finally {
       setState(() {

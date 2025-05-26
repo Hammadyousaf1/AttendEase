@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:ae/LandingScreen/UserLand.dart';
 import 'package:ae/UserManagement/Dashboard.dart';
 import 'package:ae/LandingScreen/AdminScreen.dart';
 import 'package:ae/ModelScreen/Recognition_Screen.dart';
@@ -396,6 +397,39 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Padding(
+          padding: EdgeInsets.only(left: 8.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Image.asset(
+                'assets/logo5.png',
+                height: 28.h,
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: Icon(Icons.logout, color: Colors.black, size: 28.w),
+                    onPressed: () async {
+                      await Supabase.instance.client.auth.signOut();
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => LoginScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           // Refresh all data
@@ -412,28 +446,6 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 12.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Image.asset(
-                    'assets/logo5.png',
-                    height: 28.h,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.logout, color: Colors.black, size: 24.w),
-                    onPressed: () async {
-                      await Supabase.instance.client.auth.signOut();
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => LoginScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-               SizedBox(height: 12.h),
               Row(
                 children: [
                   Stack(
@@ -495,7 +507,7 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          userName,
+                          '${userName ?? "Null"}',
                           style: TextStyle(
                             fontSize: 16.sp,
                           ),
@@ -504,7 +516,7 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                         ),
                         SizedBox(height: 4.h),
                         Text(
-                          'ID: ${userId}',
+                          'ID: ${userId ?? "N/A"}',
                           style:
                               TextStyle(fontSize: 12.sp, color: Colors.black87),
                         ),
@@ -780,7 +792,7 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                                                     .pushReplacement(
                                                   MaterialPageRoute(
                                                     builder: (context) =>
-                                                        UserManagementScreen(),
+                                                        UserlandScreen(),
                                                   ),
                                                 );
                                               } catch (e) {
@@ -1400,7 +1412,10 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                                                                     ),
                                                                     BoxShadow(
                                                                       color: Color.fromARGB(
-                                                      255, 8, 84, 146),
+                                                                          255,
+                                                                          8,
+                                                                          84,
+                                                                          146),
                                                                       offset: Offset(
                                                                           3.w,
                                                                           4.h),
@@ -1513,7 +1528,10 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                                                                     ),
                                                                     BoxShadow(
                                                                       color: Color.fromARGB(
-                                                      255, 8, 84, 146),
+                                                                          255,
+                                                                          8,
+                                                                          84,
+                                                                          146),
                                                                       offset: Offset(
                                                                           3.w,
                                                                           4.h),
@@ -1627,8 +1645,12 @@ class _UserDetailScreenState extends State<UserlandingScreen> {
                                                                             3.h),
                                                                   ),
                                                                   BoxShadow(
-                                                                    color: Color.fromARGB(
-                                                      255, 8, 84, 146),
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            8,
+                                                                            84,
+                                                                            146),
                                                                     offset:
                                                                         Offset(
                                                                             3.w,
